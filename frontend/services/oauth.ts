@@ -25,15 +25,17 @@ export const OAUTH_CONFIG = {
 };
 
 export const getRedirectUri = () => {
-  // In a standalone APK build (executionEnvironment is 'standalone' or 'bare'), use custom deep link scheme
-  // In Expo Go, use the registered Expo Auth Proxy URL
+  // In Expo Go, use the Expo Auth proxy URL
+  // In standalone builds (APK/AAB), use the custom scheme
   const isExpoGo = Constants.executionEnvironment === 'storeClient';
-  const proxyUri = 'https://auth.expo.io/@tanish1901s-team/mindbloom';
-  const standaloneUri = AuthSession.makeRedirectUri({ scheme: 'mindbloom' });
-
-  const selectedUri = isExpoGo ? proxyUri : (standaloneUri || proxyUri);
-  console.log('🔗 [OAuth] Redirect URI used:', selectedUri, '| isExpoGo:', isExpoGo);
-  return selectedUri;
+  if (isExpoGo) {
+    return 'https://auth.expo.io/@tanish1901s-team/mindbloom';
+  }
+  // Standalone APK
+  return AuthSession.makeRedirectUri({
+    scheme: 'mindbloom',
+    preferLocalhost: false,
+  });
 };
 
 const parseUrlParams = (url: string): Record<string, string> => {
@@ -55,10 +57,14 @@ const parseUrlParams = (url: string): Record<string, string> => {
 };
 
 export const startGoogleAuthFlow = async () => {
+  const isExpoGo = Constants.executionEnvironment === 'storeClient';
   const redirectUri = getRedirectUri();
-  // IMPORTANT: For Expo Go (which uses https://auth.expo.io proxy), Google requires the WEB client ID!
-  // The Android client ID is strictly for standalone signed APK/AAB builds.
-  const clientId = OAUTH_CONFIG.google.clientIdWeb || OAUTH_CONFIG.google.clientIdAndroid;
+  
+  // In Expo Go: use Web Client ID with auth.expo.io proxy
+  // In Standalone APK: use Android Client ID with custom scheme
+  const clientId = isExpoGo
+    ? OAUTH_CONFIG.google.clientIdWeb
+    : (OAUTH_CONFIG.google.clientIdAndroid || OAUTH_CONFIG.google.clientIdWeb);
 
   const authUrl = `${GOOGLE_AUTH_ENDPOINT}?client_id=${clientId}&redirect_uri=${encodeURIComponent(
     redirectUri
