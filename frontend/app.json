@@ -1,0 +1,48 @@
+{
+  "expo": {
+    "name": "MindBloom",
+    "slug": "mindbloom",
+    "scheme": "mindbloom",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mindbloom.app"
+    },
+    "android": {
+      "package": "com.mindbloom.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0D111F",
+        "foregroundImage": "./assets/android-icon-foreground.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-web-browser",
+      "expo-secure-store",
+      "expo-font",
+      "expo-video",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/code.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#0D111F"
+        }
+      ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "758e32f7-70cf-4087-bfe6-830317d6f8a8"
+      }
+    }
+  }
+}
