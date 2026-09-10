@@ -22,6 +22,16 @@ const MONGODB_URI =
   process.env.MONGODB_URI ||
   'mongodb+srv://tanish:XRWKFbHVbDAFShu1@cluster0.b9k1bph.mongodb.net/mindbloom?retryWrites=true&w=majority';
 
+// Custom IPv4-only DNS lookup function for Nodemailer to prevent Render cloud ENETUNREACH IPv6 errors
+const ipv4Lookup = (hostname: string, options: any, callback: any) => {
+  if (typeof options === 'function') {
+    callback = options;
+    options = {};
+  }
+  const opts = typeof options === 'object' ? { ...options, family: 4 } : { family: 4 };
+  return dns.lookup(hostname, opts, callback);
+};
+
 // Cached Email Transporter (SMTP / Gmail or fallback)
 let cachedTransporter: Transporter | null = null;
 
@@ -32,15 +42,16 @@ const getTransporter = async () => {
   const smtpPass = process.env.SMTP_PASS ? process.env.SMTP_PASS.trim().replace(/\s+/g, '') : '';
 
   if (smtpUser && smtpPass) {
-    console.log(`🔑 [SMTP] Initializing Gmail SMTP Transporter for ${smtpUser} (port 587 STARTTLS)...`);
+    console.log(`🔑 [SMTP] Initializing Gmail SMTP Transporter for ${smtpUser} (port 587 STARTTLS with IPv4 lookup)...`);
     cachedTransporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 587,
       secure: false,
       requireTLS: true,
-      family: 4,
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
+      lookup: ipv4Lookup,
+      connectionTimeout: 15000,
+      greetingTimeout: 15000,
+      socketTimeout: 15000,
       auth: {
         user: smtpUser,
         pass: smtpPass,
