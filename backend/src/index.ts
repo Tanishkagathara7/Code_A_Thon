@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import path from 'path';
 import dns from 'dns';
-import nodemailer, { Transporter } from 'nodemailer';
+import nodemailer, { Transporter, SendMailOptions } from 'nodemailer';
 import { User } from './models/User';
 
 // Avoid Windows ISP / local router DNS failure on SRV records & force IPv4 for Render cloud SMTP
@@ -32,36 +32,64 @@ const ipv4Lookup = (hostname: string, options: any, callback: any) => {
   return dns.lookup(hostname, opts, callback);
 };
 
-// Cached Email Transporter (SMTP / Gmail or fallback)
-let cachedTransporter: Transporter | null = null;
-
-const getTransporter = async () => {
-  if (cachedTransporter) return cachedTransporter;
-
+// Multi-strategy Email Dispatcher with Fallbacks for Cloud Runners (Render/AWS)
+const sendEmailWithFallback = async (mailOptions: SendMailOptions) => {
   const smtpUser = process.env.SMTP_USER ? process.env.SMTP_USER.trim() : '';
   const smtpPass = process.env.SMTP_PASS ? process.env.SMTP_PASS.trim().replace(/\s+/g, '') : '';
 
-  if (smtpUser && smtpPass) {
-    console.log(`🔑 [SMTP] Initializing Gmail SMTP Transporter for ${smtpUser} (port 587 STARTTLS with IPv4 lookup)...`);
-    cachedTransporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,
-      requireTLS: true,
-      lookup: ipv4Lookup,
-      connectionTimeout: 15000,
-      greetingTimeout: 15000,
-      socketTimeout: 15000,
-      auth: {
-        user: smtpUser,
-        pass: smtpPass,
-      },
-    } as any);
-    return cachedTransporter;
+  if (!smtpUser || !smtpPass) {
+    throw new Error('SMTP_USER or SMTP_PASS environment variable is missing on server.');
   }
 
-  console.warn('⚠️ [SMTP] SMTP_USER or SMTP_PASS environment variable is missing on server.');
-  return null;
+  // Configurations to try in order of cloud network reliability:
+  // 1. Port 465 SSL direct IPv4 (Avoids STARTTLS negotiation timeout on Render)
+  // 2. Port 587 STARTTLS IPv4
+  // 3. Nodemailer builtin Gmail service
+  const configs: Array<{ name: string; port?: number; secure?: boolean; service?: string }> = [
+    { name: 'Gmail SSL (Port 465 IPv4)', port: 465, secure: true },
+    { name: 'Gmail STARTTLS (Port 587 IPv4)', port: 587, secure: false },
+    { name: 'Gmail Builtin Service', service: 'gmail' },
+  ];
+
+  let lastError: any = null;
+
+  for (const config of configs) {
+    try {
+      console.log(`📧 [SMTP] Attempting email dispatch to ${mailOptions.to} via ${config.name}...`);
+      let transporter: Transporter;
+
+      if (config.service) {
+        transporter = nodemailer.createTransport({
+          service: 'gmail',
+          lookup: ipv4Lookup,
+          connectionTimeout: 12000,
+          greetingTimeout: 12000,
+          auth: { user: smtpUser, pass: smtpPass },
+        } as any);
+      } else {
+        transporter = nodemailer.createTransport({
+          host: 'smtp.gmail.com',
+          port: config.port,
+          secure: config.secure,
+          requireTLS: !config.secure,
+          lookup: ipv4Lookup,
+          connectionTimeout: 12000,
+          greetingTimeout: 12000,
+          socketTimeout: 12000,
+          auth: { user: smtpUser, pass: smtpPass },
+        } as any);
+      }
+
+      const info = await transporter.sendMail(mailOptions);
+      console.log(`✅ [SMTP] Email successfully delivered via ${config.name}! MessageId: ${info.messageId}`);
+      return info;
+    } catch (err: any) {
+      console.warn(`⚠️ [SMTP] Delivery failed via ${config.name}: ${err.message || err}`);
+      lastError = err;
+    }
+  }
+
+  throw lastError || new Error('All SMTP email delivery attempts failed.');
 };
 
 // Middlewares
@@ -396,49 +424,47 @@ app.post('/api/auth/forgot-password', async (req: Request, res: Response) => {
 
     const hasRealSmtp = Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
 
-    // Respond immediately to the client so UI is instant (< 100ms)
-    res.json({
-      success: true,
-      message: `A 6-digit verification code has been sent to ${normalizedEmail}.${!hasRealSmtp ? ` (Dev OTP: ${otp})` : ''}`,
-      otp: !hasRealSmtp ? otp : undefined,
-    });
+    const mailOptions = {
+      from: process.env.SMTP_FROM || `"MindBloom" <${process.env.SMTP_USER || 'security@mindbloom.app'}>`,
+      to: normalizedEmail,
+      subject: 'MindBloom Password Reset Verification Code',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 28px; border-radius: 16px; background-color: #f8fafc; border: 1px solid #e2e8f0;">
+          <h2 style="color: #1e293b; margin-top: 0;">Password Reset Verification</h2>
+          <p style="color: #475569; font-size: 15px; line-height: 22px;">
+            You recently requested to reset the password for your <strong>MindBloom</strong> account.
+          </p>
+          <div style="margin: 24px 0; padding: 18px; background-color: #ffffff; border-radius: 12px; text-align: center; border: 1.5px dashed #6366f1;">
+            <span style="font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #4f46e5;">${otp}</span>
+          </div>
+          <p style="color: #64748b; font-size: 13px; margin-bottom: 4px;">
+            This code will expire in <strong>15 minutes</strong>. If you did not request this, please disregard this email.
+          </p>
+        </div>
+      `,
+    };
 
-    // Dispatch verification email asynchronously in background
-    (async () => {
+    if (hasRealSmtp) {
       try {
-        const transporter = await getTransporter();
-        if (!transporter) {
-          console.warn(`⚠️ [SMTP] Cannot send email to ${normalizedEmail}: SMTP_USER or SMTP_PASS is missing in server environment variables.`);
-          return;
-        }
-
-        console.log(`📧 [SMTP] Dispatching verification email to ${normalizedEmail}...`);
-        const mailOptions = {
-          from: process.env.SMTP_FROM || `"MindBloom" <${process.env.SMTP_USER || 'security@mindbloom.app'}>`,
-          to: normalizedEmail,
-          subject: 'MindBloom Password Reset Verification Code',
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 28px; border-radius: 16px; background-color: #f8fafc; border: 1px solid #e2e8f0;">
-              <h2 style="color: #1e293b; margin-top: 0;">Password Reset Verification</h2>
-              <p style="color: #475569; font-size: 15px; line-height: 22px;">
-                You recently requested to reset the password for your <strong>MindBloom</strong> account.
-              </p>
-              <div style="margin: 24px 0; padding: 18px; background-color: #ffffff; border-radius: 12px; text-align: center; border: 1.5px dashed #6366f1;">
-                <span style="font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #4f46e5;">${otp}</span>
-              </div>
-              <p style="color: #64748b; font-size: 13px; margin-bottom: 4px;">
-                This code will expire in <strong>15 minutes</strong>. If you did not request this, please disregard this email.
-              </p>
-            </div>
-          `,
-        };
-
-        const info = await transporter.sendMail(mailOptions);
-        console.log(`✅ [SMTP] Email successfully dispatched to ${normalizedEmail}. MessageId: ${info.messageId}`);
-      } catch (emailErr: any) {
-        console.error('❌ [SMTP] Email delivery error:', emailErr.message || emailErr);
+        await sendEmailWithFallback(mailOptions);
+        return res.json({
+          success: true,
+          message: `A 6-digit verification code has been sent to ${normalizedEmail}.`,
+        });
+      } catch (sendErr: any) {
+        console.error(`❌ [SMTP] Failed to deliver OTP email to ${normalizedEmail}:`, sendErr.message || sendErr);
+        return res.status(500).json({
+          error: `Failed to send verification email: ${sendErr.message || 'SMTP Connection Error'}. Please try again later.`,
+        });
       }
-    })();
+    } else {
+      console.warn(`⚠️ [SMTP] Dev Mode: SMTP_USER or SMTP_PASS is missing in server environment variables.`);
+      return res.json({
+        success: true,
+        message: `A 6-digit verification code has been generated for ${normalizedEmail}. (Dev OTP: ${otp})`,
+        otp,
+      });
+    }
   } catch (error: any) {
     console.error('Forgot password error:', error);
     res.status(500).json({ error: error.message || 'Failed to initiate password reset' });
