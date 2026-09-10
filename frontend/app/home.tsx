@@ -18,8 +18,15 @@ import { Colors } from '../theme/colors';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, isLoading, isAuthenticating, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<TabKey>('home');
+
+  React.useEffect(() => {
+    if (!isLoading && !isAuthenticating && !user) {
+      console.log('[AUTH] No authenticated user on home screen, redirecting to auth...');
+      router.replace('/(auth)');
+    }
+  }, [user, isLoading, isAuthenticating, router]);
 
   const handleSignOut = async () => {
     try {
@@ -30,8 +37,6 @@ export default function HomeScreen() {
     }
   };
 
-  // Render content based on selected tab:
-  // "click on any screen from navbar should open blank page coming soon in dashbord it should show profile image and data of user nothing else for now"
   const renderTabContent = () => {
     if (activeTab === 'home') {
       return (
@@ -58,8 +63,8 @@ export default function HomeScreen() {
             </View>
 
             {/* User Name & Details */}
-            <Text style={styles.userName}>{user?.name || 'Authenticated User'}</Text>
-            <Text style={styles.userEmail}>{user?.email || 'user@codeathon.dev'}</Text>
+            <Text style={styles.userName}>{user?.name || 'User'}</Text>
+            {user?.email ? <Text style={styles.userEmail}>{user.email}</Text> : null}
 
             {/* Account Metadata Pills */}
             <View style={styles.metaRow}>

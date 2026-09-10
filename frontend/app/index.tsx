@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { EntrySplashLoader } from '../components/common/EntrySplashLoader';
 
 export default function Index() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, isAuthenticating } = useAuth();
   const router = useRouter();
   const [hasFinishedAnimation, setHasFinishedAnimation] = useState(false);
 
@@ -12,24 +12,28 @@ export default function Index() {
     if (hasFinishedAnimation) return;
     setHasFinishedAnimation(true);
 
-    if (!isLoading) {
+    if (!isLoading && !isAuthenticating) {
       if (user) {
+        console.log('[AUTH] Splash screen finished: user authenticated -> home');
         router.replace('/home');
       } else {
+        console.log('[AUTH] Splash screen finished: unauthenticated -> auth screen');
         router.replace('/(auth)');
       }
     }
   };
 
   React.useEffect(() => {
-    if (hasFinishedAnimation && !isLoading) {
+    if (hasFinishedAnimation && !isLoading && !isAuthenticating) {
       if (user) {
+        console.log('[AUTH] Session restored: navigating to home');
         router.replace('/home');
       } else {
+        console.log('[AUTH] No session: navigating to auth screen');
         router.replace('/(auth)');
       }
     }
-  }, [hasFinishedAnimation, isLoading, user, router]);
+  }, [hasFinishedAnimation, isLoading, isAuthenticating, user, router]);
 
   return <EntrySplashLoader onFinished={handleProceed} />;
 }

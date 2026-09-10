@@ -4,3 +4,6 @@ dist/
 web-build/
 .env
 *.log
+android/
+ios/
+

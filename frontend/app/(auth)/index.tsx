@@ -34,8 +34,15 @@ import { ForgotPasswordModal } from '../../components/auth/ForgotPasswordModal';
 
 export default function AuthScreen() {
   const router = useRouter();
-  const { loginWithEmail, signupWithEmail, loginWithGoogle, loginWithGitHub } =
+  const { user, loginWithEmail, signupWithEmail, loginWithGoogle, loginWithGitHub } =
     useAuth();
+
+  React.useEffect(() => {
+    if (user) {
+      console.log('[AUTH] AuthScreen mounted with active user session, replacing with /home');
+      router.replace('/home');
+    }
+  }, [user, router]);
 
   // Mode: 'login' | 'signup'
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
@@ -126,10 +133,12 @@ export default function AuthScreen() {
       await loginWithGoogle();
       router.replace('/home');
     } catch (err: any) {
-      setStatusMessage({
-        type: 'error',
-        text: 'Google Sign In could not be completed.',
-      });
+      if (err?.message !== 'CANCELLED') {
+        setStatusMessage({
+          type: 'error',
+          text: err?.message || 'Google Sign In could not be completed.',
+        });
+      }
     } finally {
       setSocialLoading(null);
     }
@@ -142,10 +151,12 @@ export default function AuthScreen() {
       await loginWithGitHub();
       router.replace('/home');
     } catch (err: any) {
-      setStatusMessage({
-        type: 'error',
-        text: 'GitHub Sign In could not be completed.',
-      });
+      if (err?.message !== 'CANCELLED') {
+        setStatusMessage({
+          type: 'error',
+          text: err?.message || 'GitHub Sign In could not be completed.',
+        });
+      }
     } finally {
       setSocialLoading(null);
     }

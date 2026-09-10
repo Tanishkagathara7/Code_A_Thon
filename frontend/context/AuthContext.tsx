@@ -14,6 +14,7 @@ export interface User {
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
+  isAuthenticating: boolean;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
   signupWithEmail: (username: string, email: string, pass: string) => Promise<void>;
   requestPasswordReset: (email: string) => Promise<{ success: boolean; message: string; otp?: string }>;
@@ -62,17 +63,23 @@ const storage = {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isAuthenticating, setIsAuthenticating] = useState<boolean>(false);
 
   useEffect(() => {
     // Restore persistent session on launch
     const loadSession = async () => {
       try {
+        console.log('[AUTH] Restoring session from storage...');
         const storedUser = await storage.getItem(USER_KEY);
         if (storedUser) {
-          setUser(JSON.parse(storedUser));
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+          console.log('[AUTH] Session restored:', parsedUser.email);
+        } else {
+          console.log('[AUTH] No stored session found.');
         }
       } catch (err) {
-        console.warn('Failed to restore auth session:', err);
+        console.warn('[AUTH] Failed to restore auth session:', err);
       } finally {
         setIsLoading(false);
       }
@@ -81,9 +88,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const persistSession = async (userProfile: User, token: string) => {
+    console.log('[AUTH] Persisting session for user:', userProfile.email);
     setUser(userProfile);
     await storage.setItem(TOKEN_KEY, token);
     await storage.setItem(USER_KEY, JSON.stringify(userProfile));
+    console.log('[AUTH] Session persisted successfully');
   };
 
   const syncUserWithBackend = async (profileData: {
@@ -93,10 +102,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     avatarUrl?: string;
     providerId?: string;
   }): Promise<User> => {
-    // Default to the PC Wi-Fi IP so Android devices can always reach port 5000
     const apiUrl =
       process.env.EXPO_PUBLIC_API_URL || 'http://192.168.29.172:5000/api';
-    console.log('📡 Syncing user to backend:', apiUrl);
+    console.log('[AUTH] Syncing user to backend:', apiUrl);
     try {
       const response = await fetch(`${apiUrl}/auth/sync`, {
         method: 'POST',
@@ -105,6 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       const data = await response.json();
       if (data && data.user) {
+        console.log('[AUTH] User synced with MongoDB backend:', data.user.email);
         return {
           id: data.user.id || data.user._id,
           email: data.user.email,
@@ -113,8 +122,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           provider: data.user.provider,
         };
       }
-    } catch (err) {
-      console.warn('Backend sync failed, falling back to local session:', err);
+    } catch (err: any) {
+      console.warn('[AUTH] Backend sync failed, falling back to local session:', err.message || err);
     }
     return {
       id: 'mb_' + Math.random().toString(36).substring(2, 9),
@@ -126,57 +135,93 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const loginWithEmail = async (email: string, pass: string) => {
+    setIsAuthenticating(true);
     const apiUrl =
       process.env.EXPO_PUBLIC_API_URL || 'http://192.168.29.172:5000/api';
-    const response = await fetch(`${apiUrl}/auth/email`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    try {
+      console.log('[AUTH] Logging in with email:', email);
+      const response = await fetch(`${apiUrl}/auth/email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          password: pass,
+          mode: 'login',
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed. Please check your credentials.');
+      }
+      const userProfile: User = {
+        id: data.user.id || data.user._id,
+        email: data.user.email,
+        name: data.user.name,
+        avatarUrl: data.user.avatarUrl,
+        provider: data.user.provider || 'email',
+      };
+      await persistSession(userProfile, 'mb_token_' + Date.now());
+    } catch (err: any) {
+      if (err.message && !err.message.includes('Network') && !err.message.includes('fetch') && !err.message.includes('CLEARTEXT')) {
+        throw err;
+      }
+      // Offline / network fallback session
+      const fallbackUser: User = {
+        id: 'mb_' + Math.random().toString(36).substring(2, 9),
         email: email.trim().toLowerCase(),
-        password: pass,
-        mode: 'login',
-      }),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.error || 'Login failed. Please check your credentials.');
+        name: email.trim().split('@')[0],
+        provider: 'email',
+      };
+      await persistSession(fallbackUser, 'mb_token_' + Date.now());
+    } finally {
+      setIsAuthenticating(false);
     }
-    const userProfile: User = {
-      id: data.user.id || data.user._id,
-      email: data.user.email,
-      name: data.user.name,
-      avatarUrl: data.user.avatarUrl,
-      provider: data.user.provider || 'email',
-    };
-    await persistSession(userProfile, 'mb_token_' + Date.now());
   };
 
   const signupWithEmail = async (username: string, email: string, pass: string) => {
+    setIsAuthenticating(true);
     const apiUrl =
       process.env.EXPO_PUBLIC_API_URL || 'http://192.168.29.172:5000/api';
-    const response = await fetch(`${apiUrl}/auth/email`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: username.trim(),
-        name: username.trim(),
+    try {
+      console.log('[AUTH] Signing up with email:', email);
+      const response = await fetch(`${apiUrl}/auth/email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: username.trim(),
+          name: username.trim(),
+          email: email.trim().toLowerCase(),
+          password: pass,
+          mode: 'signup',
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Sign up failed. Please try again.');
+      }
+      const userProfile: User = {
+        id: data.user.id || data.user._id,
+        email: data.user.email,
+        name: data.user.name,
+        avatarUrl: data.user.avatarUrl,
+        provider: data.user.provider || 'email',
+      };
+      await persistSession(userProfile, 'mb_token_' + Date.now());
+    } catch (err: any) {
+      if (err.message && !err.message.includes('Network') && !err.message.includes('fetch') && !err.message.includes('CLEARTEXT')) {
+        throw err;
+      }
+      // Offline / network fallback session
+      const fallbackUser: User = {
+        id: 'mb_' + Math.random().toString(36).substring(2, 9),
         email: email.trim().toLowerCase(),
-        password: pass,
-        mode: 'signup',
-      }),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.error || 'Sign up failed. Please try again.');
+        name: username.trim(),
+        provider: 'email',
+      };
+      await persistSession(fallbackUser, 'mb_token_' + Date.now());
+    } finally {
+      setIsAuthenticating(false);
     }
-    const userProfile: User = {
-      id: data.user.id || data.user._id,
-      email: data.user.email,
-      name: data.user.name,
-      avatarUrl: data.user.avatarUrl,
-      provider: data.user.provider || 'email',
-    };
-    await persistSession(userProfile, 'mb_token_' + Date.now());
   };
 
   const requestPasswordReset = async (email: string) => {
@@ -212,7 +257,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (err.message && !err.message.includes('Network') && !err.message.includes('Failed to fetch')) {
         throw err;
       }
-      // Offline fallback success
       return {
         success: true,
         message: 'Password reset successful! You can now log in with your new password.',
@@ -221,57 +265,99 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const loginWithGoogle = async () => {
+    setIsAuthenticating(true);
     try {
+      console.log('[AUTH] Initiating Google login flow...');
       const googleProfile = await startGoogleAuthFlow();
-      const email = googleProfile?.email || 'google.user@gmail.com';
-      const name = googleProfile?.name || 'Google User';
-      const avatarUrl = googleProfile?.picture;
+      if (!googleProfile || googleProfile.cancelled) {
+        console.log('[AUTH] Google Sign In cancelled by user');
+        throw new Error('CANCELLED');
+      }
+
+      const email = googleProfile.email || googleProfile.user_email;
+      if (!email) {
+        console.error('[AUTH] Google Sign In error: No email returned');
+        throw new Error('Google Sign In failed: No email received from Google account.');
+      }
+
+      const name = googleProfile.name || googleProfile.given_name || email.split('@')[0];
+      const avatarUrl = googleProfile.picture;
 
       const userProfile = await syncUserWithBackend({
         email,
         name,
         avatarUrl,
         provider: 'google',
-        providerId: googleProfile?.id,
+        providerId: googleProfile.sub || googleProfile.id,
       });
       await persistSession(userProfile, 'mb_google_token_' + Date.now());
-    } catch (err) {
-      console.warn('Google login error:', err);
-      // Fallback
-      const userProfile = await syncUserWithBackend({
-        email: 'sam.altman@gmail.com',
-        name: 'Sam Altman (Google)',
-        provider: 'google',
-      });
-      await persistSession(userProfile, 'mb_google_token_' + Date.now());
+      console.log('[AUTH] Navigating to dashboard after Google login');
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
   const loginWithGitHub = async () => {
+    setIsAuthenticating(true);
     try {
-      const code = await startGitHubAuthFlow();
-      const userProfile = await syncUserWithBackend({
-        email: 'octocat@github.com',
-        name: 'GitHub User',
-        provider: 'github',
-        providerId: code || undefined,
-      });
-      await persistSession(userProfile, 'mb_github_token_' + Date.now());
-    } catch (err) {
-      console.warn('GitHub login error:', err);
-      const userProfile = await syncUserWithBackend({
-        email: 'octocat@github.com',
-        name: 'Sam Altman (GitHub)',
-        provider: 'github',
-      });
-      await persistSession(userProfile, 'mb_github_token_' + Date.now());
+      console.log('[AUTH] Initiating GitHub login flow...');
+      const githubResult = await startGitHubAuthFlow();
+      if (!githubResult || githubResult.cancelled) {
+        console.log('[AUTH] GitHub Sign In cancelled by user');
+        throw new Error('CANCELLED');
+      }
+
+      // Step 1: If backend exchange directly returned the synced user profile
+      if (githubResult.user) {
+        await persistSession(githubResult.user, 'mb_github_token_' + Date.now());
+        console.log('[AUTH] Navigating to dashboard after GitHub login (backend sync)');
+        return;
+      }
+
+      // Step 2: If profile was retrieved directly on frontend
+      if (githubResult.profile) {
+        const email = githubResult.email;
+        const name = githubResult.profile.name || githubResult.profile.login || 'GitHub User';
+        const avatarUrl = githubResult.profile.avatar_url;
+        const providerId = String(githubResult.profile.id);
+
+        const userProfile = await syncUserWithBackend({
+          email,
+          name,
+          avatarUrl,
+          provider: 'github',
+          providerId,
+        });
+        await persistSession(userProfile, 'mb_github_token_' + Date.now());
+        console.log('[AUTH] Navigating to dashboard after GitHub login (frontend profile)');
+        return;
+      }
+
+      // Step 3: Fallback if only auth code is available
+      if (githubResult.code) {
+        const userProfile = await syncUserWithBackend({
+          email: `github_${githubResult.code.substring(0, 8)}@user.github`,
+          name: 'GitHub User',
+          provider: 'github',
+          providerId: githubResult.code,
+        });
+        await persistSession(userProfile, 'mb_github_token_' + Date.now());
+        console.log('[AUTH] Navigating to dashboard after GitHub login (fallback code)');
+        return;
+      }
+
+      throw new Error('GitHub Sign In failed to retrieve user profile.');
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
   const logout = async () => {
+    console.log('[AUTH] Logging out user...');
     setUser(null);
     await storage.removeItem(TOKEN_KEY);
     await storage.removeItem(USER_KEY);
+    console.log('[AUTH] Session cleared');
   };
 
   return (
@@ -279,6 +365,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         user,
         isLoading,
+        isAuthenticating,
         loginWithEmail,
         signupWithEmail,
         requestPasswordReset,

@@ -1,8 +1,13 @@
 {
   "expo": {
     "name": "MindBloom",
-    "slug": "mindbloom",
-    "scheme": "mindbloom",
+    "owner": "tvkms-team",
+    "slug": "tanis",
+    "scheme": [
+      "mindbloom",
+      "com.mindbloom.app",
+      "com.googleusercontent.apps.878949461550-s6de153nvgoq1gb94191i1pgqfqbv1jd"
+    ],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,6 +18,7 @@
     },
     "android": {
       "package": "com.mindbloom.app",
+      "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "backgroundColor": "#0D111F",
         "foregroundImage": "./assets/android-icon-foreground.png"
@@ -29,6 +35,7 @@
       "expo-secure-store",
       "expo-font",
       "expo-video",
+      "@react-native-google-signin/google-signin",
       [
         "expo-splash-screen",
         {
@@ -41,7 +48,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "758e32f7-70cf-4087-bfe6-830317d6f8a8"
+        "projectId": "bc0e2321-ddf3-4df9-b813-e6e8c3549eeb"
       }
     }
   }

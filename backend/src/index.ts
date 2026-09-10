@@ -70,8 +70,10 @@ app.get('/api/health', (req: Request, res: Response) => {
 app.post('/api/auth/sync', async (req: Request, res: Response) => {
   try {
     const { email, name, provider, providerId, avatarUrl } = req.body;
+    console.log(`[AUTH] User sync requested for email: ${email || 'none'} (${provider || 'unknown'})`);
 
     if (!email) {
+      console.warn('[AUTH] Auth sync failed: Email is required');
       return res.status(400).json({ error: 'Email is required' });
     }
 
@@ -86,14 +88,14 @@ app.post('/api/auth/sync', async (req: Request, res: Response) => {
         avatarUrl: avatarUrl || null,
       });
       await user.save();
-      console.log(`👤 New user created in MongoDB: ${user.email} (${user.provider})`);
+      console.log(`[AUTH] New user created in MongoDB: ${user.email} (${user.provider})`);
     } else {
       if (name) user.name = name;
       if (avatarUrl) user.avatarUrl = avatarUrl;
       if (provider) user.provider = provider;
       if (providerId) user.providerId = providerId;
       await user.save();
-      console.log(`🔄 Existing user synced in MongoDB: ${user.email}`);
+      console.log(`[AUTH] Existing user synced in MongoDB: ${user.email}`);
     }
 
     res.json({
@@ -108,10 +110,151 @@ app.post('/api/auth/sync', async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    console.error('Auth sync error:', error);
+    console.error('[AUTH] Auth sync error:', error.message || error);
     res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
+
+// GitHub OAuth Code Exchange & Sync Endpoint
+app.post('/api/auth/github', async (req: Request, res: Response) => {
+  try {
+    const { code, redirectUri } = req.body;
+    console.log(`[AUTH] Exchanging authorization code with GitHub. Redirect URI: ${redirectUri || 'none'}`);
+
+    if (!code) {
+      console.warn('[AUTH] GitHub exchange failed: Code missing');
+      return res.status(400).json({ error: 'Authorization code is required' });
+    }
+
+    const clientId = process.env.GITHUB_CLIENT_ID || process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID || 'Ov23lijRkAOA5aBGuvDL';
+    const clientSecret = process.env.GITHUB_CLIENT_SECRET || process.env.EXPO_PUBLIC_GITHUB_CLIENT_SECRET || '';
+
+    if (!clientSecret) {
+      console.warn('⚠️ [AUTH] GITHUB_CLIENT_SECRET is missing from backend environment variables.');
+    }
+
+    // Step 1: Exchange auth code for access token with GitHub
+    const tokenParams: Record<string, string> = {
+      client_id: clientId,
+      code,
+    };
+    if (clientSecret) {
+      tokenParams.client_secret = clientSecret;
+    }
+    if (redirectUri) {
+      tokenParams.redirect_uri = redirectUri;
+    }
+
+    const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'User-Agent': 'MindBloom-App',
+      },
+      body: JSON.stringify(tokenParams),
+    });
+
+    const tokenData = await tokenResponse.json();
+
+    if (!tokenResponse.ok || tokenData.error || !tokenData.access_token) {
+      console.warn('[AUTH] GitHub token exchange response error:', tokenData.error_description || tokenData.error);
+      return res.status(400).json({
+        error: tokenData.error_description || tokenData.error || 'Failed to exchange GitHub authorization code.',
+      });
+    }
+
+    const accessToken = tokenData.access_token;
+    console.log('[AUTH] GitHub token exchange successful. Fetching GitHub user profile...');
+
+    // Step 2: Fetch GitHub User Profile
+    const profileResponse = await fetch('https://api.github.com/user', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: 'application/vnd.github.v3+json',
+        'User-Agent': 'MindBloom-App',
+      },
+    });
+
+    if (!profileResponse.ok) {
+      console.warn('[AUTH] Failed to fetch GitHub profile');
+      return res.status(400).json({ error: 'Failed to fetch GitHub user profile' });
+    }
+
+    const ghUser = await profileResponse.json();
+
+    // Step 3: Fetch User Emails if email is private
+    let userEmail = ghUser.email;
+    if (!userEmail) {
+      try {
+        const emailsResponse = await fetch('https://api.github.com/user/emails', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            Accept: 'application/vnd.github.v3+json',
+            'User-Agent': 'MindBloom-App',
+          },
+        });
+        if (emailsResponse.ok) {
+          const emails = await emailsResponse.json();
+          if (Array.isArray(emails)) {
+            const primaryEmail = emails.find((e: any) => e.primary && e.verified) || emails.find((e: any) => e.verified) || emails[0];
+            if (primaryEmail && primaryEmail.email) {
+              userEmail = primaryEmail.email;
+            }
+          }
+        }
+      } catch (emailErr) {
+        console.warn('[AUTH] Could not fetch GitHub private emails:', emailErr);
+      }
+    }
+
+    if (!userEmail) {
+      userEmail = `${ghUser.login || 'github_user'}@users.noreply.github.com`;
+    }
+
+    const userName = ghUser.name || ghUser.login || 'GitHub User';
+    const avatarUrl = ghUser.avatar_url || null;
+    const providerId = String(ghUser.id);
+
+    // Step 4: Upsert User in MongoDB Atlas
+    let user = await User.findOne({ email: userEmail.toLowerCase() });
+
+    if (!user) {
+      user = new User({
+        email: userEmail.toLowerCase(),
+        name: userName,
+        provider: 'github',
+        providerId,
+        avatarUrl,
+      });
+      await user.save();
+      console.log(`[AUTH] New GitHub user created in MongoDB: ${user.email}`);
+    } else {
+      user.name = userName;
+      user.provider = 'github';
+      user.providerId = providerId;
+      if (avatarUrl) user.avatarUrl = avatarUrl;
+      await user.save();
+      console.log(`[AUTH] Existing GitHub user synced in MongoDB: ${user.email}`);
+    }
+
+    res.json({
+      success: true,
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        provider: user.provider,
+        avatarUrl: user.avatarUrl,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (error: any) {
+    console.error('[AUTH] GitHub auth error:', error.message || error);
+    res.status(500).json({ error: error.message || 'Internal server error during GitHub authentication' });
+  }
+});
+
 
 // Strong password validator: min 8 characters, at least 1 uppercase, 1 lowercase, 1 number, and 1 special character
 const validatePassword = (pass: string): string | null => {
