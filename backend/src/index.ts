@@ -19,28 +19,43 @@ const MONGODB_URI =
   process.env.MONGODB_URI ||
   'mongodb+srv://tanish:XRWKFbHVbDAFShu1@cluster0.b9k1bph.mongodb.net/mindbloom?retryWrites=true&w=majority';
 
-// Email Transporter (SMTP / Gmail or test account)
-const createTransporter = async () => {
+// Cached Email Transporter (SMTP / Gmail or test account)
+let cachedTransporter: nodemailer.Transporter | null = null;
+
+const getTransporter = async () => {
+  if (cachedTransporter) return cachedTransporter;
+
   if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-    return nodemailer.createTransport({
+    cachedTransporter = nodemailer.createTransport({
       service: process.env.SMTP_SERVICE || 'gmail',
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
     });
+    return cachedTransporter;
   }
-  // Generate automated Ethereal test inbox if custom SMTP is not provided in .env
-  const testAccount = await nodemailer.createTestAccount();
-  return nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
-    secure: false,
-    auth: {
-      user: testAccount.user,
-      pass: testAccount.pass,
-    },
-  });
+
+  try {
+    const testAccount = await nodemailer.createTestAccount();
+    cachedTransporter = nodemailer.createTransport({
+      host: 'smtp.ethereal.email',
+      port: 587,
+      secure: false,
+      auth: {
+        user: testAccount.user,
+        pass: testAccount.pass,
+      },
+    });
+  } catch (err: any) {
+    console.warn('⚠️ Could not create Ethereal test account:', err.message);
+    cachedTransporter = nodemailer.createTransport({
+      host: 'smtp.ethereal.email',
+      port: 587,
+      secure: false,
+    });
+  }
+  return cachedTransporter;
 };
 
 // Middlewares
@@ -366,48 +381,52 @@ app.post('/api/auth/forgot-password', async (req: Request, res: Response) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
 
+    // Save OTP to database immediately
     user.resetPasswordOtp = otp;
     user.resetPasswordExpires = expiresAt;
     await user.save();
 
-    // Send verification code directly to user's email inbox
-    try {
-      const transporter = await createTransporter();
-      const mailOptions = {
-        from: process.env.SMTP_FROM || '"MindBloom" <security@mindbloom.app>',
-        to: normalizedEmail,
-        subject: 'MindBloom Password Reset Verification Code',
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 28px; border-radius: 16px; background-color: #f8fafc; border: 1px solid #e2e8f0;">
-            <h2 style="color: #1e293b; margin-top: 0;">Password Reset Verification</h2>
-            <p style="color: #475569; font-size: 15px; line-height: 22px;">
-              You recently requested to reset the password for your <strong>MindBloom</strong> account.
-            </p>
-            <div style="margin: 24px 0; padding: 18px; background-color: #ffffff; border-radius: 12px; text-align: center; border: 1.5px dashed #6366f1;">
-              <span style="font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #4f46e5;">${otp}</span>
-            </div>
-            <p style="color: #64748b; font-size: 13px; margin-bottom: 4px;">
-              This code will expire in <strong>15 minutes</strong>. If you did not request this, please disregard this email.
-            </p>
-          </div>
-        `,
-      };
+    console.log(`🔑 Verification code generated for ${normalizedEmail}: ${otp}`);
 
-      const info = await transporter.sendMail(mailOptions);
-      console.log(`📧 Reset email successfully dispatched to ${normalizedEmail}. MessageId: ${info.messageId}`);
-      if (nodemailer.getTestMessageUrl(info)) {
-        console.log(`🔗 Preview email in browser: ${nodemailer.getTestMessageUrl(info)}`);
-      }
-    } catch (emailErr: any) {
-      console.warn('⚠️ Email delivery error:', emailErr.message);
-    }
-
-    console.log(`🔑 Verification code for ${normalizedEmail}: ${otp}`);
-
+    // Respond immediately to the client so UI is instant (< 100ms)
     res.json({
       success: true,
       message: `A 6-digit verification code has been sent to ${normalizedEmail}.`,
     });
+
+    // Dispatch verification email asynchronously in background
+    (async () => {
+      try {
+        const transporter = await getTransporter();
+        const mailOptions = {
+          from: process.env.SMTP_FROM || '"MindBloom" <security@mindbloom.app>',
+          to: normalizedEmail,
+          subject: 'MindBloom Password Reset Verification Code',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 28px; border-radius: 16px; background-color: #f8fafc; border: 1px solid #e2e8f0;">
+              <h2 style="color: #1e293b; margin-top: 0;">Password Reset Verification</h2>
+              <p style="color: #475569; font-size: 15px; line-height: 22px;">
+                You recently requested to reset the password for your <strong>MindBloom</strong> account.
+              </p>
+              <div style="margin: 24px 0; padding: 18px; background-color: #ffffff; border-radius: 12px; text-align: center; border: 1.5px dashed #6366f1;">
+                <span style="font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #4f46e5;">${otp}</span>
+              </div>
+              <p style="color: #64748b; font-size: 13px; margin-bottom: 4px;">
+                This code will expire in <strong>15 minutes</strong>. If you did not request this, please disregard this email.
+              </p>
+            </div>
+          `,
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`📧 Reset email successfully dispatched to ${normalizedEmail}. MessageId: ${info.messageId}`);
+        if (nodemailer.getTestMessageUrl(info)) {
+          console.log(`🔗 Preview email in browser: ${nodemailer.getTestMessageUrl(info)}`);
+        }
+      } catch (emailErr: any) {
+        console.warn('⚠️ Email delivery error:', emailErr.message);
+      }
+    })();
   } catch (error: any) {
     console.error('Forgot password error:', error);
     res.status(500).json({ error: error.message || 'Failed to initiate password reset' });
