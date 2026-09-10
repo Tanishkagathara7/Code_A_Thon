@@ -22,46 +22,32 @@ const MONGODB_URI =
   process.env.MONGODB_URI ||
   'mongodb+srv://tanish:XRWKFbHVbDAFShu1@cluster0.b9k1bph.mongodb.net/mindbloom?retryWrites=true&w=majority';
 
-// Cached Email Transporter (SMTP / Gmail or test account)
+// Cached Email Transporter (SMTP / Gmail or fallback)
 let cachedTransporter: Transporter | null = null;
 
 const getTransporter = async () => {
   if (cachedTransporter) return cachedTransporter;
 
-  if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+  const smtpUser = process.env.SMTP_USER ? process.env.SMTP_USER.trim() : '';
+  const smtpPass = process.env.SMTP_PASS ? process.env.SMTP_PASS.trim().replace(/\s+/g, '') : '';
+
+  if (smtpUser && smtpPass) {
+    console.log(`🔑 [SMTP] Initializing Gmail SMTP Transporter for ${smtpUser}...`);
     cachedTransporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 465,
       secure: true,
       family: 4,
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: smtpUser,
+        pass: smtpPass,
       },
     } as any);
     return cachedTransporter;
   }
 
-  try {
-    const testAccount = await nodemailer.createTestAccount();
-    cachedTransporter = nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      secure: false,
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
-      },
-    });
-  } catch (err: any) {
-    console.warn('⚠️ Could not create Ethereal test account:', err.message);
-    cachedTransporter = nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      secure: false,
-    });
-  }
-  return cachedTransporter;
+  console.warn('⚠️ [SMTP] SMTP_USER or SMTP_PASS environment variable is missing on server.');
+  return null;
 };
 
 // Middlewares
@@ -407,8 +393,14 @@ app.post('/api/auth/forgot-password', async (req: Request, res: Response) => {
     (async () => {
       try {
         const transporter = await getTransporter();
+        if (!transporter) {
+          console.warn(`⚠️ [SMTP] Cannot send email to ${normalizedEmail}: SMTP_USER or SMTP_PASS is missing in server environment variables.`);
+          return;
+        }
+
+        console.log(`📧 [SMTP] Dispatching verification email to ${normalizedEmail}...`);
         const mailOptions = {
-          from: process.env.SMTP_FROM || '"MindBloom" <security@mindbloom.app>',
+          from: process.env.SMTP_FROM || `"MindBloom" <${process.env.SMTP_USER || 'security@mindbloom.app'}>`,
           to: normalizedEmail,
           subject: 'MindBloom Password Reset Verification Code',
           html: `
@@ -428,12 +420,9 @@ app.post('/api/auth/forgot-password', async (req: Request, res: Response) => {
         };
 
         const info = await transporter.sendMail(mailOptions);
-        console.log(`📧 Reset email successfully dispatched to ${normalizedEmail}. MessageId: ${info.messageId}`);
-        if (nodemailer.getTestMessageUrl(info)) {
-          console.log(`🔗 Preview email in browser: ${nodemailer.getTestMessageUrl(info)}`);
-        }
+        console.log(`✅ [SMTP] Email successfully dispatched to ${normalizedEmail}. MessageId: ${info.messageId}`);
       } catch (emailErr: any) {
-        console.warn('⚠️ Email delivery error:', emailErr.message);
+        console.error('❌ [SMTP] Email delivery error:', emailErr.message || emailErr);
       }
     })();
   } catch (error: any) {
