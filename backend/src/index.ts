@@ -428,28 +428,23 @@ app.post('/api/auth/forgot-password', async (req: Request, res: Response) => {
       `,
     };
 
+    // Return HTTP 200 immediately to mobile app (< 100ms) so mobile OkHttp client never times out
+    res.json({
+      success: true,
+      message: `A 6-digit verification code has been sent to ${normalizedEmail}.`,
+    });
+
+    // Dispatch verification email in background with 3x retries
     if (hasRealSmtp) {
-      try {
-        await sendEmailWithRetries(mailOptions, 3);
-        return res.json({
-          success: true,
-          message: `A 6-digit verification code has been sent to ${normalizedEmail}.`,
-        });
-      } catch (sendErr: any) {
-        console.warn(`⚠️ [SMTP] All 3 cloud SMTP retries timed out for ${normalizedEmail}. Returning fail-safe response so user is not blocked.`);
-        return res.json({
-          success: true,
-          message: `A 6-digit verification code has been generated for ${normalizedEmail}. (Verification Code: ${otp})`,
-          otp,
-        });
-      }
+      (async () => {
+        try {
+          await sendEmailWithRetries(mailOptions, 3);
+        } catch (sendErr: any) {
+          console.error(`❌ [SMTP] Background delivery error for ${normalizedEmail}:`, sendErr.message || sendErr);
+        }
+      })();
     } else {
-      console.warn(`⚠️ [SMTP] Dev Mode: SMTP_USER or SMTP_PASS is missing in server environment variables.`);
-      return res.json({
-        success: true,
-        message: `A 6-digit verification code has been generated for ${normalizedEmail}. (Dev OTP: ${otp})`,
-        otp,
-      });
+      console.warn(`⚠️ [SMTP] Dev Mode: SMTP_USER or SMTP_PASS missing. Dev OTP: ${otp}`);
     }
   } catch (error: any) {
     console.error('Forgot password error:', error);
