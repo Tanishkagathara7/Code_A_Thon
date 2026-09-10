@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import path from 'path';
 import dns from 'dns';
-import nodemailer from 'nodemailer';
+import nodemailer, { Transporter } from 'nodemailer';
 import { User } from './models/User';
 
 // Avoid Windows ISP / local router DNS failure on SRV records for MongoDB Atlas
@@ -20,7 +20,7 @@ const MONGODB_URI =
   'mongodb+srv://tanish:XRWKFbHVbDAFShu1@cluster0.b9k1bph.mongodb.net/mindbloom?retryWrites=true&w=majority';
 
 // Cached Email Transporter (SMTP / Gmail or test account)
-let cachedTransporter: nodemailer.Transporter | null = null;
+let cachedTransporter: Transporter | null = null;
 
 const getTransporter = async () => {
   if (cachedTransporter) return cachedTransporter;
