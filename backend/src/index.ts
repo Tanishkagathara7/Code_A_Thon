@@ -388,10 +388,13 @@ app.post('/api/auth/forgot-password', async (req: Request, res: Response) => {
 
     console.log(`🔑 Verification code generated for ${normalizedEmail}: ${otp}`);
 
+    const hasRealSmtp = Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
+
     // Respond immediately to the client so UI is instant (< 100ms)
     res.json({
       success: true,
-      message: `A 6-digit verification code has been sent to ${normalizedEmail}.`,
+      message: `A 6-digit verification code has been sent to ${normalizedEmail}.${!hasRealSmtp ? ` (Dev OTP: ${otp})` : ''}`,
+      otp: !hasRealSmtp ? otp : undefined,
     });
 
     // Dispatch verification email asynchronously in background

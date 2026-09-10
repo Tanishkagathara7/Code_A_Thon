@@ -63,6 +63,9 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
     try {
       const res = await requestPasswordReset(email.trim());
       setSuccessInfo(res.message || `Verification code has been sent to ${email.trim()}`);
+      if (res.otp) {
+        setOtp(res.otp);
+      }
       setStep('reset');
     } catch (err: any) {
       setErrorMsg(err?.message || 'Failed to request reset code. Please try again.');

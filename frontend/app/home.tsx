@@ -21,19 +21,17 @@ export default function HomeScreen() {
   const { user, isLoading, isAuthenticating, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<TabKey>('home');
 
-  React.useEffect(() => {
-    if (!isLoading && !isAuthenticating && !user) {
-      console.log('[AUTH] No authenticated user on home screen, redirecting to auth...');
+  // Guest browsing supported when user clicks Skip on login screen
+  const handleAuthAction = async () => {
+    if (user) {
+      try {
+        await logout();
+        router.replace('/(auth)');
+      } catch {
+        router.replace('/');
+      }
+    } else {
       router.replace('/(auth)');
-    }
-  }, [user, isLoading, isAuthenticating, router]);
-
-  const handleSignOut = async () => {
-    try {
-      await logout();
-      router.replace('/(auth)');
-    } catch {
-      router.replace('/');
     }
   };
 
@@ -44,7 +42,7 @@ export default function HomeScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* User Profile Summary Card */}
+          {/* User Profile / Guest Summary Card */}
           <View style={styles.profileCard}>
             {/* Avatar image or initials */}
             <View style={styles.avatarWrapper}>
@@ -56,24 +54,26 @@ export default function HomeScreen() {
                   style={styles.avatarPlaceholder}
                 >
                   <Text style={styles.avatarText}>
-                    {(user?.name?.[0] || user?.email?.[0] || 'U').toUpperCase()}
+                    {(user?.name?.[0] || user?.email?.[0] || 'G').toUpperCase()}
                   </Text>
                 </LinearGradient>
               )}
             </View>
 
             {/* User Name & Details */}
-            <Text style={styles.userName}>{user?.name || 'User'}</Text>
-            {user?.email ? <Text style={styles.userEmail}>{user.email}</Text> : null}
+            <Text style={styles.userName}>{user?.name || 'Guest User'}</Text>
+            <Text style={styles.userEmail}>
+              {user?.email || 'Browsing in guest mode'}
+            </Text>
 
             {/* Account Metadata Pills */}
             <View style={styles.metaRow}>
-              {user?.provider && (
-                <View style={styles.pill}>
-                  <Text style={styles.pillLabel}>Provider: </Text>
-                  <Text style={styles.pillValue}>{user.provider.toUpperCase()}</Text>
-                </View>
-              )}
+              <View style={styles.pill}>
+                <Text style={styles.pillLabel}>Provider: </Text>
+                <Text style={styles.pillValue}>
+                  {user?.provider ? user.provider.toUpperCase() : 'GUEST'}
+                </Text>
+              </View>
               {user?.id && (
                 <View style={styles.pill}>
                   <Text style={styles.pillLabel}>ID: </Text>
@@ -81,6 +81,22 @@ export default function HomeScreen() {
                 </View>
               )}
             </View>
+
+            {/* Guest Action Button */}
+            {!user && (
+              <TouchableOpacity
+                style={styles.guestLoginButton}
+                onPress={() => router.replace('/(auth)')}
+                activeOpacity={0.8}
+              >
+                <LinearGradient
+                  colors={['#6366F1', '#4F46E5']}
+                  style={styles.guestLoginGradient}
+                >
+                  <Text style={styles.guestLoginText}>Log In / Sign Up to Sync</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            )}
           </View>
         </ScrollView>
       );
@@ -126,15 +142,17 @@ export default function HomeScreen() {
           <View style={styles.headerRow}>
             <View>
               <Text style={styles.brandTitle}>MindBloom</Text>
-              <Text style={styles.headerSubtitle}>User Space</Text>
+              <Text style={styles.headerSubtitle}>
+                {user ? 'User Space' : 'Guest Mode'}
+              </Text>
             </View>
 
             <TouchableOpacity
-              onPress={handleSignOut}
+              onPress={handleAuthAction}
               style={styles.logoutButton}
               activeOpacity={0.8}
             >
-              <Text style={styles.logoutText}>Sign Out</Text>
+              <Text style={styles.logoutText}>{user ? 'Sign Out' : 'Sign In'}</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -300,6 +318,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#4B5568',
     fontWeight: '700',
+  },
+  guestLoginButton: {
+    marginTop: 24,
+    width: '100%',
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  guestLoginGradient: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 16,
+  },
+  guestLoginText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+    fontFamily: 'PlusJakartaSans_600SemiBold',
   },
   comingSoonContainer: {
     flex: 1,

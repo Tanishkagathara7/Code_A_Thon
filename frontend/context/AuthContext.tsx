@@ -103,7 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     providerId?: string;
   }): Promise<User> => {
     const apiUrl =
-      process.env.EXPO_PUBLIC_API_URL || 'http://192.168.29.172:5000/api';
+      process.env.EXPO_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
     console.log('[AUTH] Syncing user to backend:', apiUrl);
     try {
       const response = await fetch(`${apiUrl}/auth/sync`, {
@@ -137,7 +137,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginWithEmail = async (email: string, pass: string) => {
     setIsAuthenticating(true);
     const apiUrl =
-      process.env.EXPO_PUBLIC_API_URL || 'http://192.168.29.172:5000/api';
+      process.env.EXPO_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
     try {
       console.log('[AUTH] Logging in with email:', email);
       const response = await fetch(`${apiUrl}/auth/email`, {
@@ -181,7 +181,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signupWithEmail = async (username: string, email: string, pass: string) => {
     setIsAuthenticating(true);
     const apiUrl =
-      process.env.EXPO_PUBLIC_API_URL || 'http://192.168.29.172:5000/api';
+      process.env.EXPO_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
     try {
       console.log('[AUTH] Signing up with email:', email);
       const response = await fetch(`${apiUrl}/auth/email`, {
@@ -226,7 +226,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const requestPasswordReset = async (email: string) => {
     const apiUrl =
-      process.env.EXPO_PUBLIC_API_URL || 'http://192.168.29.172:5000/api';
+      process.env.EXPO_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
     const response = await fetch(`${apiUrl}/auth/forgot-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -241,7 +241,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resetPassword = async (email: string, otp: string, newPass: string) => {
     const apiUrl =
-      process.env.EXPO_PUBLIC_API_URL || 'http://192.168.29.172:5000/api';
+      process.env.EXPO_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
     try {
       const response = await fetch(`${apiUrl}/auth/reset-password`, {
         method: 'POST',

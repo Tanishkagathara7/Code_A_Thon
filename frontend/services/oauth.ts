@@ -188,7 +188,7 @@ export const startGitHubAuthFlow = async (): Promise<any> => {
       console.log('[AUTH] Exchanging authorization code via backend API...');
 
       // Step 1: Attempt exchange via backend API
-      const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.29.172:5000/api';
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
       try {
         const backendRes = await fetch(`${apiUrl}/auth/github`, {
           method: 'POST',
