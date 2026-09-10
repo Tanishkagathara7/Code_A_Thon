@@ -7,7 +7,17 @@ import dns from 'dns';
 import nodemailer, { Transporter, SendMailOptions } from 'nodemailer';
 import { User } from './models/User';
 
-// Avoid Windows ISP / local router DNS failure on SRV records & force IPv4 for Render cloud SMTP
+// Force global IPv4 resolution for dns.lookup to prevent Render cloud IPv6 ENETUNREACH errors
+const originalDnsLookup = dns.lookup;
+(dns as any).lookup = function (hostname: any, options: any, callback: any) {
+  if (typeof options === 'function') {
+    callback = options;
+    options = {};
+  }
+  const opts = typeof options === 'object' ? { ...options, family: 4 } : { family: 4 };
+  return (originalDnsLookup as any).call(dns, hostname, opts, callback);
+};
+
 try {
   dns.setDefaultResultOrder('ipv4first');
 } catch {}
@@ -22,17 +32,7 @@ const MONGODB_URI =
   process.env.MONGODB_URI ||
   'mongodb+srv://tanish:XRWKFbHVbDAFShu1@cluster0.b9k1bph.mongodb.net/mindbloom?retryWrites=true&w=majority';
 
-// Custom IPv4-only DNS lookup function for Nodemailer to prevent Render cloud ENETUNREACH IPv6 errors
-const ipv4Lookup = (hostname: string, options: any, callback: any) => {
-  if (typeof options === 'function') {
-    callback = options;
-    options = {};
-  }
-  const opts = typeof options === 'object' ? { ...options, family: 4 } : { family: 4 };
-  return dns.lookup(hostname, opts, callback);
-};
-
-// Verified working Gmail SMTP Transporter for Render cloud (Port 587 STARTTLS + IPv4 lookup)
+// Verified working Gmail SMTP Transporter for Render cloud (Port 587 STARTTLS + Global IPv4)
 const sendEmailWithFallback = async (mailOptions: SendMailOptions) => {
   const smtpUser = process.env.SMTP_USER ? process.env.SMTP_USER.trim() : '';
   const smtpPass = process.env.SMTP_PASS ? process.env.SMTP_PASS.trim().replace(/\s+/g, '') : '';
@@ -41,15 +41,13 @@ const sendEmailWithFallback = async (mailOptions: SendMailOptions) => {
     throw new Error('SMTP_USER or SMTP_PASS environment variable is missing on server.');
   }
 
-  console.log(`📧 [SMTP] Dispatching email to ${mailOptions.to} via smtp.gmail.com:587 (IPv4 lookup)...`);
+  console.log(`📧 [SMTP] Dispatching email to ${mailOptions.to} via smtp.gmail.com:587 (Global IPv4)...`);
 
   const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
     secure: false,
     requireTLS: true,
-    family: 4,
-    lookup: ipv4Lookup,
     connectionTimeout: 15000,
     greetingTimeout: 15000,
     socketTimeout: 15000,
