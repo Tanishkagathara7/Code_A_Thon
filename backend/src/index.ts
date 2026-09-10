@@ -41,21 +41,17 @@ const sendEmailWithFallback = async (mailOptions: SendMailOptions) => {
     throw new Error('SMTP_USER or SMTP_PASS environment variable is missing on server.');
   }
 
-  // Configurations to try in order:
-  // 1. Port 587 STARTTLS IPv4 (Verified working on Render cloud)
-  // 2. Port 465 SSL direct IPv4
-  // 3. Nodemailer builtin Gmail service
+  // Verified working configuration on Render cloud: Port 587 STARTTLS with IPv4 lookup
   const configs: Array<{ name: string; port?: number; secure?: boolean; service?: string }> = [
     { name: 'Gmail STARTTLS (Port 587 IPv4)', port: 587, secure: false },
-    { name: 'Gmail SSL (Port 465 IPv4)', port: 465, secure: true },
-    { name: 'Gmail Builtin Service', service: 'gmail' },
+    { name: 'Gmail Service Fallback', service: 'gmail' },
   ];
 
   let lastError: any = null;
 
   for (const config of configs) {
     try {
-      console.log(`📧 [SMTP] Attempting email dispatch to ${mailOptions.to} via ${config.name}...`);
+      console.log(`📧 [SMTP] Dispatching email to ${mailOptions.to} via ${config.name}...`);
       let transporter: Transporter;
 
       if (config.service) {
@@ -63,21 +59,21 @@ const sendEmailWithFallback = async (mailOptions: SendMailOptions) => {
           service: 'gmail',
           family: 4,
           lookup: ipv4Lookup,
-          connectionTimeout: 12000,
-          greetingTimeout: 12000,
+          connectionTimeout: 8000,
+          greetingTimeout: 8000,
           auth: { user: smtpUser, pass: smtpPass },
         } as any);
       } else {
         transporter = nodemailer.createTransport({
           host: 'smtp.gmail.com',
-          port: config.port,
-          secure: config.secure,
-          requireTLS: !config.secure,
+          port: 587,
+          secure: false,
+          requireTLS: true,
           family: 4,
           lookup: ipv4Lookup,
-          connectionTimeout: 12000,
-          greetingTimeout: 12000,
-          socketTimeout: 12000,
+          connectionTimeout: 8000,
+          greetingTimeout: 8000,
+          socketTimeout: 8000,
           auth: { user: smtpUser, pass: smtpPass },
         } as any);
       }
