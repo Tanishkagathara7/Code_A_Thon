@@ -7,7 +7,10 @@ import dns from 'dns';
 import nodemailer, { Transporter } from 'nodemailer';
 import { User } from './models/User';
 
-// Avoid Windows ISP / local router DNS failure on SRV records for MongoDB Atlas
+// Avoid Windows ISP / local router DNS failure on SRV records & force IPv4 for Render cloud SMTP
+try {
+  dns.setDefaultResultOrder('ipv4first');
+} catch {}
 dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1']);
 
 // Load environment variables from backend/.env
@@ -27,12 +30,15 @@ const getTransporter = async () => {
 
   if (process.env.SMTP_USER && process.env.SMTP_PASS) {
     cachedTransporter = nodemailer.createTransport({
-      service: process.env.SMTP_SERVICE || 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      family: 4,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
-    });
+    } as any);
     return cachedTransporter;
   }
 
