@@ -32,19 +32,7 @@ const ipv4Lookup = (hostname: string, options: any, callback: any) => {
   return dns.lookup(hostname, opts, callback);
 };
 
-// Helper to resolve IPv4 A-records for a hostname to completely avoid IPv6 ENETUNREACH
-const resolveIPv4Hosts = async (hostname: string): Promise<string[]> => {
-  return new Promise((resolve) => {
-    dns.resolve4(hostname, (err, addresses) => {
-      if (!err && addresses && addresses.length > 0) {
-        return resolve(addresses);
-      }
-      resolve([hostname]);
-    });
-  });
-};
-
-// Multi-strategy Email Dispatcher with Pure IPv4 Targets for Cloud Runners (Render/AWS)
+// Verified working Gmail SMTP Transporter for Render cloud (Port 587 STARTTLS + IPv4 lookup)
 const sendEmailWithFallback = async (mailOptions: SendMailOptions) => {
   const smtpUser = process.env.SMTP_USER ? process.env.SMTP_USER.trim() : '';
   const smtpPass = process.env.SMTP_PASS ? process.env.SMTP_PASS.trim().replace(/\s+/g, '') : '';
@@ -53,44 +41,27 @@ const sendEmailWithFallback = async (mailOptions: SendMailOptions) => {
     throw new Error('SMTP_USER or SMTP_PASS environment variable is missing on server.');
   }
 
-  // Get IPv4 addresses for smtp.gmail.com to guarantee 0% IPv6 attempt
-  const ipv4Targets = await resolveIPv4Hosts('smtp.gmail.com');
-  console.log(`🌐 [SMTP] Resolved IPv4 targets for smtp.gmail.com:`, ipv4Targets);
+  console.log(`📧 [SMTP] Dispatching email to ${mailOptions.to} via smtp.gmail.com:587 (IPv4 lookup)...`);
 
-  let lastError: any = null;
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    requireTLS: true,
+    family: 4,
+    lookup: ipv4Lookup,
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 15000,
+    auth: {
+      user: smtpUser,
+      pass: smtpPass,
+    },
+  } as any);
 
-  for (const ipOrHost of ipv4Targets) {
-    try {
-      console.log(`📧 [SMTP] Dispatching email to ${mailOptions.to} via IPv4 target ${ipOrHost}:587...`);
-      const transporter = nodemailer.createTransport({
-        host: ipOrHost,
-        port: 587,
-        secure: false,
-        requireTLS: true,
-        family: 4,
-        lookup: ipv4Lookup,
-        connectionTimeout: 20000,
-        greetingTimeout: 20000,
-        socketTimeout: 20000,
-        tls: {
-          servername: 'smtp.gmail.com',
-        },
-        auth: {
-          user: smtpUser,
-          pass: smtpPass,
-        },
-      } as any);
-
-      const info = await transporter.sendMail(mailOptions);
-      console.log(`✅ [SMTP] Email successfully delivered via ${ipOrHost}! MessageId: ${info.messageId}`);
-      return info;
-    } catch (err: any) {
-      console.warn(`⚠️ [SMTP] Delivery failed via ${ipOrHost}: ${err.message || err}`);
-      lastError = err;
-    }
-  }
-
-  throw lastError || new Error('All SMTP email delivery attempts failed.');
+  const info = await transporter.sendMail(mailOptions);
+  console.log(`✅ [SMTP] Email successfully delivered to ${mailOptions.to}! MessageId: ${info.messageId}`);
+  return info;
 };
 
 // Middlewares
