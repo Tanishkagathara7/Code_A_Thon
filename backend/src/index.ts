@@ -41,13 +41,13 @@ const sendEmailWithFallback = async (mailOptions: SendMailOptions) => {
     throw new Error('SMTP_USER or SMTP_PASS environment variable is missing on server.');
   }
 
-  // Configurations to try in order of cloud network reliability:
-  // 1. Port 465 SSL direct IPv4 (Avoids STARTTLS negotiation timeout on Render)
-  // 2. Port 587 STARTTLS IPv4
+  // Configurations to try in order:
+  // 1. Port 587 STARTTLS IPv4 (Verified working on Render cloud)
+  // 2. Port 465 SSL direct IPv4
   // 3. Nodemailer builtin Gmail service
   const configs: Array<{ name: string; port?: number; secure?: boolean; service?: string }> = [
-    { name: 'Gmail SSL (Port 465 IPv4)', port: 465, secure: true },
     { name: 'Gmail STARTTLS (Port 587 IPv4)', port: 587, secure: false },
+    { name: 'Gmail SSL (Port 465 IPv4)', port: 465, secure: true },
     { name: 'Gmail Builtin Service', service: 'gmail' },
   ];
 
@@ -61,6 +61,7 @@ const sendEmailWithFallback = async (mailOptions: SendMailOptions) => {
       if (config.service) {
         transporter = nodemailer.createTransport({
           service: 'gmail',
+          family: 4,
           lookup: ipv4Lookup,
           connectionTimeout: 12000,
           greetingTimeout: 12000,
@@ -72,6 +73,7 @@ const sendEmailWithFallback = async (mailOptions: SendMailOptions) => {
           port: config.port,
           secure: config.secure,
           requireTLS: !config.secure,
+          family: 4,
           lookup: ipv4Lookup,
           connectionTimeout: 12000,
           greetingTimeout: 12000,
