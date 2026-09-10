@@ -32,7 +32,19 @@ const ipv4Lookup = (hostname: string, options: any, callback: any) => {
   return dns.lookup(hostname, opts, callback);
 };
 
-// Multi-strategy Email Dispatcher with Fallbacks for Cloud Runners (Render/AWS)
+// Helper to resolve IPv4 A-records for a hostname to completely avoid IPv6 ENETUNREACH
+const resolveIPv4Hosts = async (hostname: string): Promise<string[]> => {
+  return new Promise((resolve) => {
+    dns.resolve4(hostname, (err, addresses) => {
+      if (!err && addresses && addresses.length > 0) {
+        return resolve(addresses);
+      }
+      resolve([hostname]);
+    });
+  });
+};
+
+// Multi-strategy Email Dispatcher with Pure IPv4 Targets for Cloud Runners (Render/AWS)
 const sendEmailWithFallback = async (mailOptions: SendMailOptions) => {
   const smtpUser = process.env.SMTP_USER ? process.env.SMTP_USER.trim() : '';
   const smtpPass = process.env.SMTP_PASS ? process.env.SMTP_PASS.trim().replace(/\s+/g, '') : '';
@@ -41,48 +53,39 @@ const sendEmailWithFallback = async (mailOptions: SendMailOptions) => {
     throw new Error('SMTP_USER or SMTP_PASS environment variable is missing on server.');
   }
 
-  // Verified working configuration on Render cloud: Port 587 STARTTLS with IPv4 lookup
-  const configs: Array<{ name: string; port?: number; secure?: boolean; service?: string }> = [
-    { name: 'Gmail STARTTLS (Port 587 IPv4)', port: 587, secure: false },
-    { name: 'Gmail Service Fallback', service: 'gmail' },
-  ];
+  // Get IPv4 addresses for smtp.gmail.com to guarantee 0% IPv6 attempt
+  const ipv4Targets = await resolveIPv4Hosts('smtp.gmail.com');
+  console.log(`🌐 [SMTP] Resolved IPv4 targets for smtp.gmail.com:`, ipv4Targets);
 
   let lastError: any = null;
 
-  for (const config of configs) {
+  for (const ipOrHost of ipv4Targets) {
     try {
-      console.log(`📧 [SMTP] Dispatching email to ${mailOptions.to} via ${config.name}...`);
-      let transporter: Transporter;
-
-      if (config.service) {
-        transporter = nodemailer.createTransport({
-          service: 'gmail',
-          family: 4,
-          lookup: ipv4Lookup,
-          connectionTimeout: 8000,
-          greetingTimeout: 8000,
-          auth: { user: smtpUser, pass: smtpPass },
-        } as any);
-      } else {
-        transporter = nodemailer.createTransport({
-          host: 'smtp.gmail.com',
-          port: 587,
-          secure: false,
-          requireTLS: true,
-          family: 4,
-          lookup: ipv4Lookup,
-          connectionTimeout: 8000,
-          greetingTimeout: 8000,
-          socketTimeout: 8000,
-          auth: { user: smtpUser, pass: smtpPass },
-        } as any);
-      }
+      console.log(`📧 [SMTP] Dispatching email to ${mailOptions.to} via IPv4 target ${ipOrHost}:587...`);
+      const transporter = nodemailer.createTransport({
+        host: ipOrHost,
+        port: 587,
+        secure: false,
+        requireTLS: true,
+        family: 4,
+        lookup: ipv4Lookup,
+        connectionTimeout: 20000,
+        greetingTimeout: 20000,
+        socketTimeout: 20000,
+        tls: {
+          servername: 'smtp.gmail.com',
+        },
+        auth: {
+          user: smtpUser,
+          pass: smtpPass,
+        },
+      } as any);
 
       const info = await transporter.sendMail(mailOptions);
-      console.log(`✅ [SMTP] Email successfully delivered via ${config.name}! MessageId: ${info.messageId}`);
+      console.log(`✅ [SMTP] Email successfully delivered via ${ipOrHost}! MessageId: ${info.messageId}`);
       return info;
     } catch (err: any) {
-      console.warn(`⚠️ [SMTP] Delivery failed via ${config.name}: ${err.message || err}`);
+      console.warn(`⚠️ [SMTP] Delivery failed via ${ipOrHost}: ${err.message || err}`);
       lastError = err;
     }
   }
