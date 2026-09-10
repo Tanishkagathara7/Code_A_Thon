@@ -32,12 +32,15 @@ const getTransporter = async () => {
   const smtpPass = process.env.SMTP_PASS ? process.env.SMTP_PASS.trim().replace(/\s+/g, '') : '';
 
   if (smtpUser && smtpPass) {
-    console.log(`🔑 [SMTP] Initializing Gmail SMTP Transporter for ${smtpUser}...`);
+    console.log(`🔑 [SMTP] Initializing Gmail SMTP Transporter for ${smtpUser} (port 587 STARTTLS)...`);
     cachedTransporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
+      port: 587,
+      secure: false,
+      requireTLS: true,
       family: 4,
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
       auth: {
         user: smtpUser,
         pass: smtpPass,
