@@ -16,6 +16,7 @@ import { useAuth } from '../context/AuthContext';
 import { InteractiveNavbar, TabKey } from '../components/navigation/InteractiveNavbar';
 import { Colors } from '../theme/colors';
 import { AISummarizerCard } from '../components/ai';
+import { FileUploadDemoCard } from '../components/file/FileUploadDemoCard';
 
 
 export default function HomeScreen() {
@@ -129,6 +130,9 @@ export default function HomeScreen() {
 
           {/* AI Foundation Reference Feature Card */}
           <AISummarizerCard />
+
+          {/* File & Image Upload Foundation Reference Feature Card */}
+          <FileUploadDemoCard />
         </ScrollView>
 
       );
