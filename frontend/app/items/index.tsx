@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -15,22 +15,33 @@ import {
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { hackathonItemApi } from '../../services/api/hackathonItemApi';
-import { HackathonItem } from '../../types/domain';
+import { HackathonItem, SortOption } from '../../types/domain';
 import { DomainCard } from '../../components/domain/DomainCard';
 import { EmptyState } from '../../components/domain/EmptyState';
 import { ErrorState } from '../../components/domain/ErrorState';
 import { LoadingState } from '../../components/domain/LoadingState';
 import { ConfirmDeleteModal } from '../../components/domain/ConfirmDeleteModal';
+import { FilterBar } from '../../components/domain/FilterBar';
 
 export default function ItemListScreen() {
   const router = useRouter();
 
+  // Query & Filter State
+  const [searchInput, setSearchInput] = useState<string>('');
+  const [debouncedSearch, setDebouncedSearch] = useState<string>('');
+  const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined);
+  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
+  const [selectedSort, setSelectedSort] = useState<SortOption | undefined>('createdAt_desc');
+
+  // List & Pagination State
   const [items, setItems] = useState<HackathonItem[]>([]);
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [search, setSearch] = useState<string>('');
 
+  // Status & Loading Flags
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,12 +50,34 @@ export default function ItemListScreen() {
   const [deleteTarget, setDeleteTarget] = useState<HackathonItem | null>(null);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
+  // Ref to track latest request ID for race-condition prevention
+  const requestIdRef = useRef<number>(0);
+
+  // 1. Debounce Search Input (350ms)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchInput);
+    }, 350);
+    return () => clearTimeout(handler);
+  }, [searchInput]);
+
+  const hasActiveFilters =
+    !!debouncedSearch.trim() ||
+    !!selectedStatus ||
+    !!selectedCategory ||
+    selectedSort !== 'createdAt_desc';
+
+  // 2. Fetch Items with Query Parameters & Stale Request Protection
   const fetchItems = useCallback(
     async (pageToFetch: number, refresh: boolean = false) => {
+      const currentRequestId = ++requestIdRef.current;
+
       if (refresh) {
         setIsRefreshing(true);
       } else if (pageToFetch > 1) {
         setIsLoadingMore(true);
+      } else if (items.length > 0) {
+        setIsSearching(true);
       } else {
         setIsLoading(true);
       }
@@ -54,32 +87,58 @@ export default function ItemListScreen() {
         const response = await hackathonItemApi.getItems({
           page: pageToFetch,
           limit: 10,
-          search: search.trim() || undefined,
+          search: debouncedSearch.trim() || undefined,
+          status: selectedStatus,
+          category: selectedCategory,
+          sort: selectedSort,
         });
 
+        // Ignore response if a newer search/filter request was fired (race condition protection)
+        if (currentRequestId !== requestIdRef.current) {
+          return;
+        }
+
+        const newItems = response.data || [];
+
         if (refresh || pageToFetch === 1) {
-          setItems(response.data || []);
+          setItems(newItems);
         } else {
           setItems((prev) => {
             const existingIds = new Set(prev.map((i) => i.id));
-            const newItems = (response.data || []).filter((i) => !existingIds.has(i.id));
-            return [...prev, ...newItems];
+            const uniqueIncoming = newItems.filter((i) => !existingIds.has(i.id));
+            return [...prev, ...uniqueIncoming];
           });
         }
 
         setPage(response.pagination?.page || pageToFetch);
         setTotalPages(response.pagination?.totalPages || 1);
+
+        // Dynamically collect unique categories for filter options
+        if (newItems.length > 0) {
+          const cats = Array.from(
+            new Set(newItems.map((i) => i.category).filter((c): c is string => !!c && c.trim() !== ''))
+          );
+          if (cats.length > 0) {
+            setAvailableCategories((prev) => Array.from(new Set([...prev, ...cats])));
+          }
+        }
       } catch (err: any) {
-        setError(err.message || 'Failed to retrieve items from server.');
+        if (currentRequestId === requestIdRef.current) {
+          setError(err.message || 'Failed to retrieve items from server.');
+        }
       } finally {
-        setIsLoading(false);
-        setIsLoadingMore(false);
-        setIsRefreshing(false);
+        if (currentRequestId === requestIdRef.current) {
+          setIsLoading(false);
+          setIsSearching(false);
+          setIsLoadingMore(false);
+          setIsRefreshing(false);
+        }
       }
     },
-    [search]
+    [debouncedSearch, selectedStatus, selectedCategory, selectedSort]
   );
 
+  // Trigger fetch when query parameters change (resets to page 1)
   useEffect(() => {
     fetchItems(1);
   }, [fetchItems]);
@@ -89,10 +148,18 @@ export default function ItemListScreen() {
   };
 
   const handleLoadMore = () => {
-    if (isLoadingMore || isLoading || isRefreshing || page >= totalPages) {
+    if (isLoadingMore || isLoading || isRefreshing || isSearching || page >= totalPages) {
       return;
     }
     fetchItems(page + 1);
+  };
+
+  const handleClearFilters = () => {
+    setSearchInput('');
+    setDebouncedSearch('');
+    setSelectedStatus(undefined);
+    setSelectedCategory(undefined);
+    setSelectedSort('createdAt_desc');
   };
 
   const handleDeleteConfirm = async () => {
@@ -135,14 +202,30 @@ export default function ItemListScreen() {
         <View style={styles.searchBox}>
           <TextInput
             style={styles.searchInput}
-            placeholder="Search items..."
+            placeholder="Search title, description, or category..."
             placeholderTextColor="rgba(255, 255, 255, 0.6)"
-            value={search}
-            onChangeText={setSearch}
-            onSubmitEditing={() => fetchItems(1)}
+            value={searchInput}
+            onChangeText={setSearchInput}
             returnKeyType="search"
+            clearButtonMode="while-editing"
           />
+          {isSearching && (
+            <ActivityIndicator size="small" color="#FFFFFF" style={styles.searchSpinner} />
+          )}
         </View>
+
+        {/* Reusable Filter Bar */}
+        <FilterBar
+          selectedStatus={selectedStatus}
+          onStatusChange={setSelectedStatus}
+          selectedCategory={selectedCategory}
+          categories={availableCategories}
+          onCategoryChange={setSelectedCategory}
+          selectedSort={selectedSort}
+          onSortChange={setSelectedSort}
+          onClearFilters={handleClearFilters}
+          hasActiveFilters={hasActiveFilters}
+        />
       </LinearGradient>
 
       {/* List / Content */}
@@ -176,12 +259,21 @@ export default function ItemListScreen() {
             onEndReached={handleLoadMore}
             onEndReachedThreshold={0.3}
             ListEmptyComponent={
-              <EmptyState
-                title="No domain items found"
-                description="Get started by creating your first item to see it listed here."
-                actionLabel="+ Create New Item"
-                onAction={() => router.push('/items/create')}
-              />
+              hasActiveFilters ? (
+                <EmptyState
+                  title="No items match your search"
+                  description="No items match the selected search keywords or filters. Try adjusting or clearing your filters."
+                  actionLabel="Clear All Filters"
+                  onAction={handleClearFilters}
+                />
+              ) : (
+                <EmptyState
+                  title="No domain items found"
+                  description="Get started by creating your first item to see it listed here."
+                  actionLabel="+ Create New Item"
+                  onAction={() => router.push('/items/create')}
+                />
+              )
             }
             ListFooterComponent={
               isLoadingMore ? (
@@ -213,9 +305,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#1E274A',
   },
   header: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: Platform.OS === 'android' ? 12 : 8,
-    paddingBottom: 16,
+    paddingBottom: 8,
   },
   headerTop: {
     flexDirection: 'row',
@@ -258,11 +350,18 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: Platform.OS === 'ios' ? 10 : 4,
+    marginBottom: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   searchInput: {
+    flex: 1,
     color: '#FFFFFF',
     fontSize: 14,
     fontFamily: 'PlusJakartaSans_400Regular',
+  },
+  searchSpinner: {
+    marginLeft: 8,
   },
   body: {
     flex: 1,

@@ -10,6 +10,8 @@ import { generalLimiter, requireAuth, authLimiter, otpLimiter, AuthenticatedRequ
 import { errorHandler } from './middleware/errorHandler';
 import authRoutes from './routes/auth.routes';
 import hackathonItemRoutes from './routes/hackathonItem.routes';
+import aiRoutes from './routes/ai.routes';
+import fileRoutes from './routes/file.routes';
 
 // Load environment variables from backend/.env
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
@@ -54,6 +56,9 @@ app.get('/api/health', (req: Request, res: Response) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/items', hackathonItemRoutes);
+app.use('/api/ai', aiRoutes);
+app.use('/api/files', fileRoutes);
+
 
 // Global Error Handler Middleware
 app.use(errorHandler);

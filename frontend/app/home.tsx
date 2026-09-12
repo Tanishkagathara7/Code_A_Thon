@@ -15,6 +15,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../context/AuthContext';
 import { InteractiveNavbar, TabKey } from '../components/navigation/InteractiveNavbar';
 import { Colors } from '../theme/colors';
+import { AISummarizerCard } from '../components/ai';
+
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -124,7 +126,11 @@ export default function HomeScreen() {
               </Text>
             </LinearGradient>
           </TouchableOpacity>
+
+          {/* AI Foundation Reference Feature Card */}
+          <AISummarizerCard />
         </ScrollView>
+
       );
     }
 

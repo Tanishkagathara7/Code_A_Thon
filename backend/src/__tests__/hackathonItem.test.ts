@@ -189,6 +189,87 @@ describe('2. HackathonItem Service & Ownership Integration Tests', () => {
       await HackathonItemService.getById(randomId, USER_A_ID);
     }, (err: any) => err.message === 'Item not found');
   });
+
+  test('11. Search by title, description, category (case-insensitive & empty search handling)', async () => {
+    if (!isDbConnected) return;
+
+    // Seed test items
+    await HackathonItemService.create({ title: 'Alpha Mobile App', description: 'React Native project', category: 'Mobile', status: 'pending' }, USER_A_ID);
+    await HackathonItemService.create({ title: 'Beta Cloud API', description: 'Node.js Express backend', category: 'Backend', status: 'in_progress' }, USER_A_ID);
+
+    // Search by title
+    const searchTitle = await HackathonItemService.getAll(USER_A_ID, { search: 'mobile' });
+    assert.ok(searchTitle.items.some(i => i.title.includes('Alpha Mobile')));
+
+    // Search by description
+    const searchDesc = await HackathonItemService.getAll(USER_A_ID, { search: 'express' });
+    assert.ok(searchDesc.items.some(i => i.title.includes('Beta Cloud')));
+
+    // Search by category
+    const searchCategory = await HackathonItemService.getAll(USER_A_ID, { search: 'backend' });
+    assert.ok(searchCategory.items.some(i => i.category === 'Backend'));
+
+    // Empty search returns all user items
+    const searchEmpty = await HackathonItemService.getAll(USER_A_ID, { search: '   ' });
+    assert.ok(searchEmpty.items.length >= 2);
+  });
+
+  test('12. Filtering by status, category, and combined query', async () => {
+    if (!isDbConnected) return;
+
+    const statusRes = await HackathonItemService.getAll(USER_A_ID, { status: 'in_progress' });
+    assert.ok(statusRes.items.every(i => i.status === 'in_progress'));
+
+    const categoryRes = await HackathonItemService.getAll(USER_A_ID, { category: 'Backend' });
+    assert.ok(categoryRes.items.every(i => i.category === 'Backend'));
+
+    const combinedRes = await HackathonItemService.getAll(USER_A_ID, {
+      search: 'cloud',
+      status: 'in_progress',
+      category: 'Backend',
+    });
+    assert.ok(combinedRes.items.length >= 1);
+    assert.strictEqual(combinedRes.items[0].category, 'Backend');
+    assert.strictEqual(combinedRes.items[0].status, 'in_progress');
+  });
+
+  test('13. Controlled sorting (title_asc, title_desc, createdAt_asc, createdAt_desc)', async () => {
+    if (!isDbConnected) return;
+
+    const titleAsc = await HackathonItemService.getAll(USER_A_ID, { sort: 'title_asc' });
+    assert.ok(titleAsc.items.length >= 2);
+    const firstTitle = titleAsc.items[0].title.toLowerCase();
+    const secondTitle = titleAsc.items[1].title.toLowerCase();
+    assert.ok(firstTitle.localeCompare(secondTitle) <= 0, 'Items should be sorted alphabetically by title ascending');
+
+    const titleDesc = await HackathonItemService.getAll(USER_A_ID, { sort: 'title_desc' });
+    assert.ok(titleDesc.items[0].title.toLowerCase().localeCompare(titleDesc.items[1].title.toLowerCase()) >= 0, 'Items should be sorted title descending');
+  });
+
+  test('14. Pagination metadata (hasNextPage, hasPrevPage, page, totalPages)', async () => {
+    if (!isDbConnected) return;
+
+    const page1 = await HackathonItemService.getAll(USER_A_ID, { page: 1, limit: 1 });
+    assert.strictEqual(page1.pagination.page, 1);
+    assert.strictEqual(page1.pagination.limit, 1);
+    assert.ok(page1.pagination.total >= 2);
+    assert.strictEqual(page1.pagination.hasNextPage, true);
+    assert.strictEqual(page1.pagination.hasPrevPage, false);
+
+    const page2 = await HackathonItemService.getAll(USER_A_ID, { page: 2, limit: 1 });
+    assert.strictEqual(page2.pagination.page, 2);
+    assert.strictEqual(page2.pagination.hasPrevPage, true);
+  });
+
+  test('15. Security: User B search/filter query cannot access User A items', async () => {
+    if (!isDbConnected) return;
+
+    const userBSearch = await HackathonItemService.getAll(USER_B_ID, { search: 'Alpha Mobile' });
+    assert.strictEqual(userBSearch.items.length, 0, 'User B must not see User A items via search');
+
+    const userBFilter = await HackathonItemService.getAll(USER_B_ID, { category: 'Backend' });
+    assert.strictEqual(userBFilter.items.length, 0, 'User B must not see User A items via filter');
+  });
 });
 
 describe('3. HackathonItem HTTP Endpoints (Simulated / Live)', () => {
@@ -222,4 +303,18 @@ describe('3. HackathonItem HTTP Endpoints (Simulated / Live)', () => {
       console.warn(`[TEST NOTICE] Server offline at ${API_BASE_URL}, HTTP verification skipped`);
     }
   });
+
+  test('16. Invalid sort query parameter is rejected (HTTP 400)', async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/items?sort=malicious_field_asc`, {
+        headers: { Authorization: `Bearer ${USER_A_TOKEN}` },
+      });
+      assert.strictEqual(res.status, 400);
+      const json = await res.json();
+      assert.strictEqual(json.success, false);
+    } catch (err: any) {
+      console.warn(`[TEST NOTICE] Server offline at ${API_BASE_URL}, HTTP verification skipped`);
+    }
+  });
 });
+

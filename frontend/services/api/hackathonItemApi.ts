@@ -6,20 +6,20 @@ import {
   CreateItemPayload,
   UpdateItemPayload,
   ApiSuccessMessageResponse,
+  ItemListQuery,
 } from '../../types/domain';
 
-export interface GetItemsParams {
-  page?: number;
-  limit?: number;
-  search?: string;
-}
+export type GetItemsParams = ItemListQuery;
 
 export const hackathonItemApi = {
-  async getItems(params: GetItemsParams = {}): Promise<PaginatedResponse<HackathonItem>> {
+  async getItems(params: ItemListQuery = {}): Promise<PaginatedResponse<HackathonItem>> {
     return apiClient.get<PaginatedResponse<HackathonItem>>('/items', {
       page: params.page,
       limit: params.limit,
       search: params.search,
+      status: params.status,
+      category: params.category,
+      sort: params.sort,
     });
   },
 

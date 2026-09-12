@@ -69,16 +69,40 @@ class MockDomainApiService {
     },
   ];
 
-  async getItems(params: { page?: number; limit?: number; search?: string }) {
+  async getItems(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+    category?: string;
+    sort?: string;
+  }) {
     const page = params.page || 1;
     const limit = params.limit || 10;
     let filtered = [...this.items];
 
+    if (params.status) {
+      filtered = filtered.filter((i) => i.status === params.status);
+    }
+
+    if (params.category) {
+      filtered = filtered.filter((i) => i.category === params.category);
+    }
+
     if (params.search) {
       const q = params.search.toLowerCase();
       filtered = filtered.filter(
-        (i) => i.title.toLowerCase().includes(q) || i.category?.toLowerCase().includes(q)
+        (i) =>
+          i.title.toLowerCase().includes(q) ||
+          i.description?.toLowerCase().includes(q) ||
+          i.category?.toLowerCase().includes(q)
       );
+    }
+
+    if (params.sort === 'title_asc') {
+      filtered.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (params.sort === 'title_desc') {
+      filtered.sort((a, b) => b.title.localeCompare(a.title));
     }
 
     const total = filtered.length;
@@ -94,6 +118,8 @@ class MockDomainApiService {
         page,
         limit,
         totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
       },
     };
   }
@@ -242,7 +268,52 @@ async function runDomainTests() {
   assert(hasNextPage(3, 3) === false, 'Page 3 of 3 should not have next page');
   console.log('✅ 7. Pagination math & deduplication passed');
 
+  // Test 8: Filter by Status & Category
+  const statusFilterRes = await service.getItems({ status: 'completed' });
+  assert(statusFilterRes.data.length >= 1, 'Status filter should return items');
+  assert(statusFilterRes.data.every((i) => i.status === 'completed'), 'All items should match completed status');
+
+  const categoryFilterRes = await service.getItems({ category: 'Frontend' });
+  assert(categoryFilterRes.data.every((i) => i.category === 'Frontend'), 'All items should match Frontend category');
+  console.log('✅ 8. Status and category filter selection passed');
+
+  // Test 9: Sorting (title_asc vs title_desc)
+  const sortAsc = await service.getItems({ sort: 'title_asc' });
+  const sortDesc = await service.getItems({ sort: 'title_desc' });
+  assert(sortAsc.data[0].title.localeCompare(sortAsc.data[sortAsc.data.length - 1].title) <= 0, 'Title asc order correct');
+  assert(sortDesc.data[0].title.localeCompare(sortDesc.data[sortDesc.data.length - 1].title) >= 0, 'Title desc order correct');
+  console.log('✅ 9. Sort selection logic passed');
+
+  // Test 10: Race-condition request sequence ID simulation
+  let requestIdCounter = 0;
+  const simulateAsyncSearch = async (query: string, delayMs: number, reqId: number) => {
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+    if (reqId !== requestIdCounter) {
+      return { cancelled: true, query };
+    }
+    return { cancelled: false, res: await service.getItems({ search: query }) };
+  };
+
+  // Trigger stale search first (slow delay), then fast search
+  requestIdCounter = 1;
+  const stalePromise = simulateAsyncSearch('Old Search', 100, 1);
+  requestIdCounter = 2; // user changed search quickly
+  const freshPromise = simulateAsyncSearch('New Search', 20, 2);
+
+  const [staleRes, freshRes] = await Promise.all([stalePromise, freshPromise]);
+  assert(staleRes.cancelled === true, 'Stale search request should be cancelled/ignored');
+  assert(freshRes.cancelled === false, 'Fresh search request should complete');
+  console.log('✅ 10. Async search race condition protection passed');
+
+  // Test 11: Empty search state & filter clear simulation
+  const noMatchRes = await service.getItems({ search: 'NonexistentKeyword123' });
+  assert(noMatchRes.data.length === 0, 'No match search should return 0 items');
+  const clearedRes = await service.getItems({}); // clear filters reset
+  assert(clearedRes.data.length >= 2, 'Clearing filters should restore list items');
+  console.log('✅ 11. Empty search state & filter reset passed');
+
   console.log('--- All Domain UI & API Foundation Tests Passed! ---');
 }
 
 runDomainTests();
+

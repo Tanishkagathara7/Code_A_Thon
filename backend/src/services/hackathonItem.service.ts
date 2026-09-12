@@ -19,6 +19,9 @@ export interface GetItemsOptions {
   page?: number;
   limit?: number;
   search?: string;
+  status?: string;
+  category?: string;
+  sort?: string;
 }
 
 export interface PaginatedItemsResponse {
@@ -28,6 +31,8 @@ export interface PaginatedItemsResponse {
     limit: number;
     total: number;
     totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
   };
 }
 
@@ -52,7 +57,7 @@ export class HackathonItemService {
   }
 
   /**
-   * Get all items belonging to the authenticated user with pagination and optional search filter.
+   * Get all items belonging to the authenticated user with search, filtering, sorting, and pagination.
    */
   static async getAll(userId: string, options: GetItemsOptions = {}): Promise<PaginatedItemsResponse> {
     if (!userId) {
@@ -69,7 +74,17 @@ export class HackathonItemService {
       owner: new mongoose.Types.ObjectId(userId),
     };
 
-    // Safe search filter preparation (regex match on title or description)
+    // 1. Status Filter
+    if (options.status && options.status.trim() !== '') {
+      filter.status = options.status.trim();
+    }
+
+    // 2. Category Filter
+    if (options.category && options.category.trim() !== '') {
+      filter.category = options.category.trim();
+    }
+
+    // 3. Search Filter (case-insensitive, escaped regex match on title, description, or category)
     if (options.search && options.search.trim() !== '') {
       const sanitizedSearch = options.search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       filter.$or = [
@@ -79,9 +94,21 @@ export class HackathonItemService {
       ];
     }
 
+    // 4. Whitelisted Sorting
+    const ALLOWED_SORTS: Record<string, Record<string, 1 | -1>> = {
+      createdAt_desc: { createdAt: -1 },
+      createdAt_asc: { createdAt: 1 },
+      title_asc: { title: 1, createdAt: -1 },
+      title_desc: { title: -1, createdAt: -1 },
+    };
+
+    const sortQuery = options.sort && ALLOWED_SORTS[options.sort]
+      ? ALLOWED_SORTS[options.sort]
+      : { createdAt: -1 };
+
     const [items, total] = await Promise.all([
       HackathonItem.find(filter)
-        .sort({ createdAt: -1 })
+        .sort(sortQuery as any)
         .skip(skip)
         .limit(limit)
         .exec(),
@@ -97,6 +124,8 @@ export class HackathonItemService {
         limit,
         total,
         totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
       },
     };
   }

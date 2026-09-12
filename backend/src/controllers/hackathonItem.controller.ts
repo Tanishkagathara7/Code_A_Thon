@@ -3,6 +3,7 @@ import { AuthenticatedRequest } from '../middleware/auth';
 import { HackathonItemService } from '../services/hackathonItem.service';
 
 const VALID_STATUSES = ['pending', 'in_progress', 'completed'];
+const VALID_SORTS = ['createdAt_desc', 'createdAt_asc', 'title_asc', 'title_desc'];
 
 export class HackathonItemController {
   /**
@@ -73,7 +74,7 @@ export class HackathonItemController {
 
   /**
    * GET /api/items
-   * Retrieve all items owned by the authenticated user with pagination.
+   * Retrieve all items owned by the authenticated user with search, filter, sort, and pagination.
    */
   static async getAll(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
@@ -82,11 +83,51 @@ export class HackathonItemController {
         return res.status(401).json({ success: false, error: 'Unauthorized. User session missing.' });
       }
 
-      const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
-      const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 20;
-      const search = req.query.search ? (req.query.search as string) : undefined;
+      const rawPage = req.query.page ? parseInt(req.query.page as string, 10) : 1;
+      const rawLimit = req.query.limit ? parseInt(req.query.limit as string, 10) : 20;
 
-      const result = await HackathonItemService.getAll(userId, { page, limit, search });
+      if (isNaN(rawPage) || rawPage < 1) {
+        return res.status(400).json({ success: false, error: 'Invalid page parameter. Must be a positive integer.' });
+      }
+
+      if (isNaN(rawLimit) || rawLimit < 1) {
+        return res.status(400).json({ success: false, error: 'Invalid limit parameter. Must be a positive integer.' });
+      }
+
+      const search = req.query.search ? String(req.query.search).trim() : undefined;
+      if (search !== undefined && search.length > 100) {
+        return res.status(400).json({ success: false, error: 'Search query cannot exceed 100 characters.' });
+      }
+
+      const status = req.query.status ? String(req.query.status).trim() : undefined;
+      if (status !== undefined && !VALID_STATUSES.includes(status)) {
+        return res.status(400).json({
+          success: false,
+          error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}`,
+        });
+      }
+
+      const category = req.query.category ? String(req.query.category).trim() : undefined;
+      if (category !== undefined && category.length > 50) {
+        return res.status(400).json({ success: false, error: 'Category cannot exceed 50 characters.' });
+      }
+
+      const sort = req.query.sort ? String(req.query.sort).trim() : undefined;
+      if (sort !== undefined && !VALID_SORTS.includes(sort)) {
+        return res.status(400).json({
+          success: false,
+          error: `Invalid sort option. Must be one of: ${VALID_SORTS.join(', ')}`,
+        });
+      }
+
+      const result = await HackathonItemService.getAll(userId, {
+        page: rawPage,
+        limit: rawLimit,
+        search,
+        status,
+        category,
+        sort,
+      });
 
       return res.status(200).json({
         success: true,

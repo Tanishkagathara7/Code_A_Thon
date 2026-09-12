@@ -18,6 +18,20 @@ export interface DomainEntity {
 export type HackathonItem = DomainEntity;
 
 /**
+ * Search, Filter & Sort Query State
+ */
+export type SortOption = 'createdAt_desc' | 'createdAt_asc' | 'title_asc' | 'title_desc';
+
+export interface ItemListQuery {
+  search?: string;
+  status?: ItemStatus | string;
+  category?: string;
+  sort?: SortOption;
+  page?: number;
+  limit?: number;
+}
+
+/**
  * Pagination Metadata
  */
 export interface PaginationMeta {
@@ -25,7 +39,10 @@ export interface PaginationMeta {
   page: number;
   limit: number;
   totalPages: number;
+  hasNextPage?: boolean;
+  hasPrevPage?: boolean;
 }
+
 
 /**
  * API Response Interfaces

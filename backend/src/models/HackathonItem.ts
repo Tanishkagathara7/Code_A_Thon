@@ -50,7 +50,10 @@ const HackathonItemSchema: Schema = new Schema(
   }
 );
 
-// Compound index to quickly fetch items per user sorted by creation date
+// Compound indexes to quickly fetch items per user sorted by creation date, status, or category
 HackathonItemSchema.index({ owner: 1, createdAt: -1 });
+HackathonItemSchema.index({ owner: 1, status: 1, createdAt: -1 });
+HackathonItemSchema.index({ owner: 1, category: 1, createdAt: -1 });
 
 export const HackathonItem = mongoose.model<IHackathonItem>('HackathonItem', HackathonItemSchema);
+
