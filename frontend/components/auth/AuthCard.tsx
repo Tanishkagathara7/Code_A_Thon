@@ -1,72 +1,30 @@
 import React from 'react';
-import {
-  StyleSheet,
-  View,
-  Platform,
-  useWindowDimensions,
-} from 'react-native';
-import { Spacing } from '../../theme/typography';
+import { StyleSheet, View, ViewStyle } from 'react-native';
 
 interface AuthCardProps {
   children: React.ReactNode;
+  style?: ViewStyle;
 }
 
-export const AuthCard: React.FC<AuthCardProps> = ({ children }) => {
-  const { width } = useWindowDimensions();
-
-  // Max width constraint for tablet, desktop, and large displays
-  const isLargeScreen = width > 520;
-
-  return (
-    <View style={styles.outerContainer}>
-      <View
-        style={[
-          styles.card,
-          isLargeScreen && styles.cardLarge,
-        ]}
-      >
-        {children}
-      </View>
-    </View>
-  );
+export const AuthCard: React.FC<AuthCardProps> = ({ children, style }) => {
+  return <View style={[styles.card, style]}>{children}</View>;
 };
 
 const styles = StyleSheet.create({
-  outerContainer: {
-    width: '100%',
-    alignItems: 'center',
-  },
   card: {
     width: '100%',
+    maxWidth: 400,
     backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 38,
-    borderTopRightRadius: 38,
-    paddingTop: 28,
-    paddingHorizontal: 28,
-    paddingBottom: Platform.select({ ios: 44, android: 32, default: 36 }),
-    ...Platform.select({
-      ios: {
-        shadowColor: '#070C1E',
-        shadowOffset: { width: 0, height: -8 },
-        shadowOpacity: 0.1,
-        shadowRadius: 24,
-      },
-      android: {
-        elevation: 10,
-      },
-      default: {
-        boxShadow: '0px -10px 40px rgba(7, 12, 30, 0.09), inset 0px 1px 0px rgba(255, 255, 255, 0.9)',
-      },
-    }),
+    borderRadius: 32,
+    paddingHorizontal: 22,
+    paddingTop: 22,
+    paddingBottom: 24,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.85)',
-    borderBottomWidth: 0,
-  },
-  cardLarge: {
-    maxWidth: 480,
-    borderRadius: 38,
-    borderBottomWidth: 1,
-    borderColor: 'rgba(0, 0, 0, 0.06)',
-    marginBottom: 24,
+    borderColor: 'rgba(15, 23, 42, 0.06)',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 16 },
+    shadowOpacity: 0.08,
+    shadowRadius: 28,
+    elevation: 8,
   },
 });

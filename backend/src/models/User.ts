@@ -53,4 +53,6 @@ const UserSchema: Schema = new Schema(
   }
 );
 
+UserSchema.index({ provider: 1, providerId: 1 }, { sparse: true });
+
 export const User = mongoose.model<IUser>('User', UserSchema);

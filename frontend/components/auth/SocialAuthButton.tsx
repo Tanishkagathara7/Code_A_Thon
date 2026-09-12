@@ -1,20 +1,12 @@
 import React from 'react';
 import {
   StyleSheet,
+  View,
   Text,
   TouchableOpacity,
-  View,
-  Platform,
   ActivityIndicator,
 } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  Easing,
-} from 'react-native-reanimated';
-import { Typography, Spacing } from '../../theme/typography';
-import { GitHubIcon, GoogleIcon } from '../icons/Icons';
+import { GoogleIcon, GitHubIcon } from '../icons/Icons';
 
 interface SocialAuthButtonsProps {
   onGitHubPress: () => void;
@@ -23,58 +15,6 @@ interface SocialAuthButtonsProps {
   googleLoading?: boolean;
 }
 
-const TactileSocialButton: React.FC<{
-  title: string;
-  icon: React.ReactNode;
-  onPress: () => void;
-  loading?: boolean;
-}> = ({ title, icon, onPress, loading }) => {
-  const scale = useSharedValue(1);
-
-  const handlePressIn = () => {
-    if (loading) return;
-    scale.value = withTiming(0.97, {
-      duration: 140,
-      easing: Easing.out(Easing.quad),
-    });
-  };
-
-  const handlePressOut = () => {
-    scale.value = withTiming(1, {
-      duration: 180,
-      easing: Easing.out(Easing.quad),
-    });
-  };
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  return (
-    <Animated.View style={[styles.buttonWrapper, animatedStyle]}>
-      <TouchableOpacity
-        activeOpacity={1}
-        onPress={onPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        disabled={loading}
-        style={styles.socialButton}
-        accessibilityRole="button"
-        accessibilityLabel={`Sign in with ${title}`}
-      >
-        {loading ? (
-          <ActivityIndicator color="#111315" size="small" />
-        ) : (
-          <View style={styles.contentRow}>
-            <View style={styles.iconBox}>{icon}</View>
-            <Text style={Typography.socialButton}>{title}</Text>
-          </View>
-        )}
-      </TouchableOpacity>
-    </Animated.View>
-  );
-};
-
 export const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
   onGitHubPress,
   onGooglePress,
@@ -82,64 +22,77 @@ export const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
   googleLoading = false,
 }) => {
   return (
-    <View style={styles.row}>
-      <TactileSocialButton
-        title="GitHub"
-        icon={<GitHubIcon size={18} color="#111315" />}
+    <View style={styles.container}>
+      {/* GitHub Provider Button */}
+      <TouchableOpacity
+        activeOpacity={0.8}
         onPress={onGitHubPress}
-        loading={gitHubLoading}
-      />
-      <TactileSocialButton
-        title="Google"
-        icon={<GoogleIcon size={18} />}
+        disabled={gitHubLoading || googleLoading}
+        style={styles.socialButton}
+        accessibilityRole="button"
+        accessibilityLabel="Continue with GitHub"
+      >
+        {gitHubLoading ? (
+          <ActivityIndicator color="#0F172A" size="small" />
+        ) : (
+          <>
+            <GitHubIcon size={20} color="#0F172A" />
+            <Text style={styles.buttonText}>GitHub</Text>
+          </>
+        )}
+      </TouchableOpacity>
+
+      {/* Google Provider Button */}
+      <TouchableOpacity
+        activeOpacity={0.8}
         onPress={onGooglePress}
-        loading={googleLoading}
-      />
+        disabled={gitHubLoading || googleLoading}
+        style={styles.socialButton}
+        accessibilityRole="button"
+        accessibilityLabel="Continue with Google"
+      >
+        {googleLoading ? (
+          <ActivityIndicator color="#0F172A" size="small" />
+        ) : (
+          <>
+            <GoogleIcon size={20} />
+            <Text style={styles.buttonText}>Google</Text>
+          </>
+        )}
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  row: {
+  container: {
     flexDirection: 'row',
-    gap: 14,
+    alignItems: 'center',
+    gap: 12,
     width: '100%',
-  },
-  buttonWrapper: {
-    flex: 1,
+    marginTop: 10,
   },
   socialButton: {
-    height: 52,
+    flex: 1,
+    height: 48,
     backgroundColor: '#FFFFFF',
-    borderRadius: Spacing.pillRadius,
-    borderWidth: 1.2,
-    borderColor: '#ECEEF2',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.04,
-        shadowRadius: 5,
-      },
-      android: {
-        elevation: 1,
-      },
-      default: {
-        boxShadow: '0px 2px 6px rgba(0,0,0,0.03)',
-      },
-    }),
-  },
-  contentRow: {
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
+    gap: 8,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
   },
-  iconBox: {
-    justifyContent: 'center',
-    alignItems: 'center',
+  buttonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#334155',
+    letterSpacing: -0.2,
   },
 });

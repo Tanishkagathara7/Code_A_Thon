@@ -22,14 +22,16 @@ interface AuthContextType {
   loginWithGoogle: () => Promise<void>;
   loginWithGitHub: () => Promise<void>;
   logout: () => Promise<void>;
+  getStoredToken: () => Promise<string | null>;
+  fetchWithAuth: (url: string, options?: RequestInit) => Promise<Response>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const TOKEN_KEY = 'mindbloom_auth_token';
-const USER_KEY = 'mindbloom_user_profile';
+export const TOKEN_KEY = 'mindbloom_auth_token';
+export const USER_KEY = 'mindbloom_user_profile';
 
-const storage = {
+export const storage = {
   async getItem(key: string): Promise<string | null> {
     if (Platform.OS === 'web') {
       try {
@@ -60,21 +62,75 @@ const storage = {
   },
 };
 
+export const getStoredToken = async (): Promise<string | null> => {
+  return await storage.getItem(TOKEN_KEY);
+};
+
+export const fetchWithAuth = async (url: string, options: RequestInit = {}): Promise<Response> => {
+  const token = await getStoredToken();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string>),
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return fetch(url, { ...options, headers });
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isAuthenticating, setIsAuthenticating] = useState<boolean>(false);
 
+  const logout = async () => {
+    console.log('[AUTH] Logging out user...');
+    setUser(null);
+    await storage.removeItem(TOKEN_KEY);
+    await storage.removeItem(USER_KEY);
+    console.log('[AUTH] Session cleared');
+  };
+
   useEffect(() => {
-    // Restore persistent session on launch
+    // Restore persistent session on launch & verify JWT against backend
     const loadSession = async () => {
       try {
         console.log('[AUTH] Restoring session from storage...');
+        const storedToken = await storage.getItem(TOKEN_KEY);
         const storedUser = await storage.getItem(USER_KEY);
-        if (storedUser) {
+
+        if (storedToken && storedUser) {
           const parsedUser = JSON.parse(storedUser);
           setUser(parsedUser);
-          console.log('[AUTH] Session restored:', parsedUser.email);
+          console.log('[AUTH] Session restored from storage:', parsedUser.email);
+
+          // Verify token against backend /api/auth/me if online
+          const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
+          try {
+            const meRes = await fetch(`${apiUrl}/auth/me`, {
+              headers: { Authorization: `Bearer ${storedToken}` },
+            });
+            if (meRes.ok) {
+              const meData = await meRes.json();
+              if (meData.user) {
+                const updatedUser: User = {
+                  id: meData.user.id || meData.user._id,
+                  email: meData.user.email,
+                  name: meData.user.name,
+                  avatarUrl: meData.user.avatarUrl,
+                  provider: meData.user.provider,
+                };
+                setUser(updatedUser);
+                await storage.setItem(USER_KEY, JSON.stringify(updatedUser));
+                console.log('[AUTH] User profile refreshed from /api/auth/me');
+              }
+            } else if (meRes.status === 401) {
+              console.warn('[AUTH] Stored token expired or invalid (HTTP 401). Clearing session...');
+              await logout();
+            }
+          } catch (meErr) {
+            console.warn('[AUTH] Offline / backend unreachable during startup token check. Preserving local session.');
+          }
         } else {
           console.log('[AUTH] No stored session found.');
         }
@@ -92,7 +148,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(userProfile);
     await storage.setItem(TOKEN_KEY, token);
     await storage.setItem(USER_KEY, JSON.stringify(userProfile));
-    console.log('[AUTH] Session persisted successfully');
+    console.log('[AUTH] Session persisted successfully with JWT token');
   };
 
   const syncUserWithBackend = async (profileData: {
@@ -101,7 +157,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     provider: 'email' | 'google' | 'github';
     avatarUrl?: string;
     providerId?: string;
-  }): Promise<User> => {
+  }): Promise<{ user: User; token?: string }> => {
     const apiUrl =
       process.env.EXPO_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
     console.log('[AUTH] Syncing user to backend:', apiUrl);
@@ -115,22 +171,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data && data.user) {
         console.log('[AUTH] User synced with MongoDB backend:', data.user.email);
         return {
-          id: data.user.id || data.user._id,
-          email: data.user.email,
-          name: data.user.name,
-          avatarUrl: data.user.avatarUrl,
-          provider: data.user.provider,
+          user: {
+            id: data.user.id || data.user._id,
+            email: data.user.email,
+            name: data.user.name,
+            avatarUrl: data.user.avatarUrl,
+            provider: data.user.provider,
+          },
+          token: data.token,
         };
       }
     } catch (err: any) {
       console.warn('[AUTH] Backend sync failed, falling back to local session:', err.message || err);
     }
     return {
-      id: 'mb_' + Math.random().toString(36).substring(2, 9),
-      email: profileData.email,
-      name: profileData.name,
-      avatarUrl: profileData.avatarUrl,
-      provider: profileData.provider,
+      user: {
+        id: 'mb_' + Math.random().toString(36).substring(2, 9),
+        email: profileData.email,
+        name: profileData.name,
+        avatarUrl: profileData.avatarUrl,
+        provider: profileData.provider,
+      },
     };
   };
 
@@ -160,7 +221,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         avatarUrl: data.user.avatarUrl,
         provider: data.user.provider || 'email',
       };
-      await persistSession(userProfile, 'mb_token_' + Date.now());
+      const token = data.token || 'mb_token_' + Date.now();
+      await persistSession(userProfile, token);
     } catch (err: any) {
       if (err.message && !err.message.includes('Network') && !err.message.includes('fetch') && !err.message.includes('CLEARTEXT')) {
         throw err;
@@ -206,7 +268,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         avatarUrl: data.user.avatarUrl,
         provider: data.user.provider || 'email',
       };
-      await persistSession(userProfile, 'mb_token_' + Date.now());
+      const token = data.token || 'mb_token_' + Date.now();
+      await persistSession(userProfile, token);
     } catch (err: any) {
       if (err.message && !err.message.includes('Network') && !err.message.includes('fetch') && !err.message.includes('CLEARTEXT')) {
         throw err;
@@ -283,14 +346,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const name = googleProfile.name || googleProfile.given_name || email.split('@')[0];
       const avatarUrl = googleProfile.picture;
 
-      const userProfile = await syncUserWithBackend({
+      const syncResult = await syncUserWithBackend({
         email,
         name,
         avatarUrl,
         provider: 'google',
         providerId: googleProfile.sub || googleProfile.id,
       });
-      await persistSession(userProfile, 'mb_google_token_' + Date.now());
+      const token = syncResult.token || 'mb_google_token_' + Date.now();
+      await persistSession(syncResult.user, token);
       console.log('[AUTH] Navigating to dashboard after Google login');
     } finally {
       setIsAuthenticating(false);
@@ -309,7 +373,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Step 1: If backend exchange directly returned the synced user profile
       if (githubResult.user) {
-        await persistSession(githubResult.user, 'mb_github_token_' + Date.now());
+        const token = githubResult.token || 'mb_github_token_' + Date.now();
+        await persistSession(githubResult.user, token);
         console.log('[AUTH] Navigating to dashboard after GitHub login (backend sync)');
         return;
       }
@@ -321,27 +386,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const avatarUrl = githubResult.profile.avatar_url;
         const providerId = String(githubResult.profile.id);
 
-        const userProfile = await syncUserWithBackend({
+        const syncResult = await syncUserWithBackend({
           email,
           name,
           avatarUrl,
           provider: 'github',
           providerId,
         });
-        await persistSession(userProfile, 'mb_github_token_' + Date.now());
+        const token = syncResult.token || 'mb_github_token_' + Date.now();
+        await persistSession(syncResult.user, token);
         console.log('[AUTH] Navigating to dashboard after GitHub login (frontend profile)');
         return;
       }
 
       // Step 3: Fallback if only auth code is available
       if (githubResult.code) {
-        const userProfile = await syncUserWithBackend({
+        const syncResult = await syncUserWithBackend({
           email: `github_${githubResult.code.substring(0, 8)}@user.github`,
           name: 'GitHub User',
           provider: 'github',
           providerId: githubResult.code,
         });
-        await persistSession(userProfile, 'mb_github_token_' + Date.now());
+        const token = syncResult.token || 'mb_github_token_' + Date.now();
+        await persistSession(syncResult.user, token);
         console.log('[AUTH] Navigating to dashboard after GitHub login (fallback code)');
         return;
       }
@@ -350,14 +417,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setIsAuthenticating(false);
     }
-  };
-
-  const logout = async () => {
-    console.log('[AUTH] Logging out user...');
-    setUser(null);
-    await storage.removeItem(TOKEN_KEY);
-    await storage.removeItem(USER_KEY);
-    console.log('[AUTH] Session cleared');
   };
 
   return (
@@ -373,6 +432,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loginWithGoogle,
         loginWithGitHub,
         logout,
+        getStoredToken,
+        fetchWithAuth,
       }}
     >
       {children}

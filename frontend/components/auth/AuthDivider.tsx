@@ -1,18 +1,15 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-import { Typography } from '../../theme/typography';
 
 interface AuthDividerProps {
-  authMode: 'login' | 'signup';
+  authMode?: 'login' | 'signup';
 }
 
-export const AuthDivider: React.FC<AuthDividerProps> = ({ authMode }) => {
+export const AuthDivider: React.FC<AuthDividerProps> = () => {
   return (
     <View style={styles.container}>
       <View style={styles.line} />
-      <Text style={styles.text}>
-        {authMode === 'login' ? 'Or log in with' : 'Or sign up with'}
-      </Text>
+      <Text style={styles.text}>Or continue with</Text>
       <View style={styles.line} />
     </View>
   );
@@ -23,14 +20,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 18,
-    gap: 12,
+    width: '100%',
   },
   line: {
     flex: 1,
     height: 1,
-    backgroundColor: '#E7E9EF',
+    backgroundColor: '#E2E8F0',
   },
   text: {
-    ...Typography.dividerText,
+    paddingHorizontal: 12,
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#94A3B8',
+    letterSpacing: -0.1,
   },
 });

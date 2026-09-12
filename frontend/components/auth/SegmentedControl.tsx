@@ -1,21 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   StyleSheet,
   View,
   Text,
   TouchableOpacity,
-  LayoutChangeEvent,
-  Platform,
+  useWindowDimensions,
 } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
-  interpolateColor,
 } from 'react-native-reanimated';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Colors } from '../../theme/colors';
-import { Typography, Spacing } from '../../theme/typography';
 
 interface SegmentedControlProps {
   authMode: 'login' | 'signup';
@@ -26,104 +21,63 @@ export const SegmentedControl: React.FC<SegmentedControlProps> = ({
   authMode,
   onChangeMode,
 }) => {
-  const [containerWidth, setContainerWidth] = React.useState<number>(0);
-  const isLogin = authMode === 'login';
+  const { width: SCREEN_WIDTH } = useWindowDimensions();
+  // Card width inside sheet padding
+  const containerWidth = Math.min(SCREEN_WIDTH - 48, 380);
+  const trackPadding = 4;
+  const tabWidth = (containerWidth - trackPadding * 2) / 2;
 
-  // Shared value 0 = login, 1 = signup
-  const slideProgress = useSharedValue(isLogin ? 0 : 1);
+  const activeIndex = authMode === 'login' ? 0 : 1;
+  const translateX = useSharedValue(activeIndex * tabWidth);
 
-  React.useEffect(() => {
-    slideProgress.value = withSpring(isLogin ? 0 : 1, {
-      damping: 18,
-      stiffness: 160,
+  useEffect(() => {
+    translateX.value = withSpring(activeIndex * tabWidth, {
+      damping: 22,
+      stiffness: 260,
       mass: 0.8,
     });
-  }, [isLogin]);
+  }, [activeIndex, tabWidth]);
 
-  const onLayout = (e: LayoutChangeEvent) => {
-    setContainerWidth(e.nativeEvent.layout.width);
-  };
-
-  const pillWidth = containerWidth ? (containerWidth - 8) / 2 : 0;
-
-  const animatedPillStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          translateX: slideProgress.value * pillWidth,
-        },
-      ],
-    };
-  });
+  const animatedIndicatorStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+    width: tabWidth,
+  }));
 
   return (
-    <View style={styles.container} onLayout={onLayout}>
-      {/* Sliding Active Pill with Dynamic Gradient */}
-      {pillWidth > 0 && (
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            styles.activePillContainer,
-            { width: pillWidth },
-            animatedPillStyle,
-          ]}
-        >
-          {isLogin ? (
-            <LinearGradient
-              colors={['#8898DF', '#7889D7']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.pillGradient}
-            />
-          ) : (
-            <LinearGradient
-              colors={['#24CCA8', '#38DFC0']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.pillGradient}
-            />
-          )}
-        </Animated.View>
-      )}
+    <View style={styles.trackContainer}>
+      {/* Animated Periwinkle Pill */}
+      <Animated.View style={[styles.activePill, animatedIndicatorStyle]} />
 
-      {/* Login Tab Button */}
+      {/* Log In Tab */}
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => onChangeMode('login')}
         style={styles.tabButton}
-        accessibilityRole="tab"
-        accessibilityState={{ selected: isLogin }}
-        accessibilityLabel="Log in tab"
+        accessibilityRole="button"
+        accessibilityLabel="Switch to Log in"
       >
         <Text
           style={[
             styles.tabText,
-            {
-              color: isLogin ? '#FFFFFF' : '#6A6F82',
-              fontWeight: isLogin ? '600' : '500',
-            },
+            authMode === 'login' ? styles.activeTabText : styles.inactiveTabText,
           ]}
         >
           Log in
         </Text>
       </TouchableOpacity>
 
-      {/* Sign Up Tab Button */}
+      {/* Sign Up Tab */}
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => onChangeMode('signup')}
         style={styles.tabButton}
-        accessibilityRole="tab"
-        accessibilityState={{ selected: !isLogin }}
-        accessibilityLabel="Sign up tab"
+        accessibilityRole="button"
+        accessibilityLabel="Switch to Sign up"
       >
         <Text
           style={[
             styles.tabText,
-            {
-              color: !isLogin ? '#FFFFFF' : '#6A6F82',
-              fontWeight: !isLogin ? '600' : '500',
-            },
+            authMode === 'signup' ? styles.activeTabText : styles.inactiveTabText,
           ]}
         >
           Sign up
@@ -134,50 +88,47 @@ export const SegmentedControl: React.FC<SegmentedControlProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
+  trackContainer: {
     height: 48,
-    backgroundColor: '#EBECEF',
-    borderRadius: Spacing.pillRadius,
+    backgroundColor: '#F1F5F9',
+    borderRadius: 24,
+    padding: 4,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 4,
     position: 'relative',
-    marginBottom: 22,
+    marginBottom: 20,
+    width: '100%',
   },
-  activePillContainer: {
+  activePill: {
     position: 'absolute',
+    left: 4,
     top: 4,
     bottom: 4,
-    left: 4,
-    borderRadius: Spacing.pillRadius,
-    overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#364066',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.18,
-        shadowRadius: 6,
-      },
-      android: {
-        elevation: 3,
-      },
-      default: {
-        boxShadow: '0px 2px 8px rgba(36, 64, 102, 0.15)',
-      },
-    }),
-  },
-  pillGradient: {
-    flex: 1,
-    borderRadius: Spacing.pillRadius,
+    borderRadius: 20,
+    backgroundColor: '#818CF8', // Sophisticated periwinkle
+    shadowColor: '#818CF8',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 3,
   },
   tabButton: {
     flex: 1,
     height: '100%',
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
     zIndex: 2,
   },
   tabText: {
-    ...Typography.tabLabel,
+    fontSize: 15,
+    letterSpacing: -0.2,
+  },
+  activeTabText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+  inactiveTabText: {
+    color: '#64748B',
+    fontWeight: '600',
   },
 });

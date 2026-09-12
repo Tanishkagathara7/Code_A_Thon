@@ -198,7 +198,7 @@ export const startGitHubAuthFlow = async (): Promise<any> => {
         const backendData = await backendRes.json();
         if (backendRes.ok && backendData.user) {
           console.log('[AUTH] Backend GitHub exchange successful');
-          return { user: backendData.user };
+          return { user: backendData.user, token: backendData.token };
         }
         if (backendData && backendData.error) {
           console.warn('[AUTH] Backend GitHub exchange error:', backendData.error);

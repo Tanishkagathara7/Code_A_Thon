@@ -1,40 +1,40 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { useAuth } from '../context/AuthContext';
-import { EntrySplashLoader } from '../components/common/EntrySplashLoader';
 
 export default function Index() {
   const { user, isLoading, isAuthenticating } = useAuth();
   const router = useRouter();
-  const [hasFinishedAnimation, setHasFinishedAnimation] = useState(false);
 
-  const handleProceed = () => {
-    if (hasFinishedAnimation) return;
-    setHasFinishedAnimation(true);
+  useEffect(() => {
+    // Hide native splash screen immediately
+    SplashScreen.hideAsync().catch(() => {});
 
     if (!isLoading && !isAuthenticating) {
       if (user) {
-        console.log('[AUTH] Splash screen finished: user authenticated -> home');
+        console.log('[AUTH] User authenticated -> home');
         router.replace('/home');
       } else {
-        console.log('[AUTH] Splash screen finished: unauthenticated -> auth screen');
-        router.replace('/(auth)');
+        console.log('[AUTH] Unauthenticated -> onboarding');
+        router.replace('/onboarding');
       }
     }
-  };
+  }, [user, isLoading, isAuthenticating, router]);
 
-  React.useEffect(() => {
-    if (hasFinishedAnimation && !isLoading && !isAuthenticating) {
-      if (user) {
-        console.log('[AUTH] Session restored: navigating to home');
-        router.replace('/home');
-      } else {
-        console.log('[AUTH] No session: navigating to auth screen');
-        router.replace('/(auth)');
-      }
-    }
-  }, [hasFinishedAnimation, isLoading, isAuthenticating, user, router]);
-
-  return <EntrySplashLoader onFinished={handleProceed} />;
+  return (
+    <View style={styles.container}>
+      <ActivityIndicator size="large" color="#0F172A" />
+    </View>
+  );
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FBF9F5',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});

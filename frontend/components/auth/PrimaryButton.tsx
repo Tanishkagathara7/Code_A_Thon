@@ -4,21 +4,24 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
-  Platform,
+  ViewStyle,
+  TextStyle,
 } from 'react-native';
 import Animated, {
-  useSharedValue,
   useAnimatedStyle,
-  withTiming,
-  Easing,
+  useSharedValue,
+  withSpring,
 } from 'react-native-reanimated';
-import { Typography, Spacing } from '../../theme/typography';
+import { AppTheme, DefaultTheme } from '../../theme/config';
 
 interface PrimaryButtonProps {
   title: string;
   onPress: () => void;
   loading?: boolean;
   disabled?: boolean;
+  theme?: AppTheme;
+  style?: ViewStyle;
+  textStyle?: TextStyle;
 }
 
 export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
@@ -26,48 +29,49 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   onPress,
   loading = false,
   disabled = false,
+  theme = DefaultTheme,
+  style,
+  textStyle,
 }) => {
   const scale = useSharedValue(1);
-  const brightness = useSharedValue(1);
 
   const handlePressIn = () => {
-    if (disabled || loading) return;
-    scale.value = withTiming(0.975, {
-      duration: 140,
-      easing: Easing.out(Easing.quad),
-    });
-    brightness.value = withTiming(0.85, { duration: 140 });
+    scale.value = withSpring(0.97, { damping: 15, stiffness: 300 });
   };
 
   const handlePressOut = () => {
-    scale.value = withTiming(1, {
-      duration: 180,
-      easing: Easing.out(Easing.quad),
-    });
-    brightness.value = withTiming(1, { duration: 180 });
+    scale.value = withSpring(1, { damping: 15, stiffness: 300 });
   };
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
-    opacity: brightness.value,
   }));
 
   return (
-    <Animated.View style={[styles.wrapper, animatedStyle]}>
+    <Animated.View style={[styles.container, animatedStyle, style]}>
       <TouchableOpacity
-        activeOpacity={1}
-        onPress={onPress}
+        activeOpacity={0.88}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        disabled={disabled || loading}
-        style={[styles.button, (disabled || loading) && styles.disabled]}
+        onPress={onPress}
+        disabled={loading || disabled}
+        style={[
+          styles.button,
+          {
+            backgroundColor: theme.colors.accent,
+            borderRadius: theme.radii.md,
+            opacity: disabled ? 0.6 : 1,
+          },
+        ]}
         accessibilityRole="button"
         accessibilityLabel={title}
       >
         {loading ? (
-          <ActivityIndicator color="#FFFFFF" size="small" />
+          <ActivityIndicator color={theme.colors.accentText} size="small" />
         ) : (
-          <Text style={Typography.buttonPrimary}>{title}</Text>
+          <Text style={[styles.buttonText, { color: theme.colors.accentText }, textStyle]}>
+            {title}
+          </Text>
         )}
       </TouchableOpacity>
     </Animated.View>
@@ -75,33 +79,19 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
+  container: {
     width: '100%',
-    borderRadius: Spacing.pillRadius,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.18,
-        shadowRadius: 10,
-      },
-      android: {
-        elevation: 4,
-      },
-      default: {
-        boxShadow: '0px 4px 14px rgba(0, 0, 0, 0.22)',
-      },
-    }),
+    marginVertical: 4,
   },
   button: {
-    height: 52,
-    backgroundColor: '#0F1115',
-    borderRadius: Spacing.pillRadius,
-    justifyContent: 'center',
+    width: '100%',
+    height: 48,
     alignItems: 'center',
-    paddingHorizontal: 20,
+    justifyContent: 'center',
   },
-  disabled: {
-    opacity: 0.6,
+  buttonText: {
+    fontSize: 15.5,
+    fontWeight: '600',
+    letterSpacing: -0.2,
   },
 });

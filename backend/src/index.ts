@@ -5,6 +5,10 @@ import dotenv from 'dotenv';
 import path from 'path';
 import dns from 'dns';
 import nodemailer, { Transporter, SendMailOptions } from 'nodemailer';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import { User } from './models/User';
 
 // Force global IPv4 resolution for dns.lookup to prevent Render cloud IPv6 ENETUNREACH errors
@@ -28,9 +32,47 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const MONGODB_URI =
-  process.env.MONGODB_URI ||
-  'mongodb+srv://tanish:XRWKFbHVbDAFShu1@cluster0.b9k1bph.mongodb.net/mindbloom?retryWrites=true&w=majority';
+const MONGODB_URI = process.env.MONGODB_URI;
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!MONGODB_URI) {
+  console.error('❌ FATAL CONFIGURATION ERROR: MONGODB_URI environment variable is missing on server.');
+  process.exit(1);
+}
+
+if (!JWT_SECRET) {
+  console.error('❌ FATAL CONFIGURATION ERROR: JWT_SECRET environment variable is missing on server.');
+  process.exit(1);
+}
+
+// Generate JWT token valid for 7 days
+const generateToken = (userId: string, email: string): string => {
+  return jwt.sign({ id: userId, email }, JWT_SECRET, { expiresIn: '7d' });
+};
+
+export interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+  };
+}
+
+// Express Authorization Middleware
+export const requireAuth = (req: AuthenticatedRequest, res: Response, next: any) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Access token required. Please provide Authorization header.' });
+  }
+
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: string; email: string };
+    req.user = decoded;
+    next();
+  } catch (err: any) {
+    return res.status(401).json({ error: 'Invalid or expired access token.' });
+  }
+};
 
 // Robust Retry Email Dispatcher for Cloud Runners (Render/AWS)
 const sendEmailWithRetries = async (mailOptions: SendMailOptions, maxRetries = 3) => {
@@ -76,9 +118,40 @@ const sendEmailWithRetries = async (mailOptions: SendMailOptions, maxRetries = 3
   throw lastError || new Error(`All ${maxRetries} SMTP delivery attempts timed out.`);
 };
 
-// Middlewares
+// Middlewares & Security Headers
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
+
+// General API Rate Limiter (Max 100 requests per 15 mins per IP)
+export const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests from this IP, please try again after 15 minutes.' },
+});
+
+// Sensitive Auth Rate Limiter (Max 10 login/signup attempts per 15 mins per IP)
+export const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many authentication attempts from this IP, please try again after 15 minutes.' },
+});
+
+// OTP / Password Reset Rate Limiter (Max 5 attempts per 15 mins per IP)
+export const otpLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many password reset requests from this IP, please try again after 15 minutes.' },
+});
+
+// Apply general rate limiter to all API routes
+app.use('/api/', generalLimiter);
 
 // MongoDB Connection
 mongoose
@@ -133,6 +206,7 @@ app.post('/api/auth/sync', async (req: Request, res: Response) => {
 
     res.json({
       success: true,
+      token: generateToken((user._id as any).toString(), user.email),
       user: {
         id: user._id,
         email: user.email,
@@ -159,11 +233,12 @@ app.post('/api/auth/github', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Authorization code is required' });
     }
 
-    const clientId = process.env.GITHUB_CLIENT_ID || process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID || 'Ov23lijRkAOA5aBGuvDL';
-    const clientSecret = process.env.GITHUB_CLIENT_SECRET || process.env.EXPO_PUBLIC_GITHUB_CLIENT_SECRET || '';
+    const clientId = process.env.GITHUB_CLIENT_ID || process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID;
+    const clientSecret = process.env.GITHUB_CLIENT_SECRET;
 
-    if (!clientSecret) {
-      console.warn('⚠️ [AUTH] GITHUB_CLIENT_SECRET is missing from backend environment variables.');
+    if (!clientId || !clientSecret) {
+      console.error('❌ [AUTH] GitHub auth configuration error: GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET environment variable is missing on server.');
+      return res.status(500).json({ error: 'Server authentication misconfigured: Missing GitHub credentials.' });
     }
 
     // Step 1: Exchange auth code for access token with GitHub
@@ -273,6 +348,7 @@ app.post('/api/auth/github', async (req: Request, res: Response) => {
 
     res.json({
       success: true,
+      token: generateToken((user._id as any).toString(), user.email),
       user: {
         id: user._id,
         email: user.email,
@@ -310,7 +386,7 @@ const validatePassword = (pass: string): string | null => {
 };
 
 // Email login / signup endpoint
-app.post('/api/auth/email', async (req: Request, res: Response) => {
+app.post('/api/auth/email', authLimiter, async (req: Request, res: Response) => {
   try {
     const { email, password, name, mode } = req.body;
 
@@ -332,11 +408,13 @@ app.post('/api/auth/email', async (req: Request, res: Response) => {
         return res.status(400).json({ error: passwordError });
       }
 
+      const hashedPassword = await bcrypt.hash(password, 10);
+
       user = new User({
         email: normalizedEmail,
         name: name ? name.trim() : normalizedEmail.split('@')[0],
         provider: 'email',
-        passwordHash: password,
+        passwordHash: hashedPassword,
       });
       await user.save();
       console.log(`👤 New user registered via email: ${user.email}`);
@@ -349,21 +427,37 @@ app.post('/api/auth/email', async (req: Request, res: Response) => {
       }
 
       // Check password if set
-      if (user.passwordHash && user.passwordHash !== password) {
-        return res.status(401).json({
-          error: 'Incorrect password. Please try again or reset your password.',
-        });
-      }
+      if (user.passwordHash) {
+        let isMatch = false;
+        try {
+          isMatch = await bcrypt.compare(password, user.passwordHash);
+        } catch (bcryptErr) {
+          isMatch = false;
+        }
 
-      // If user registered with Google or GitHub and hasn't set a password yet
-      if (!user.passwordHash) {
-        user.passwordHash = password;
+        // Dual-check for legacy plaintext passwords to auto-migrate them to bcrypt
+        if (!isMatch && user.passwordHash === password) {
+          isMatch = true;
+          user.passwordHash = await bcrypt.hash(password, 10);
+          await user.save();
+          console.log(`🔐 Auto-upgraded legacy plaintext password to bcrypt hash for user: ${user.email}`);
+        }
+
+        if (!isMatch) {
+          return res.status(401).json({
+            error: 'Incorrect password. Please try again or reset your password.',
+          });
+        }
+      } else {
+        // If user registered with Google or GitHub and hasn't set a password yet
+        user.passwordHash = await bcrypt.hash(password, 10);
         await user.save();
       }
     }
 
     res.json({
       success: true,
+      token: generateToken((user._id as any).toString(), user.email),
       user: {
         id: user._id,
         email: user.email,
@@ -378,7 +472,7 @@ app.post('/api/auth/email', async (req: Request, res: Response) => {
 });
 
 // Request Password Reset (generates 6-digit OTP code valid for 15 minutes)
-app.post('/api/auth/forgot-password', async (req: Request, res: Response) => {
+app.post('/api/auth/forgot-password', otpLimiter, async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
     if (!email) {
@@ -453,7 +547,7 @@ app.post('/api/auth/forgot-password', async (req: Request, res: Response) => {
 });
 
 // Verify Code and Reset Password
-app.post('/api/auth/reset-password', async (req: Request, res: Response) => {
+app.post('/api/auth/reset-password', otpLimiter, async (req: Request, res: Response) => {
   try {
     const { email, otp, newPassword } = req.body;
 
@@ -482,7 +576,7 @@ app.post('/api/auth/reset-password', async (req: Request, res: Response) => {
     }
 
     // Update password and clear OTP
-    user.passwordHash = newPassword;
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
     user.resetPasswordOtp = undefined;
     user.resetPasswordExpires = undefined;
     await user.save();
@@ -496,6 +590,30 @@ app.post('/api/auth/reset-password', async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error('Reset password error:', error);
     res.status(500).json({ error: error.message || 'Failed to reset password' });
+  }
+});
+
+// Protected route to retrieve current user profile using Bearer token
+app.get('/api/auth/me', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const user = await User.findById(req.user?.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User profile not found.' });
+    }
+
+    res.json({
+      success: true,
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        provider: user.provider,
+        avatarUrl: user.avatarUrl,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || 'Failed to retrieve user profile.' });
   }
 });
 
