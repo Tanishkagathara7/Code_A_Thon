@@ -100,9 +100,12 @@ export const startGoogleAuthFlow = async (): Promise<any> => {
     }
 
     // Native Mobile (Android & iOS): Use official Native Google Play Services prompt (0 browser redirects)
+    const t2 = Date.now();
+    console.log(`[TIMING] T2: Google SDK sign-in starts at ${t2}`);
     await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
     const response = await GoogleSignin.signIn();
-    console.log('[AUTH] Native Google Sign-In prompt completed successfully');
+    const t3 = Date.now();
+    console.log(`[TIMING] T3: Google SDK sign-in returns at ${t3} (Google SDK Duration: ${t3 - t2}ms)`);
 
     // Extract user profile from native Google Sign-In response
     const userInfo = (response as any)?.data || response;

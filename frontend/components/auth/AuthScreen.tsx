@@ -82,9 +82,13 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
   const { user, loginWithEmail, signupWithEmail, loginWithGoogle, loginWithGitHub } =
     useAuth();
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated (Single source of truth for auth navigation)
   React.useEffect(() => {
-    if (user) router.replace('/home');
+    if (user) {
+      const t7 = Date.now();
+      console.log(`[TIMING] T7: Navigation starts at ${t7}`);
+      router.replace('/home');
+    }
   }, [user, router]);
 
   // ─── Mode ─────────────────────────────────────────────────────────────
@@ -141,7 +145,6 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
       setLoading(true);
       try {
         await loginWithEmail(loginEmail, loginPassword);
-        router.replace('/home');
       } catch (err: any) {
         setBanner({ type: 'error', text: err?.message || 'Sign in failed. Please try again.' });
       } finally {
@@ -157,7 +160,6 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
       setLoading(true);
       try {
         await signupWithEmail(signupName, signupEmail, signupPassword);
-        router.replace('/home');
       } catch (err: any) {
         setBanner({ type: 'error', text: err?.message || 'Sign up failed. Please try again.' });
       } finally {
@@ -174,15 +176,15 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     signupConfirm,
     loginWithEmail,
     signupWithEmail,
-    router,
   ]);
 
   const handleGoogle = async () => {
+    const t1 = Date.now();
+    console.log(`[TIMING] T1: Google button pressed at ${t1}`);
     setBanner(null);
     setSocialLoading('google');
     try {
       await loginWithGoogle();
-      router.replace('/home');
     } catch (err: any) {
       if (err?.message !== 'CANCELLED') {
         setBanner({ type: 'error', text: err?.message || 'Google sign in failed.' });
@@ -197,7 +199,6 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     setSocialLoading('github');
     try {
       await loginWithGitHub();
-      router.replace('/home');
     } catch (err: any) {
       if (err?.message !== 'CANCELLED') {
         setBanner({ type: 'error', text: err?.message || 'GitHub sign in failed.' });

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { startGoogleAuthFlow, startGitHubAuthFlow } from '../services/oauth';
 
 export interface User {
@@ -85,6 +86,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     console.log('[AUTH] Logging out user...');
+    if (Platform.OS !== 'web') {
+      try {
+        console.log('[AUTH] Clearing Google native sign-in session...');
+        await GoogleSignin.signOut();
+        console.log('[AUTH] Google native sign-in session cleared successfully');
+      } catch (err: any) {
+        console.warn('[AUTH] GoogleSignin.signOut() note:', err?.message || err);
+      }
+    }
     setUser(null);
     await storage.removeItem(TOKEN_KEY);
     await storage.removeItem(USER_KEY);
@@ -148,6 +158,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(userProfile);
     await storage.setItem(TOKEN_KEY, token);
     await storage.setItem(USER_KEY, JSON.stringify(userProfile));
+    const t6 = Date.now();
+    console.log(`[TIMING] T6: JWT storage completes at ${t6}`);
     console.log('[AUTH] Session persisted successfully with JWT token');
   };
 
@@ -160,7 +172,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }): Promise<{ user: User; token?: string }> => {
     const apiUrl =
       process.env.EXPO_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
-    console.log('[AUTH] Syncing user to backend:', apiUrl);
+    const t4 = Date.now();
+    console.log(`[TIMING] T4: Backend sync starts at ${t4}`);
     try {
       const response = await fetch(`${apiUrl}/auth/sync`, {
         method: 'POST',
@@ -168,6 +181,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify(profileData),
       });
       const data = await response.json();
+      const t5 = Date.now();
+      console.log(`[TIMING] T5: Backend sync returns at ${t5} (Backend Duration: ${t5 - t4}ms)`);
       if (data && data.user) {
         console.log('[AUTH] User synced with MongoDB backend:', data.user.email);
         return {

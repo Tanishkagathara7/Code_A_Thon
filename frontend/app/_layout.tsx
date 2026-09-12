@@ -38,6 +38,10 @@ export default function RootLayout() {
           <Stack.Screen name="onboarding" />
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="home" />
+          <Stack.Screen name="items/index" />
+          <Stack.Screen name="items/[id]" />
+          <Stack.Screen name="items/create" />
+          <Stack.Screen name="items/edit/[id]" />
           <Stack.Screen name="oauthredirect" />
         </Stack>
       </AuthProvider>

@@ -21,6 +21,11 @@ export default function HomeScreen() {
   const { user, isLoading, isAuthenticating, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<TabKey>('home');
 
+  React.useEffect(() => {
+    const t8 = Date.now();
+    console.log(`[TIMING] T8: Dashboard rendered at ${t8}`);
+  }, []);
+
   // Guest browsing supported when user clicks Skip on login screen
   const handleAuthAction = async () => {
     if (user) {
@@ -98,6 +103,27 @@ export default function HomeScreen() {
               </TouchableOpacity>
             )}
           </View>
+
+          {/* Quick Access Domain Items Card */}
+          <TouchableOpacity
+            style={styles.domainSectionCard}
+            onPress={() => router.push('/items')}
+            activeOpacity={0.85}
+          >
+            <LinearGradient
+              colors={['#4F46E5', '#3730A3']}
+              style={styles.domainCardGradient}
+            >
+              <View style={styles.domainCardHeader}>
+                <Text style={styles.domainCardBadge}>CRUD DOMAIN</Text>
+                <Text style={styles.domainCardArrow}>Explore ›</Text>
+              </View>
+              <Text style={styles.domainCardTitle}>Manage Domain Items</Text>
+              <Text style={styles.domainCardSubtitle}>
+                View, search, create, update, and delete tasks, events, products, or custom entities.
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
         </ScrollView>
       );
     }
@@ -166,7 +192,13 @@ export default function HomeScreen() {
       {/* Interactive Bottom Navbar matching the design with custom purple center button */}
       <InteractiveNavbar
         activeTab={activeTab}
-        onSelectTab={(tab) => setActiveTab(tab)}
+        onSelectTab={(tab) => {
+          if (tab === 'create') {
+            router.push('/items/create');
+          } else {
+            setActiveTab(tab);
+          }
+        }}
       />
     </View>
   );
@@ -390,5 +422,64 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
     fontFamily: 'PlusJakartaSans_500Medium',
+  },
+  domainSectionCard: {
+    marginTop: 16,
+    borderRadius: 24,
+    overflow: 'hidden',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#4F46E5',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.18,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 4,
+      },
+      default: {
+        filter: 'drop-shadow(0px 6px 16px rgba(79, 70, 229, 0.18))',
+      },
+    }),
+  },
+  domainCardGradient: {
+    padding: 20,
+    borderRadius: 24,
+  },
+  domainCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  domainCardBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    color: '#FFFFFF',
+    fontSize: 10.5,
+    fontWeight: '700',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    letterSpacing: 0.8,
+    fontFamily: 'PlusJakartaSans_700Bold',
+  },
+  domainCardArrow: {
+    color: 'rgba(255, 255, 255, 0.85)',
+    fontSize: 13,
+    fontWeight: '600',
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+  },
+  domainCardTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 6,
+    fontFamily: 'PlusJakartaSans_700Bold',
+  },
+  domainCardSubtitle: {
+    fontSize: 13,
+    color: 'rgba(255, 255, 255, 0.82)',
+    lineHeight: 18,
+    fontFamily: 'PlusJakartaSans_400Regular',
   },
 });
