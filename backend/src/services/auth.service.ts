@@ -311,19 +311,19 @@ export class AuthService {
         user.passwordHash = await bcrypt.hash(password, 10);
         await user.save();
       }
-    }
 
-    return {
-      success: true,
-      token: generateToken((user._id as any).toString(), user.email),
-      user: {
-        id: user._id,
-        email: user.email,
-        name: user.name,
-        provider: user.provider,
-        avatarUrl: user.avatarUrl,
-      },
-    };
+      return {
+        success: true,
+        token: generateToken((user._id as any).toString(), user.email),
+        user: {
+          id: user._id,
+          email: user.email,
+          name: user.name,
+          provider: user.provider,
+          avatarUrl: user.avatarUrl,
+        },
+      };
+    }
   }
 
   static async forgotPassword(email: string) {
