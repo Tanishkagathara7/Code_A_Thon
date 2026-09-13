@@ -66,37 +66,43 @@ export const fileApi = {
       formData.append('file', filePayload as any);
     }
 
-    let response: Response;
-    try {
-      response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: formData,
-      });
-    } catch (err: any) {
-      throw new ApiError(
-        err.message || 'Network request failed during file upload. Please check your connection.',
-        0,
-        err
-      );
-    }
+    // Use XMLHttpRequest for React Native 0.86 cross-platform compatibility
+    const xhrResult = await new Promise<{ status: number; text: string }>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', url);
+      xhr.setRequestHeader('Accept', 'application/json');
+      if (token) {
+        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      }
 
-    let data: any;
+      xhr.onload = () => {
+        resolve({ status: xhr.status, text: xhr.responseText });
+      };
+
+      xhr.onerror = (err) => {
+        reject(new ApiError('Network request failed during file upload. Please check your connection.', 0, err));
+      };
+
+      xhr.ontimeout = () => {
+        reject(new ApiError('File upload timed out. Please try again.', 0, null, 'TIMEOUT'));
+      };
+
+      xhr.send(formData);
+    });
+
+    let data: any = null;
     try {
-      data = await response.json();
+      data = JSON.parse(xhrResult.text);
     } catch {
       data = null;
     }
 
-    if (!response.ok) {
+    if (xhrResult.status < 200 || xhrResult.status >= 300) {
       const errorMessage =
         (typeof data === 'object' && data?.error) ||
         (typeof data === 'object' && data?.message) ||
-        `Upload failed with status ${response.status}`;
-      throw new ApiError(errorMessage, response.status, data);
+        `Upload failed with status ${xhrResult.status}`;
+      throw new ApiError(errorMessage, xhrResult.status, data);
     }
 
     return data as FileUploadResponse;
