@@ -61,6 +61,7 @@ export default function OnboardingScreen() {
 
   // Gesture handler for interactive background touch feedback
   const panGesture = Gesture.Pan()
+    .simultaneousWithExternalGesture()
     .onStart((e) => {
       touchX.value = e.x;
       touchY.value = e.y;
@@ -132,15 +133,18 @@ export default function OnboardingScreen() {
     <GestureHandlerRootView style={styles.root}>
       <StatusBar style="dark" />
 
-      <GestureDetector gesture={panGesture}>
-        <View style={styles.root}>
-          {/* Interactive Light-Theme Atmospheric Background */}
-          <InteractiveBackground
-            scrollX={scrollX}
-            touchX={touchX}
-            touchY={touchY}
-            isTouching={isTouching}
-          />
+      <View style={styles.root}>
+        {/* Interactive Light-Theme Atmospheric Background */}
+        <GestureDetector gesture={panGesture}>
+          <View style={StyleSheet.absoluteFill}>
+            <InteractiveBackground
+              scrollX={scrollX}
+              touchX={touchX}
+              touchY={touchY}
+              isTouching={isTouching}
+            />
+          </View>
+        </GestureDetector>
 
           <SafeAreaView style={styles.safeArea}>
             {/* Top Editorial Header Row: Safe Area Inset Protection & Light-Theme Matching SKIP Pill */}
@@ -174,6 +178,7 @@ export default function OnboardingScreen() {
               onScroll={scrollHandler}
               scrollEventThrottle={16}
               onMomentumScrollEnd={handleScrollEnd}
+              onScrollEndDrag={handleScrollEnd}
               renderItem={({ item }) => item.component}
               style={styles.flatList}
             />
@@ -212,7 +217,6 @@ export default function OnboardingScreen() {
             </View>
           </SafeAreaView>
         </View>
-      </GestureDetector>
     </GestureHandlerRootView>
   );
 }
