@@ -13,13 +13,16 @@ export const fileApi = {
    * Upload a file using multipart/form-data
    */
   async uploadFile(fileUri: string, fileName: string, mimeType: string): Promise<FileUploadResponse> {
+    if (!fileUri) {
+      throw new ApiError('No file selected or invalid file URI.', 400);
+    }
+
     const token = await getStoredToken();
     const url = `${getBaseUrl()}/files`;
 
     const formData = new FormData();
 
-    // Cross-platform FormData handling (Web vs Mobile Native)
-    if (Platform.OS === 'web' && (fileUri.startsWith('blob:') || fileUri.startsWith('data:') || fileUri.startsWith('http'))) {
+    if (Platform.OS === 'web') {
       try {
         const res = await fetch(fileUri);
         const blob = await res.blob();
@@ -32,11 +35,19 @@ export const fileApi = {
         } as any);
       }
     } else {
-      formData.append('file', {
-        uri: fileUri,
+      // React Native Mobile (Android & iOS)
+      // Normalize file URI for React Native Android OkHttp
+      const cleanUri = Platform.OS === 'android' && !fileUri.includes('://')
+        ? `file://${fileUri}`
+        : fileUri;
+
+      const filePayload = {
+        uri: cleanUri,
         name: fileName || 'upload_file',
         type: mimeType || 'application/octet-stream',
-      } as any);
+      };
+
+      formData.append('file', filePayload as any);
     }
 
     let response: Response;
