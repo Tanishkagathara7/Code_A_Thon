@@ -141,7 +141,7 @@ export const startGoogleAuthFlow = async (): Promise<any> => {
     ) {
       console.error('[AUTH] DEVELOPER_ERROR in Native Google Sign-In');
       throw new Error(
-        'DEVELOPER_ERROR: Android SHA-1 fingerprint (5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25) for com.app.mobile must be added to an Android OAuth Client ID in Google Cloud Console.'
+        'DEVELOPER_ERROR: Android SHA-1 fingerprint (5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25) for com.tvkms.app must be added to an Android OAuth Client ID in Google Cloud Console.'
       );
     } else {
       console.error('[AUTH] Native Google Sign-In error:', error.message || error);

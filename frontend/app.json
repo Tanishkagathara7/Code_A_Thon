@@ -5,7 +5,7 @@
     "slug": "tanis",
     "scheme": [
       "app",
-      "com.app.mobile",
+      "com.tvkms.app",
       "com.googleusercontent.apps.878949461550-s6de153nvgoq1gb94191i1pgqfqbv1jd"
     ],
     "version": "1.0.0",
@@ -14,10 +14,10 @@
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.app.mobile"
+      "bundleIdentifier": "com.tvkms.app"
     },
     "android": {
-      "package": "com.app.mobile",
+      "package": "com.tvkms.app",
       "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "backgroundColor": "#0D111F",
