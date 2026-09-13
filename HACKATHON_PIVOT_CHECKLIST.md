@@ -78,7 +78,7 @@ npm run seed:reset
 npm run seed
 ```
 
-*Note: Seeding preserves demo user credentials (`demo@mindbloom.com` / `Demo123!`) and maintains full idempotency.*
+*Note: Seeding preserves demo user credentials (`demo@app.com` / `Demo123!`) and maintains full idempotency.*
 
 ---
 
@@ -134,7 +134,7 @@ Run the full verification suite before starting the live demo:
 - [ ] **Backend Build**: `npm run build` (in `backend/`)
 - [ ] **Backend Tests**: `npm test -- --runInBand` (in `backend/`)
 - [ ] **Seed Verification**: `npm run seed:reset` (in `backend/`)
-- [ ] **Login Flow**: Log in with demo credentials (`demo@mindbloom.com`)
+- [ ] **Login Flow**: Log in with demo credentials (`demo@app.com`)
 - [ ] **Main User Flow**: Create, filter, update, and delete an item
 - [ ] **AI Flow**: Trigger AI summary / action items on a sample record
 - [ ] **File Upload**: Attach and view an image asset (if used)

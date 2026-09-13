@@ -40,7 +40,7 @@ describe('1. Password Hashing & JWT Logic', () => {
   });
 
   test('JWT token signing and verification works correctly', () => {
-    const secret = process.env.JWT_SECRET || 'mindbloom_super_secret_jwt_key_hackathon_2026_9xqm';
+    const secret = process.env.JWT_SECRET || 'app_super_secret_jwt_key_hackathon_2026_9xqm';
     const payload = { id: 'user_123', email: 'jwt_test@example.com' };
     const token = jwt.sign(payload, secret, { expiresIn: '1h' });
 
@@ -51,7 +51,7 @@ describe('1. Password Hashing & JWT Logic', () => {
   });
 
   test('Invalid JWT token verification throws error', () => {
-    const secret = process.env.JWT_SECRET || 'mindbloom_super_secret_jwt_key_hackathon_2026_9xqm';
+    const secret = process.env.JWT_SECRET || 'app_super_secret_jwt_key_hackathon_2026_9xqm';
     assert.throws(() => {
       jwt.verify('invalid_tampered_token_string', secret);
     }, 'Tampered or malformed token should throw verification error');

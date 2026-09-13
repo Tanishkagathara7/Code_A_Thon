@@ -19,7 +19,7 @@ app.use(errorHandler);
 
 const TEST_PORT = 5005;
 const API_URL = `http://localhost:${TEST_PORT}/api`;
-const JWT_SECRET = process.env.JWT_SECRET || 'mindbloom_super_secret_jwt_key_hackathon_2026_9xqm';
+const JWT_SECRET = process.env.JWT_SECRET || 'app_super_secret_jwt_key_hackathon_2026_9xqm';
 
 async function runLiveVerification() {
   console.log('🚀 Starting Live API Verification for HackathonItem CRUD...');

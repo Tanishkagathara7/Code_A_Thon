@@ -13,7 +13,7 @@ import { AnalyticsService } from '../services/analytics.service';
 import { HackathonItem } from '../models/HackathonItem';
 
 const API_BASE_URL = process.env.TEST_API_URL || 'http://localhost:5000/api';
-const JWT_SECRET = process.env.JWT_SECRET || 'mindbloom_super_secret_jwt_key_hackathon_2026_9xqm';
+const JWT_SECRET = process.env.JWT_SECRET || 'app_super_secret_jwt_key_hackathon_2026_9xqm';
 
 // Create test user IDs
 const USER_A_ID = new mongoose.Types.ObjectId().toString();
