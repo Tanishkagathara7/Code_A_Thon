@@ -1,5 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, View, ActivityIndicator, Text } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
 
 interface LoadingStateProps {
   message?: string;
@@ -10,22 +17,36 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   message = 'Loading items...',
   count = 3,
 }) => {
+  const opacity = useSharedValue(0.4);
+
+  useEffect(() => {
+    opacity.value = withRepeat(
+      withTiming(0.85, { duration: 800, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
+  }, [opacity]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
+
   return (
     <View style={styles.container}>
       <View style={styles.headerIndicator}>
-        <ActivityIndicator size="small" color="#4F46E5" />
+        <ActivityIndicator size="small" color="#18181B" />
         <Text style={styles.message}>{message}</Text>
       </View>
 
       {Array.from({ length: count }).map((_, index) => (
-        <View key={index} style={styles.skeletonCard}>
+        <Animated.View key={index} style={[styles.skeletonCard, animatedStyle]}>
           <View style={styles.skeletonHeader}>
             <View style={styles.skeletonTitle} />
             <View style={styles.skeletonBadge} />
           </View>
           <View style={styles.skeletonBodyLine1} />
           <View style={styles.skeletonBodyLine2} />
-        </View>
+        </Animated.View>
       ))}
     </View>
   );
@@ -55,7 +76,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 1,
     borderColor: '#E4E4E7',
-    opacity: 0.6,
   },
   skeletonHeader: {
     flexDirection: 'row',
@@ -88,3 +108,4 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
 });
+

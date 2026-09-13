@@ -22,16 +22,14 @@ interface DomainFormProps {
   onCancel?: () => void;
 }
 
-const STATUS_OPTIONS: { key: ItemStatus; label: string; bg: string; text: string }[] = [
-  { key: 'pending', label: 'Pending', bg: '#FEF3C7', text: '#B45309' },
-  { key: 'in_progress', label: 'In Progress', bg: '#E0E7FF', text: '#4338CA' },
-  { key: 'completed', label: 'Completed', bg: '#DCFCE7', text: '#15803D' },
-];
+import { appConfig } from '../../config/appConfig';
+
+const STATUS_OPTIONS = appConfig.statuses as { key: ItemStatus; label: string; bg: string; text: string }[];
 
 export const DomainForm: React.FC<DomainFormProps> = ({
   initialValues = {},
   isSubmitting = false,
-  submitButtonText = 'Save Item',
+  submitButtonText = `Save ${appConfig.primaryEntityName}`,
   serverError,
   onSubmit,
   onCancel,
@@ -85,6 +83,8 @@ export const DomainForm: React.FC<DomainFormProps> = ({
     });
   };
 
+  const [focusedField, setFocusedField] = useState<string | null>(null);
+
   return (
     <KeyboardAvoidingView
       style={styles.flex}
@@ -108,7 +108,11 @@ export const DomainForm: React.FC<DomainFormProps> = ({
             Title <Text style={styles.requiredStar}>*</Text>
           </Text>
           <TextInput
-            style={[styles.input, titleError ? styles.inputError : null]}
+            style={[
+              styles.input,
+              focusedField === 'title' ? styles.inputFocused : null,
+              titleError ? styles.inputError : null,
+            ]}
             placeholder="e.g. Build Hackathon MVP"
             placeholderTextColor="#A1A1AA"
             value={title}
@@ -116,8 +120,11 @@ export const DomainForm: React.FC<DomainFormProps> = ({
               setTitle(text);
               if (titleError) setTitleError(null);
             }}
+            onFocus={() => setFocusedField('title')}
+            onBlur={() => setFocusedField(null)}
             maxLength={100}
             editable={!isSubmitting}
+            accessibilityLabel="Item title input"
           />
           {titleError ? <Text style={styles.errorText}>{titleError}</Text> : null}
         </View>
@@ -126,7 +133,12 @@ export const DomainForm: React.FC<DomainFormProps> = ({
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>Description</Text>
           <TextInput
-            style={[styles.input, styles.multilineInput, descError ? styles.inputError : null]}
+            style={[
+              styles.input,
+              styles.multilineInput,
+              focusedField === 'desc' ? styles.inputFocused : null,
+              descError ? styles.inputError : null,
+            ]}
             placeholder="Provide relevant details or context..."
             placeholderTextColor="#A1A1AA"
             value={description}
@@ -134,11 +146,14 @@ export const DomainForm: React.FC<DomainFormProps> = ({
               setDescription(text);
               if (descError) setDescError(null);
             }}
+            onFocus={() => setFocusedField('desc')}
+            onBlur={() => setFocusedField(null)}
             multiline
             numberOfLines={4}
             maxLength={1000}
             textAlignVertical="top"
             editable={!isSubmitting}
+            accessibilityLabel="Item description input"
           />
           {descError ? <Text style={styles.errorText}>{descError}</Text> : null}
         </View>
@@ -160,6 +175,8 @@ export const DomainForm: React.FC<DomainFormProps> = ({
                   onPress={() => setStatus(opt.key)}
                   disabled={isSubmitting}
                   activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Select status ${opt.label}`}
                 >
                   <Text
                     style={[
@@ -180,7 +197,11 @@ export const DomainForm: React.FC<DomainFormProps> = ({
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>Category</Text>
           <TextInput
-            style={[styles.input, catError ? styles.inputError : null]}
+            style={[
+              styles.input,
+              focusedField === 'category' ? styles.inputFocused : null,
+              catError ? styles.inputError : null,
+            ]}
             placeholder="e.g. Engineering, Design, General"
             placeholderTextColor="#A1A1AA"
             value={category}
@@ -188,8 +209,11 @@ export const DomainForm: React.FC<DomainFormProps> = ({
               setCategory(text);
               if (catError) setCatError(null);
             }}
+            onFocus={() => setFocusedField('category')}
+            onBlur={() => setFocusedField(null)}
             maxLength={50}
             editable={!isSubmitting}
+            accessibilityLabel="Item category input"
           />
           {catError ? <Text style={styles.errorText}>{catError}</Text> : null}
         </View>
@@ -270,6 +294,10 @@ const styles = StyleSheet.create({
     fontSize: 14.5,
     color: '#09090B',
     fontFamily: 'PlusJakartaSans_400Regular',
+  },
+  inputFocused: {
+    borderColor: '#18181B',
+    borderWidth: 1.5,
   },
   multilineInput: {
     minHeight: 100,

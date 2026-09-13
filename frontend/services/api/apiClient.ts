@@ -1,17 +1,57 @@
 import { getStoredToken } from '../../context/AuthContext';
-import { ApiError } from '../../types/domain';
+import { ApiError, ApiErrorKind } from '../../types/domain';
 
 const getBaseUrl = (): string => {
   return process.env.EXPO_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
 };
 
+const DEFAULT_TIMEOUT_MS = 12000;
+const MAX_GET_RETRIES = 1;
+const RETRY_DELAY_MS = 1000;
+
 interface RequestOptions extends Omit<RequestInit, 'body'> {
   body?: any;
   params?: Record<string, string | number | boolean | undefined>;
+  timeoutMs?: number;
+  skipRetry?: boolean;
+}
+
+async function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function singleFetch(url: string, config: RequestInit, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...config,
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (err: any) {
+    clearTimeout(timeoutId);
+    if (err.name === 'AbortError' || err.message?.includes('aborted')) {
+      throw new ApiError(
+        'The server is taking too long to respond. Please try again.',
+        0,
+        err,
+        'TIMEOUT'
+      );
+    }
+    throw new ApiError(
+      "You're offline. Check your internet connection and try again.",
+      0,
+      err,
+      'NETWORK'
+    );
+  }
 }
 
 async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-  const { body, params, headers: customHeaders, ...customOptions } = options;
+  const { body, params, headers: customHeaders, timeoutMs = DEFAULT_TIMEOUT_MS, skipRetry = false, ...customOptions } = options;
 
   let url = `${getBaseUrl()}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
 
@@ -46,15 +86,29 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
     config.body = typeof body === 'string' ? body : JSON.stringify(body);
   }
 
-  let response: Response;
-  try {
-    response = await fetch(url, config);
-  } catch (err: any) {
-    throw new ApiError(
-      'Network request failed. Please check your internet connection or server availability.',
-      0,
-      err
-    );
+  const method = (config.method || 'GET').toUpperCase();
+  const canRetry = method === 'GET' && !skipRetry;
+
+  let response: Response | null = null;
+  let lastError: any = null;
+
+  for (let attempt = 0; attempt <= (canRetry ? MAX_GET_RETRIES : 0); attempt++) {
+    try {
+      if (attempt > 0) {
+        await delay(RETRY_DELAY_MS);
+      }
+      response = await singleFetch(url, config, timeoutMs);
+      break;
+    } catch (err: any) {
+      lastError = err;
+      if (!canRetry || attempt >= MAX_GET_RETRIES) {
+        throw err;
+      }
+    }
+  }
+
+  if (!response) {
+    throw lastError || new ApiError('Request failed to complete.', 0, null, 'UNKNOWN');
   }
 
   let data: any;
@@ -73,12 +127,15 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
     const errorMessage =
       (typeof data === 'object' && data?.error) ||
       (typeof data === 'object' && data?.message) ||
-      `Request failed with status ${response.status}`;
-    throw new ApiError(errorMessage, response.status, data);
+      (response.status >= 500
+        ? 'Something went wrong on the server. Please try again.'
+        : `Request failed with status ${response.status}`);
+    const kind: ApiErrorKind = response.status >= 500 ? 'SERVER' : response.status >= 400 ? 'CLIENT' : 'UNKNOWN';
+    throw new ApiError(errorMessage, response.status, data, kind);
   }
 
   if (typeof data === 'object' && data !== null && data.success === false) {
-    throw new ApiError(data.error || 'Operation failed', response.status, data);
+    throw new ApiError(data.error || 'Operation failed', response.status, data, 'CLIENT');
   }
 
   return data as T;
@@ -95,6 +152,10 @@ export const apiClient = {
 
   put<T>(endpoint: string, body?: any, options?: RequestOptions): Promise<T> {
     return request<T>(endpoint, { ...options, method: 'PUT', body });
+  },
+
+  patch<T>(endpoint: string, body?: any, options?: RequestOptions): Promise<T> {
+    return request<T>(endpoint, { ...options, method: 'PATCH', body });
   },
 
   delete<T>(endpoint: string, options?: RequestOptions): Promise<T> {

@@ -23,11 +23,11 @@ export interface FilterBarProps {
   hasActiveFilters: boolean;
 }
 
+import { appConfig } from '../../config/appConfig';
+
 const STATUS_OPTIONS = [
   { label: 'All Status', value: undefined },
-  { label: 'Pending', value: 'pending' },
-  { label: 'In Progress', value: 'in_progress' },
-  { label: 'Completed', value: 'completed' },
+  ...appConfig.statuses.map((s) => ({ label: s.label, value: s.key })),
 ];
 
 const SORT_OPTIONS: { label: string; value: SortOption }[] = [

@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
   TouchableWithoutFeedback,
 } from 'react-native';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut, ZoomIn } from 'react-native-reanimated';
 import { AuthInput } from './AuthInput';
 import { PrimaryButton } from './PrimaryButton';
 import { MailIcon, KeyIcon } from '../icons/Icons';
@@ -119,7 +119,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
               behavior={Platform.OS === 'ios' ? 'padding' : undefined}
               style={styles.container}
             >
-              <View style={styles.dialogCard}>
+              <Animated.View entering={ZoomIn.duration(200)} style={styles.dialogCard}>
                 {/* Header Row */}
                 <View style={styles.headerRow}>
                   <Text style={styles.title}>
@@ -235,7 +235,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                     </TouchableOpacity>
                   </View>
                 )}
-              </View>
+              </Animated.View>
             </KeyboardAvoidingView>
           </TouchableWithoutFeedback>
         </View>

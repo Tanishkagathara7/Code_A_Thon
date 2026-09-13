@@ -16,9 +16,15 @@ import { DomainForm } from '../../../components/domain/DomainForm';
 import { LoadingState } from '../../../components/domain/LoadingState';
 import { ErrorState } from '../../../components/domain/ErrorState';
 
+import { useNetwork } from '../../../context/NetworkContext';
+import { useToast } from '../../../context/ToastContext';
+import { appConfig } from '../../../config/appConfig';
+
 export default function ItemEditScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { isOffline } = useNetwork();
+  const { showToast } = useToast();
 
   const [item, setItem] = useState<HackathonItem | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -51,14 +57,22 @@ export default function ItemEditScreen() {
 
   const handleSubmit = async (values: CreateItemPayload) => {
     if (!id) return;
+    if (isOffline) {
+      setServerError("You're offline. Reconnect to save your changes.");
+      return;
+    }
+
     setIsSubmitting(true);
     setServerError(null);
 
     try {
       await hackathonItemApi.updateItem(id, values);
+      showToast('Item updated successfully!', 'success');
       router.replace(`/items/${id}`);
     } catch (err: any) {
-      setServerError(err.message || 'Failed to update item.');
+      const msg = err.message || 'Failed to update item.';
+      setServerError(msg);
+      showToast(msg, 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -74,7 +88,7 @@ export default function ItemEditScreen() {
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
             <Text style={styles.backBtnText}>‹ Cancel</Text>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Edit Item</Text>
+          <Text style={styles.headerTitle}>Edit {appConfig.primaryEntityName}</Text>
           <View style={styles.headerSpacer} />
         </View>
       </LinearGradient>
@@ -82,9 +96,9 @@ export default function ItemEditScreen() {
       {/* Body */}
       <View style={styles.body}>
         {isLoading ? (
-          <LoadingState message="Loading item details..." count={1} />
+          <LoadingState message={`Loading ${appConfig.primaryEntityName.toLowerCase()} details...`} count={1} />
         ) : loadError || !item ? (
-          <ErrorState message={loadError || 'Item not found'} onRetry={fetchItem} />
+          <ErrorState message={loadError || `${appConfig.primaryEntityName} not found`} onRetry={fetchItem} />
         ) : (
           <DomainForm
             initialValues={{
@@ -93,7 +107,7 @@ export default function ItemEditScreen() {
               status: item.status,
               category: item.category,
             }}
-            submitButtonText="Update Item"
+            submitButtonText={`Update ${appConfig.primaryEntityName}`}
             isSubmitting={isSubmitting}
             serverError={serverError}
             onSubmit={handleSubmit}

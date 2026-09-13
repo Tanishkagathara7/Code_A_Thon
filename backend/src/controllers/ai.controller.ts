@@ -1,6 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { defaultAIService, AIError } from '../services/ai';
+import { NotificationService } from '../services/notification.service';
 
 export class AIController {
   /**
@@ -33,6 +34,19 @@ export class AIController {
         temperature,
         maxTokens,
       });
+
+      // Trigger non-blocking notification for AI completion
+      try {
+        await NotificationService.createNotification({
+          recipient: userId,
+          type: 'AI_COMPLETED',
+          title: 'AI Task Completed',
+          message: 'Your AI request was processed successfully.',
+          data: { entityType: 'ai' },
+        });
+      } catch (notifError) {
+        console.error('Failed to create notification for AI completion:', notifError);
+      }
 
       return res.status(200).json({
         success: true,

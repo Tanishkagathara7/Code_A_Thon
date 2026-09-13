@@ -88,8 +88,7 @@ export const FileUploadField: React.FC<FileUploadFieldProps> = ({
       try {
         await fileApi.deleteFile(uploadedFile.id);
       } catch (err) {
-        // Log silently, clear client state regardless
-        console.warn('Backend file deletion failed during UI remove:', err);
+        // Clear client state regardless of backend file deletion outcome
       }
     }
     setSelectedFile(null);

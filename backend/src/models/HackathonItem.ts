@@ -8,6 +8,7 @@ export interface IHackathonItem extends Document {
   status: HackathonItemStatus;
   category?: string;
   owner: mongoose.Types.ObjectId;
+  isDemo?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -42,6 +43,11 @@ const HackathonItemSchema: Schema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: [true, 'Owner is required'],
+      index: true,
+    },
+    isDemo: {
+      type: Boolean,
+      default: false,
       index: true,
     },
   },

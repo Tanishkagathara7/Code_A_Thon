@@ -6,6 +6,7 @@ import { AIGeneratedResult } from '../../types/ai';
 import { AIActionButton } from './AIActionButton';
 import { AIResponseCard } from './AIResponseCard';
 import { AIErrorState } from './AIErrorState';
+import { appConfig } from '../../config/appConfig';
 
 interface AISummarizerCardProps {
   initialText?: string;

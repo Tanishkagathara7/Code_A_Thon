@@ -17,9 +17,15 @@ import { LoadingState } from '../../components/domain/LoadingState';
 import { ErrorState } from '../../components/domain/ErrorState';
 import { ConfirmDeleteModal } from '../../components/domain/ConfirmDeleteModal';
 
+import { useNetwork } from '../../context/NetworkContext';
+import { useToast } from '../../context/ToastContext';
+import { appConfig } from '../../config/appConfig';
+
 export default function ItemDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { isOffline } = useNetwork();
+  const { showToast } = useToast();
 
   const [item, setItem] = useState<HackathonItem | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -52,28 +58,33 @@ export default function ItemDetailScreen() {
 
   const handleDeleteConfirm = async () => {
     if (!id) return;
+    if (isOffline) {
+      showToast("You're offline. Reconnect to delete this item.", 'error');
+      setShowDeleteModal(false);
+      return;
+    }
+
     setIsDeleting(true);
     try {
       await hackathonItemApi.deleteItem(id);
       setShowDeleteModal(false);
+      showToast('Item deleted successfully.', 'info');
       router.replace('/items');
     } catch (err: any) {
-      alert(err.message || 'Failed to delete item');
+      showToast(err.message || 'Failed to delete item', 'error');
     } finally {
       setIsDeleting(false);
     }
   };
 
   const getStatusBadge = (status?: string) => {
-    switch (status?.toLowerCase()) {
-      case 'completed':
-        return { bg: '#DCFCE7', text: '#15803D', label: 'Completed' };
-      case 'in_progress':
-        return { bg: '#E0E7FF', text: '#4338CA', label: 'In Progress' };
-      case 'pending':
-      default:
-        return { bg: '#FEF3C7', text: '#B45309', label: 'Pending' };
+    const matched = appConfig.statuses.find(
+      (s) => s.key.toLowerCase() === status?.toLowerCase()
+    );
+    if (matched) {
+      return { bg: matched.bg, text: matched.text, label: matched.label };
     }
+    return { bg: '#FEF3C7', text: '#B45309', label: status || 'Pending' };
   };
 
   return (
@@ -86,7 +97,7 @@ export default function ItemDetailScreen() {
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
             <Text style={styles.backBtnText}>‹ Back</Text>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Item Details</Text>
+          <Text style={styles.headerTitle}>{appConfig.primaryEntityName} Details</Text>
           <View style={styles.headerSpacer} />
         </View>
       </LinearGradient>
@@ -176,7 +187,7 @@ export default function ItemDetailScreen() {
                   onPress={() => router.push(`/items/edit/${item.id}`)}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.editButtonText}>✏️ Edit Item</Text>
+                  <Text style={styles.editButtonText}>✏️ Edit {appConfig.primaryEntityName}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity

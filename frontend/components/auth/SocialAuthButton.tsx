@@ -6,6 +6,11 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import { GoogleIcon, GitHubIcon } from '../icons/Icons';
 
 interface SocialAuthButtonsProps {
@@ -21,45 +26,64 @@ export const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
   gitHubLoading = false,
   googleLoading = false,
 }) => {
+  const ghScale = useSharedValue(1);
+  const googScale = useSharedValue(1);
+
+  const ghAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: ghScale.value }],
+  }));
+
+  const googAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: googScale.value }],
+  }));
+
   return (
     <View style={styles.container}>
       {/* GitHub Provider Button */}
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={onGitHubPress}
-        disabled={gitHubLoading || googleLoading}
-        style={styles.socialButton}
-        accessibilityRole="button"
-        accessibilityLabel="Continue with GitHub"
-      >
-        {gitHubLoading ? (
-          <ActivityIndicator color="#0F172A" size="small" />
-        ) : (
-          <>
-            <GitHubIcon size={20} color="#0F172A" />
-            <Text style={styles.buttonText}>GitHub</Text>
-          </>
-        )}
-      </TouchableOpacity>
+      <Animated.View style={[{ flex: 1 }, ghAnimatedStyle]}>
+        <TouchableOpacity
+          activeOpacity={0.88}
+          onPressIn={() => (ghScale.value = withSpring(0.97, { damping: 15, stiffness: 300 }))}
+          onPressOut={() => (ghScale.value = withSpring(1, { damping: 15, stiffness: 300 }))}
+          onPress={onGitHubPress}
+          disabled={gitHubLoading || googleLoading}
+          style={[styles.socialButton, (gitHubLoading || googleLoading) && { opacity: 0.6 }]}
+          accessibilityRole="button"
+          accessibilityLabel="Continue with GitHub"
+        >
+          {gitHubLoading ? (
+            <ActivityIndicator color="#0F172A" size="small" />
+          ) : (
+            <>
+              <GitHubIcon size={20} color="#0F172A" />
+              <Text style={styles.buttonText}>GitHub</Text>
+            </>
+          )}
+        </TouchableOpacity>
+      </Animated.View>
 
       {/* Google Provider Button */}
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={onGooglePress}
-        disabled={gitHubLoading || googleLoading}
-        style={styles.socialButton}
-        accessibilityRole="button"
-        accessibilityLabel="Continue with Google"
-      >
-        {googleLoading ? (
-          <ActivityIndicator color="#0F172A" size="small" />
-        ) : (
-          <>
-            <GoogleIcon size={20} />
-            <Text style={styles.buttonText}>Google</Text>
-          </>
-        )}
-      </TouchableOpacity>
+      <Animated.View style={[{ flex: 1 }, googAnimatedStyle]}>
+        <TouchableOpacity
+          activeOpacity={0.88}
+          onPressIn={() => (googScale.value = withSpring(0.97, { damping: 15, stiffness: 300 }))}
+          onPressOut={() => (googScale.value = withSpring(1, { damping: 15, stiffness: 300 }))}
+          onPress={onGooglePress}
+          disabled={gitHubLoading || googleLoading}
+          style={[styles.socialButton, (gitHubLoading || googleLoading) && { opacity: 0.6 }]}
+          accessibilityRole="button"
+          accessibilityLabel="Continue with Google"
+        >
+          {googleLoading ? (
+            <ActivityIndicator color="#0F172A" size="small" />
+          ) : (
+            <>
+              <GoogleIcon size={20} />
+              <Text style={styles.buttonText}>Google</Text>
+            </>
+          )}
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 };
@@ -73,7 +97,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   socialButton: {
-    flex: 1,
+    width: '100%',
     height: 48,
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
@@ -96,3 +120,4 @@ const styles = StyleSheet.create({
     letterSpacing: -0.2,
   },
 });
+

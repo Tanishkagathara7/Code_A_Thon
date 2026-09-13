@@ -1,6 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { HackathonItemService } from '../services/hackathonItem.service';
+import { NotificationService } from '../services/notification.service';
 
 const VALID_STATUSES = ['pending', 'in_progress', 'completed'];
 const VALID_SORTS = ['createdAt_desc', 'createdAt_asc', 'title_asc', 'title_desc'];
@@ -59,6 +60,19 @@ export class HackathonItemController {
         { title, description, status, category },
         userId
       );
+
+      // Trigger non-blocking notification for item creation
+      try {
+        await NotificationService.createNotification({
+          recipient: userId,
+          type: 'ITEM_CREATED',
+          title: process.env.NOTIF_ITEM_CREATED_TITLE || 'Item created',
+          message: process.env.NOTIF_ITEM_CREATED_MSG || 'Your item was created successfully.',
+          data: { entityId: newItem._id.toString(), entityType: 'item' },
+        });
+      } catch (notifError) {
+        console.error('Failed to create notification for item creation:', notifError);
+      }
 
       return res.status(201).json({
         success: true,
@@ -219,12 +233,38 @@ export class HackathonItemController {
         }
       }
 
+      // Fetch existing item status before update if status is provided to detect completion transition
+      let previousStatus: string | undefined = undefined;
+      if (status !== undefined) {
+        try {
+          const existingItem = await HackathonItemService.getById(id, userId);
+          previousStatus = existingItem.status;
+        } catch {
+          // If item doesn't exist, HackathonItemService.update below will throw proper 404 error
+        }
+      }
+
       const updatedItem = await HackathonItemService.update(id, userId, {
         title,
         description,
         status,
         category,
       });
+
+      // Trigger non-blocking notification only if status transitioned to 'completed'
+      if (status === 'completed' && previousStatus !== 'completed') {
+        try {
+          await NotificationService.createNotification({
+            recipient: userId,
+            type: 'ITEM_COMPLETED',
+            title: process.env.NOTIF_ITEM_COMPLETED_TITLE || 'Item completed',
+            message: process.env.NOTIF_ITEM_COMPLETED_MSG || 'Your item has been marked as completed.',
+            data: { entityId: updatedItem._id.toString(), entityType: 'item' },
+          });
+        } catch (notifError) {
+          console.error('Failed to create notification for item completion:', notifError);
+        }
+      }
 
       return res.status(200).json({
         success: true,

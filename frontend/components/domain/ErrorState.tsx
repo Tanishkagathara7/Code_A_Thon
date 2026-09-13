@@ -10,16 +10,35 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
   message = 'Failed to load data. Please check your connection and try again.',
   onRetry,
 }) => {
+  const getFriendlyMessage = (rawMsg: string): string => {
+    const msg = rawMsg.toLowerCase();
+    if (msg.includes('aborterror') || msg.includes('timeout')) {
+      return 'Connection timed out. Please try again.';
+    }
+    if (msg.includes('network request failed') || msg.includes('failed to fetch')) {
+      return "You're offline. Check your connection and try again.";
+    }
+    return rawMsg;
+  };
+
+  const friendlyMsg = getFriendlyMessage(message);
+
   return (
     <View style={styles.container}>
       <View style={styles.iconCircle}>
         <Text style={styles.iconText}>⚠️</Text>
       </View>
       <Text style={styles.title}>Unable to Load Data</Text>
-      <Text style={styles.message}>{message}</Text>
+      <Text style={styles.message}>{friendlyMsg}</Text>
 
       {onRetry ? (
-        <TouchableOpacity style={styles.retryButton} onPress={onRetry} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={styles.retryButton}
+          onPress={onRetry}
+          activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="Retry request"
+        >
           <Text style={styles.retryText}>Retry Request</Text>
         </TouchableOpacity>
       ) : null}

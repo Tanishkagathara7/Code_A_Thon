@@ -7,22 +7,113 @@ import {
   ScrollView,
   Image,
   Platform,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useAuth } from '../context/AuthContext';
+import { useNetwork } from '../context/NetworkContext';
 import { InteractiveNavbar, TabKey } from '../components/navigation/InteractiveNavbar';
 import { Colors } from '../theme/colors';
 import { AISummarizerCard } from '../components/ai';
 import { FileUploadDemoCard } from '../components/file/FileUploadDemoCard';
+import { analyticsApi } from '../services/api/analyticsApi';
+import { AnalyticsOverviewData } from '../types/analytics';
+import { DashboardAnalyticsView } from '../components/analytics/DashboardAnalyticsView';
 
+
+import { NotificationBadge } from '../components/notifications/NotificationBadge';
+import { notificationApi } from '../services/api/notificationApi';
+import { appConfig } from '../config/appConfig';
 
 export default function HomeScreen() {
   const router = useRouter();
   const { user, isLoading, isAuthenticating, logout } = useAuth();
+  const { isOffline } = useNetwork();
   const [activeTab, setActiveTab] = useState<TabKey>('home');
+
+  // Analytics State
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsOverviewData | null>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState<boolean>(false);
+  const [analyticsError, setAnalyticsError] = useState<string | null>(null);
+  const [isStaleAnalytics, setIsStaleAnalytics] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+
+  const fetchAnalytics = React.useCallback(async () => {
+    if (!user) {
+      setAnalyticsData(null);
+      setAnalyticsLoading(false);
+      setIsStaleAnalytics(false);
+      return;
+    }
+
+    setAnalyticsLoading(true);
+    setAnalyticsError(null);
+
+    // If device is offline, attempt to load cached analytics immediately
+    if (isOffline) {
+      const cached = await analyticsApi.getCachedOverview();
+      if (cached) {
+        setAnalyticsData(cached);
+        setIsStaleAnalytics(true);
+        setAnalyticsLoading(false);
+        return;
+      }
+    }
+
+    try {
+      const data = await analyticsApi.getOverview();
+      setAnalyticsData(data);
+      setIsStaleAnalytics(false);
+    } catch (err: any) {
+      // Fall back to cached data if fetch failed (e.g. timeout or network failure)
+      const cached = await analyticsApi.getCachedOverview();
+      if (cached) {
+        setAnalyticsData(cached);
+        setIsStaleAnalytics(true);
+      } else {
+        setAnalyticsError(err.message || 'Failed to fetch analytics data');
+      }
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  }, [user, isOffline]);
+
+  // Notification State
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+
+  const fetchUnreadCount = React.useCallback(async () => {
+    if (!user) {
+      setUnreadCount(0);
+      return;
+    }
+    if (isOffline) {
+      const cached = await notificationApi.getCachedUnreadCount();
+      setUnreadCount(cached);
+      return;
+    }
+    try {
+      const count = await notificationApi.getUnreadCount();
+      setUnreadCount(count);
+    } catch {
+      const cached = await notificationApi.getCachedUnreadCount();
+      setUnreadCount(cached);
+    }
+  }, [user, isOffline]);
+
+  React.useEffect(() => {
+    fetchAnalytics();
+    fetchUnreadCount();
+  }, [fetchAnalytics, fetchUnreadCount]);
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await Promise.all([fetchAnalytics(), fetchUnreadCount()]);
+    setRefreshing(false);
+  }, [fetchAnalytics, fetchUnreadCount]);
 
   React.useEffect(() => {
     const t8 = Date.now();
@@ -49,9 +140,17 @@ export default function HomeScreen() {
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#4F46E5"
+              colors={['#4F46E5']}
+            />
+          }
         >
           {/* User Profile / Guest Summary Card */}
-          <View style={styles.profileCard}>
+          <Animated.View entering={FadeInDown.duration(250)} style={styles.profileCard}>
             {/* Avatar image or initials */}
             <View style={styles.avatarWrapper}>
               {user?.avatarUrl ? (
@@ -105,7 +204,17 @@ export default function HomeScreen() {
                 </LinearGradient>
               </TouchableOpacity>
             )}
-          </View>
+          </Animated.View>
+
+          {/* Real-time Server-Calculated Analytics & Reusable Dashboard */}
+          <DashboardAnalyticsView
+            data={analyticsData}
+            isLoading={analyticsLoading}
+            error={analyticsError}
+            onRetry={fetchAnalytics}
+            isGuest={!user}
+            isStale={isStaleAnalytics}
+          />
 
           {/* Quick Access Domain Items Card */}
           <TouchableOpacity
@@ -121,12 +230,13 @@ export default function HomeScreen() {
                 <Text style={styles.domainCardBadge}>CRUD DOMAIN</Text>
                 <Text style={styles.domainCardArrow}>Explore ›</Text>
               </View>
-              <Text style={styles.domainCardTitle}>Manage Domain Items</Text>
+              <Text style={styles.domainCardTitle}>Manage {appConfig.entityPluralName}</Text>
               <Text style={styles.domainCardSubtitle}>
-                View, search, create, update, and delete tasks, events, products, or custom entities.
+                View, search, create, update, and delete {appConfig.entityPluralName.toLowerCase()} or custom entities.
               </Text>
             </LinearGradient>
           </TouchableOpacity>
+
 
           {/* AI Foundation Reference Feature Card */}
           <AISummarizerCard />
@@ -177,19 +287,24 @@ export default function HomeScreen() {
         <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeHeader}>
           <View style={styles.headerRow}>
             <View>
-              <Text style={styles.brandTitle}>MindBloom</Text>
+              <Text style={styles.brandTitle}>{appConfig.appName}</Text>
               <Text style={styles.headerSubtitle}>
-                {user ? 'User Space' : 'Guest Mode'}
+                {user ? `${appConfig.primaryEntityName} Hub` : 'Guest Mode'}
               </Text>
             </View>
 
-            <TouchableOpacity
-              onPress={handleAuthAction}
-              style={styles.logoutButton}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.logoutText}>{user ? 'Sign Out' : 'Sign In'}</Text>
-            </TouchableOpacity>
+            <View style={styles.headerRightActions}>
+              {user && (
+                <NotificationBadge unreadCount={unreadCount} />
+              )}
+              <TouchableOpacity
+                onPress={handleAuthAction}
+                style={styles.logoutButton}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.logoutText}>{user ? 'Sign Out' : 'Sign In'}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </SafeAreaView>
       </LinearGradient>
@@ -230,6 +345,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  headerRightActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   brandTitle: {
     fontSize: 22,

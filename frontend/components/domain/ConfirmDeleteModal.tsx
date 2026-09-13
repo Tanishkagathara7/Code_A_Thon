@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Platform,
 } from 'react-native';
+import Animated, { ZoomIn } from 'react-native-reanimated';
 
 interface ConfirmDeleteModalProps {
   visible: boolean;
@@ -34,7 +35,7 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
       onRequestClose={onCancel}
     >
       <View style={styles.overlay}>
-        <View style={styles.dialog}>
+        <Animated.View entering={ZoomIn.duration(200)} style={styles.dialog}>
           <View style={styles.iconCircle}>
             <Text style={styles.iconText}>🗑️</Text>
           </View>
@@ -52,6 +53,8 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
               onPress={onCancel}
               disabled={isDeleting}
               activeOpacity={0.75}
+              accessibilityRole="button"
+              accessibilityLabel="Cancel delete"
             >
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
@@ -61,6 +64,8 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
               onPress={onConfirm}
               disabled={isDeleting}
               activeOpacity={0.75}
+              accessibilityRole="button"
+              accessibilityLabel="Confirm delete"
             >
               {isDeleting ? (
                 <ActivityIndicator size="small" color="#FFFFFF" />
@@ -69,7 +74,7 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
               )}
             </TouchableOpacity>
           </View>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );

@@ -23,8 +23,14 @@ import { LoadingState } from '../../components/domain/LoadingState';
 import { ConfirmDeleteModal } from '../../components/domain/ConfirmDeleteModal';
 import { FilterBar } from '../../components/domain/FilterBar';
 
+import { useNetwork } from '../../context/NetworkContext';
+import { useToast } from '../../context/ToastContext';
+import { appConfig } from '../../config/appConfig';
+
 export default function ItemListScreen() {
   const router = useRouter();
+  const { isOffline } = useNetwork();
+  const { showToast } = useToast();
 
   // Query & Filter State
   const [searchInput, setSearchInput] = useState<string>('');
@@ -164,13 +170,20 @@ export default function ItemListScreen() {
 
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
+    if (isOffline) {
+      showToast("You're offline. Reconnect to delete this item.", 'error');
+      setDeleteTarget(null);
+      return;
+    }
+
     setIsDeleting(true);
     try {
       await hackathonItemApi.deleteItem(deleteTarget.id);
       setItems((prev) => prev.filter((item) => item.id !== deleteTarget.id));
+      showToast('Item deleted successfully.', 'info');
       setDeleteTarget(null);
     } catch (err: any) {
-      alert(err.message || 'Failed to delete item');
+      showToast(err.message || 'Failed to delete item', 'error');
     } finally {
       setIsDeleting(false);
     }
@@ -187,7 +200,7 @@ export default function ItemListScreen() {
             <Text style={styles.backBtnText}>‹ Back</Text>
           </TouchableOpacity>
 
-          <Text style={styles.headerTitle}>Domain Items</Text>
+          <Text style={styles.headerTitle}>{appConfig.entityPluralName}</Text>
 
           <TouchableOpacity
             style={styles.createBtn}
@@ -231,16 +244,17 @@ export default function ItemListScreen() {
       {/* List / Content */}
       <View style={styles.body}>
         {isLoading && !isRefreshing ? (
-          <LoadingState message="Fetching domain items..." count={4} />
+          <LoadingState message={`Fetching ${appConfig.entityPluralName.toLowerCase()}...`} count={4} />
         ) : error ? (
           <ErrorState message={error} onRetry={() => fetchItems(1)} />
         ) : (
           <FlatList
             data={items}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
+            renderItem={({ item, index }) => (
               <DomainCard
                 item={item}
+                index={index}
                 onPress={() => router.push(`/items/${item.id}`)}
                 onEdit={() => router.push(`/items/edit/${item.id}`)}
                 onDelete={() => setDeleteTarget(item)}
@@ -268,9 +282,9 @@ export default function ItemListScreen() {
                 />
               ) : (
                 <EmptyState
-                  title="No domain items found"
-                  description="Get started by creating your first item to see it listed here."
-                  actionLabel="+ Create New Item"
+                  title={`No ${appConfig.entityPluralName.toLowerCase()} found`}
+                  description={`Get started by creating your first ${appConfig.primaryEntityName.toLowerCase()} to see it listed here.`}
+                  actionLabel={`+ Create New ${appConfig.primaryEntityName}`}
                   onAction={() => router.push('/items/create')}
                 />
               )

@@ -12,6 +12,8 @@ import authRoutes from './routes/auth.routes';
 import hackathonItemRoutes from './routes/hackathonItem.routes';
 import aiRoutes from './routes/ai.routes';
 import fileRoutes from './routes/file.routes';
+import analyticsRoutes from './routes/analytics.routes';
+import notificationRoutes from './routes/notification.routes';
 
 // Load environment variables from backend/.env
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
@@ -58,6 +60,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/items', hackathonItemRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/files', fileRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/notifications', notificationRoutes);
+
 
 
 // Global Error Handler Middleware

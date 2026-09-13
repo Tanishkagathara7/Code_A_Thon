@@ -57,3 +57,13 @@ export const otpLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: 'Too many password reset requests from this IP, please try again after 15 minutes.' },
 });
+
+// AI Generation Rate Limiter (Max 15 requests per 15 mins per IP)
+export const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many AI requests. Please wait a few minutes before trying again.' },
+});
+

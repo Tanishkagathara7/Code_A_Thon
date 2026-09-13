@@ -337,9 +337,14 @@ export class AuthService {
     user.resetPasswordExpires = expiresAt;
     await user.save();
 
-    console.log(`🔑 Verification code generated for ${normalizedEmail}: ${otp}`);
-
     const hasRealSmtp = Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    if (!hasRealSmtp && !isProduction) {
+      console.log(`🔑 Verification code generated for ${normalizedEmail}: ${otp}`);
+    } else {
+      console.log(`🔑 Verification code generated for ${normalizedEmail}: [REDACTED]`);
+    }
 
     const mailOptions = {
       from: process.env.SMTP_FROM || `"MindBloom" <${process.env.SMTP_USER || 'security@mindbloom.app'}>`,

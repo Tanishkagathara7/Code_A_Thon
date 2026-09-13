@@ -6,10 +6,17 @@ import {
   TouchableOpacity,
   Platform,
 } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  FadeInDown,
+} from 'react-native-reanimated';
 import { DomainEntity } from '../../types/domain';
 
 interface DomainCardProps {
   item: DomainEntity;
+  index?: number;
   onPress?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
@@ -33,11 +40,13 @@ const getStatusBadgeStyle = (status: string) => {
 
 export const DomainCard: React.FC<DomainCardProps> = ({
   item,
+  index = 0,
   onPress,
   onEdit,
   onDelete,
   secondaryAction,
 }) => {
+  const scale = useSharedValue(1);
   const statusInfo = getStatusBadgeStyle(item.status);
   const formattedDate = item.createdAt
     ? new Date(item.createdAt).toLocaleDateString(undefined, {
@@ -47,78 +56,109 @@ export const DomainCard: React.FC<DomainCardProps> = ({
       })
     : null;
 
+  const handlePressIn = () => {
+    if (onPress) {
+      scale.value = withSpring(0.98, { damping: 15, stiffness: 300 });
+    }
+  };
+
+  const handlePressOut = () => {
+    if (onPress) {
+      scale.value = withSpring(1, { damping: 15, stiffness: 300 });
+    }
+  };
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  // Limit staggered delay to initial visible subset (max 8 items) to maintain high scroll performance
+  const delay = Math.min(index, 6) * 40;
+
   return (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={onPress}
-      activeOpacity={onPress ? 0.75 : 1}
-      disabled={!onPress}
-    >
-      <View style={styles.headerRow}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title} numberOfLines={1}>
-            {item.title}
+    <Animated.View entering={FadeInDown.delay(delay).duration(200)} style={animatedStyle}>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        activeOpacity={onPress ? 0.88 : 1}
+        disabled={!onPress}
+        accessibilityRole="button"
+        accessibilityLabel={`Item: ${item.title}, Status: ${statusInfo.label}`}
+      >
+        <View style={styles.headerRow}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title} numberOfLines={1}>
+              {item.title}
+            </Text>
+            {item.category ? (
+              <View style={styles.categoryBadge}>
+                <Text style={styles.categoryText}>{item.category}</Text>
+              </View>
+            ) : null}
+          </View>
+
+          <View style={[styles.statusBadge, { backgroundColor: statusInfo.bg }]}>
+            <Text style={[styles.statusText, { color: statusInfo.text }]}>
+              {statusInfo.label}
+            </Text>
+          </View>
+        </View>
+
+        {item.description ? (
+          <Text style={styles.description} numberOfLines={2}>
+            {item.description}
           </Text>
-          {item.category ? (
-            <View style={styles.categoryBadge}>
-              <Text style={styles.categoryText}>{item.category}</Text>
-            </View>
-          ) : null}
+        ) : null}
+
+        <View style={styles.footerRow}>
+          {formattedDate ? (
+            <Text style={styles.dateText}>{formattedDate}</Text>
+          ) : (
+            <View />
+          )}
+
+          <View style={styles.actionsGroup}>
+            {secondaryAction ? (
+              <TouchableOpacity
+                style={styles.secondaryBtn}
+                onPress={secondaryAction.onPress}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel={secondaryAction.label}
+              >
+                <Text style={styles.secondaryBtnText}>{secondaryAction.label}</Text>
+              </TouchableOpacity>
+            ) : null}
+
+            {onEdit ? (
+              <TouchableOpacity
+                style={styles.actionBtn}
+                onPress={onEdit}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel={`Edit ${item.title}`}
+              >
+                <Text style={styles.editBtnText}>Edit</Text>
+              </TouchableOpacity>
+            ) : null}
+
+            {onDelete ? (
+              <TouchableOpacity
+                style={[styles.actionBtn, styles.deleteBtn]}
+                onPress={onDelete}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel={`Delete ${item.title}`}
+              >
+                <Text style={styles.deleteBtnText}>Delete</Text>
+              </TouchableOpacity>
+            ) : null}
+          </View>
         </View>
-
-        <View style={[styles.statusBadge, { backgroundColor: statusInfo.bg }]}>
-          <Text style={[styles.statusText, { color: statusInfo.text }]}>
-            {statusInfo.label}
-          </Text>
-        </View>
-      </View>
-
-      {item.description ? (
-        <Text style={styles.description} numberOfLines={2}>
-          {item.description}
-        </Text>
-      ) : null}
-
-      <View style={styles.footerRow}>
-        {formattedDate ? (
-          <Text style={styles.dateText}>{formattedDate}</Text>
-        ) : (
-          <View />
-        )}
-
-        <View style={styles.actionsGroup}>
-          {secondaryAction ? (
-            <TouchableOpacity
-              style={styles.secondaryBtn}
-              onPress={secondaryAction.onPress}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.secondaryBtnText}>{secondaryAction.label}</Text>
-            </TouchableOpacity>
-          ) : null}
-
-          {onEdit ? (
-            <TouchableOpacity
-              style={styles.actionBtn}
-              onPress={onEdit}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.editBtnText}>Edit</Text>
-            </TouchableOpacity>
-          ) : null}
-
-          {onDelete ? (
-            <TouchableOpacity
-              style={[styles.actionBtn, styles.deleteBtn]}
-              onPress={onDelete}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.deleteBtnText}>Delete</Text>
-            </TouchableOpacity>
-          ) : null}
-        </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 

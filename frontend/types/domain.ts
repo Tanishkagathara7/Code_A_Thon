@@ -87,17 +87,41 @@ export interface UpdateItemPayload {
   category?: string;
 }
 
+export type ApiErrorKind = 'NETWORK' | 'TIMEOUT' | 'CLIENT' | 'SERVER' | 'UNKNOWN';
+
 /**
- * Custom Error Class for API calls
+ * Custom Error Class for API calls with structured error classification
  */
 export class ApiError extends Error {
   status?: number;
   data?: any;
+  kind: ApiErrorKind;
+  isNetworkError: boolean;
+  isTimeout: boolean;
 
-  constructor(message: string, status?: number, data?: any) {
+  constructor(message: string, status?: number, data?: any, kind?: ApiErrorKind) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.data = data;
+    this.kind = kind || ApiError.deriveKind(status, message);
+    this.isNetworkError = this.kind === 'NETWORK';
+    this.isTimeout = this.kind === 'TIMEOUT';
+  }
+
+  static deriveKind(status?: number, message?: string): ApiErrorKind {
+    if (status === 0 || message?.toLowerCase().includes('network') || message?.toLowerCase().includes('failed to fetch') || message?.toLowerCase().includes('offline')) {
+      return 'NETWORK';
+    }
+    if (message?.toLowerCase().includes('timeout') || message?.toLowerCase().includes('taking too long') || message?.toLowerCase().includes('aborted')) {
+      return 'TIMEOUT';
+    }
+    if (status && status >= 400 && status < 500) {
+      return 'CLIENT';
+    }
+    if (status && status >= 500) {
+      return 'SERVER';
+    }
+    return 'UNKNOWN';
   }
 }
