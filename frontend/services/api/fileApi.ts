@@ -12,9 +12,16 @@ export const fileApi = {
   /**
    * Upload a file using multipart/form-data
    */
-  async uploadFile(fileUri: string, fileName: string, mimeType: string): Promise<FileUploadResponse> {
-    if (!fileUri) {
-      throw new ApiError('No file selected or invalid file URI.', 400);
+  async uploadFile(fileUri: any, fileName?: string, mimeType?: string): Promise<FileUploadResponse> {
+    let realUri = '';
+    if (typeof fileUri === 'string') {
+      realUri = fileUri;
+    } else if (fileUri && typeof fileUri === 'object') {
+      realUri = fileUri.uri || fileUri.path || fileUri.localUri || fileUri.fileUri || '';
+    }
+
+    if (!realUri || typeof realUri !== 'string') {
+      throw new ApiError('No valid file URI provided for upload.', 400);
     }
 
     const token = await getStoredToken();
@@ -22,29 +29,38 @@ export const fileApi = {
 
     const formData = new FormData();
 
+    const finalName = typeof fileName === 'string' && fileName.trim() ? fileName.trim() : 'upload_file.jpg';
+    const finalType = typeof mimeType === 'string' && mimeType.trim() ? mimeType.trim() : 'image/jpeg';
+
     if (Platform.OS === 'web') {
       try {
-        const res = await fetch(fileUri);
+        const res = await fetch(realUri);
         const blob = await res.blob();
-        formData.append('file', blob, fileName || 'upload_file');
+        formData.append('file', blob, finalName);
       } catch {
         formData.append('file', {
-          uri: fileUri,
-          name: fileName || 'upload_file',
-          type: mimeType || 'application/octet-stream',
+          uri: realUri,
+          name: finalName,
+          type: finalType,
         } as any);
       }
     } else {
       // React Native Mobile (Android & iOS)
-      // Normalize file URI for React Native Android OkHttp
-      const cleanUri = Platform.OS === 'android' && !fileUri.includes('://')
-        ? `file://${fileUri}`
-        : fileUri;
+      let cleanUri = realUri.trim();
+      if (
+        Platform.OS === 'android' &&
+        !cleanUri.startsWith('content://') &&
+        !cleanUri.startsWith('file://') &&
+        !cleanUri.startsWith('http://') &&
+        !cleanUri.startsWith('https://')
+      ) {
+        cleanUri = `file://${cleanUri}`;
+      }
 
       const filePayload = {
         uri: cleanUri,
-        name: fileName || 'upload_file',
-        type: mimeType || 'application/octet-stream',
+        name: finalName,
+        type: finalType,
       };
 
       formData.append('file', filePayload as any);
