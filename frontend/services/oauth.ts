@@ -1,6 +1,6 @@
 import * as WebBrowser from 'expo-web-browser';
 import * as AuthSession from 'expo-auth-session';
-import { Platform } from 'react-native';
+import { Platform, Linking } from 'react-native';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -166,18 +166,44 @@ export const startGitHubAuthFlow = async (): Promise<any> => {
 
     console.log('[AUTH] OAuth started (GitHub)');
     console.log('[AUTH] Redirect URI:', redirectUri);
+
+    let callbackUrl: string | null = null;
+
+    // Listen for deep link events while Chrome CustomTab is active
+    const subscription = Linking.addEventListener('url', (event) => {
+      if (event.url && event.url.includes('code=')) {
+        console.log('[AUTH] Captured deep link event:', event.url);
+        callbackUrl = event.url;
+      }
+    });
+
     const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUri);
+    subscription.remove();
     console.log('[AUTH] OAuth result:', result.type);
 
-    if (result.type === 'cancel' || result.type === 'dismiss') {
-      console.log('[AUTH] User cancelled GitHub OAuth flow.');
-      return { cancelled: true };
+    if (result.type === 'success' && result.url) {
+      callbackUrl = result.url;
     }
 
-    if (result.type === 'success' && result.url) {
-      console.log('[AUTH] OAuth callback received from GitHub');
-      const params = parseUrlParams(result.url);
-      const code = params.code;
+    if (!callbackUrl) {
+      const initialUrl = await Linking.getInitialURL();
+      if (initialUrl && initialUrl.includes('code=')) {
+        console.log('[AUTH] Captured initial deep link URL:', initialUrl);
+        callbackUrl = initialUrl;
+      }
+    }
+
+    if (!callbackUrl) {
+      if (result.type === 'cancel' || result.type === 'dismiss') {
+        console.log('[AUTH] User cancelled GitHub OAuth flow.');
+        return { cancelled: true };
+      }
+      return null;
+    }
+
+    console.log('[AUTH] OAuth callback received from GitHub:', callbackUrl);
+    const params = parseUrlParams(callbackUrl);
+    const code = params.code;
 
       if (params.error) {
         console.error('[AUTH] GitHub OAuth error response:', params.error_description || params.error);
