@@ -1,7 +1,6 @@
-import { AIProvider, AIRequestOptions, AIResponse, AIError } from './ai.types';
-
-// The single best free model on OpenRouter for any question, summarization, or task
-const BEST_FREE_MODEL = 'google/gemini-2.0-flash-lite-preview-02-05:free';
+// Active high-performance free models verified on OpenRouter
+const BEST_FREE_MODEL = 'nvidia/nemotron-3.5-lightning:free';
+const FALLBACK_FREE_MODEL = 'cohere/north-mini-code:free';
 
 export class OpenRouterProvider implements AIProvider {
   public readonly name = 'OpenRouter';
@@ -22,21 +21,24 @@ export class OpenRouterProvider implements AIProvider {
     return (process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1').replace(/\/+$/, '');
   }
 
-  private getModel(requestedModel?: string): string {
+  private getModels(requestedModel?: string): string[] {
     const envModel = process.env.OPENROUTER_MODEL;
-    if (requestedModel && requestedModel !== 'openrouter/free') {
-      return requestedModel;
-    }
-    if (envModel && envModel !== 'openrouter/free') {
-      return envModel;
-    }
-    return BEST_FREE_MODEL;
+    const primary = (requestedModel && !requestedModel.includes('google/gemini-2.0-flash-lite') && requestedModel !== 'openrouter/free')
+      ? requestedModel
+      : (envModel && !envModel.includes('google/gemini-2.0-flash-lite') && envModel !== 'openrouter/free')
+      ? envModel
+      : BEST_FREE_MODEL;
+
+    const list = [primary];
+    if (primary !== BEST_FREE_MODEL) list.push(BEST_FREE_MODEL);
+    if (!list.includes(FALLBACK_FREE_MODEL)) list.push(FALLBACK_FREE_MODEL);
+    return list;
   }
 
   public async generate(options: AIRequestOptions): Promise<AIResponse> {
     const apiKey = this.getApiKey();
     const baseUrl = this.getBaseUrl();
-    const model = this.getModel(options.model);
+    const candidateModels = this.getModels(options.model);
 
     const messages: Array<{ role: 'system' | 'user'; content: string }> = [];
 
@@ -44,18 +46,6 @@ export class OpenRouterProvider implements AIProvider {
       messages.push({ role: 'system', content: options.system.trim() });
     }
     messages.push({ role: 'user', content: options.prompt.trim() });
-
-    const requestBody: Record<string, any> = {
-      model,
-      messages,
-    };
-
-    if (typeof options.temperature === 'number') {
-      requestBody.temperature = options.temperature;
-    }
-    if (typeof options.maxTokens === 'number') {
-      requestBody.max_tokens = options.maxTokens;
-    }
 
     const headers: Record<string, string> = {
       'Authorization': `Bearer ${apiKey}`,
@@ -69,118 +59,92 @@ export class OpenRouterProvider implements AIProvider {
       headers['X-Title'] = process.env.OPENROUTER_SITE_NAME;
     }
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout
+    let lastError: AIError | null = null;
 
-    let res: Response;
-    try {
-      res = await fetch(`${baseUrl}/chat/completions`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(requestBody),
-        signal: controller.signal,
-      });
-    } catch (err: any) {
-      clearTimeout(timeoutId);
-      if (err.name === 'AbortError') {
-        throw new AIError('AI generation request timed out after 25 seconds.', 'TIMEOUT', 504);
-      }
-      throw new AIError(
-        'Failed to communicate with AI provider gateway.',
-        'PROVIDER_UNAVAILABLE',
-        503
-      );
-    } finally {
-      clearTimeout(timeoutId);
-    }
+    for (let i = 0; i < candidateModels.length; i++) {
+      const currentModel = candidateModels[i];
 
-    if (!res.ok) {
-      if (res.status === 401 || res.status === 403) {
-        throw new AIError(
-          'AI provider authentication failed. Please verify server configuration.',
-          'AUTH_ERROR',
-          500
-        );
+      const requestBody: Record<string, any> = {
+        model: currentModel,
+        messages,
+      };
+
+      if (typeof options.temperature === 'number') {
+        requestBody.temperature = options.temperature;
       }
-      if (res.status === 429) {
-        throw new AIError(
-          'AI service rate limit reached. Please try again in a few moments.',
-          'RATE_LIMIT',
-          429
-        );
+      if (typeof options.maxTokens === 'number') {
+        requestBody.max_tokens = options.maxTokens;
       }
-      if (res.status >= 500) {
-        throw new AIError(
-          'AI service is temporarily unavailable.',
-          'PROVIDER_UNAVAILABLE',
-          503
-        );
-      }
-      if (res.status === 400) {
-        let errData: any = {};
-        try {
-          errData = await res.json();
-        } catch {
-          // ignore parsing error
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+      try {
+        const res = await fetch(`${baseUrl}/chat/completions`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(requestBody),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!res.ok) {
+          if (res.status === 401 || res.status === 403) {
+            throw new AIError('AI provider authentication failed.', 'AUTH_ERROR', 500);
+          }
+          let errData: any = {};
+          try {
+            errData = await res.json();
+          } catch {
+            // ignore
+          }
+          const message = errData?.error?.message || `Status ${res.status}`;
+          console.warn(`⚠️ [AI-GATEWAY] Model "${currentModel}" failed (${res.status}): ${message}. Trying next model...`);
+          lastError = new AIError(message, 'PROVIDER_UNAVAILABLE', res.status);
+          continue;
         }
-        const message = errData?.error?.message || 'Invalid request sent to AI provider.';
-        throw new AIError(message, 'INVALID_INPUT', 400);
-      }
-      throw new AIError(
-        `AI provider request failed with status ${res.status}.`,
-        'PROVIDER_UNAVAILABLE',
-        res.status
-      );
-    }
 
-    let payload: any;
-    try {
-      payload = await res.json();
-    } catch {
-      throw new AIError(
-        'Malformed JSON response received from AI provider.',
-        'MALFORMED_RESPONSE',
-        502
-      );
-    }
-
-    if (!payload || !Array.isArray(payload.choices) || payload.choices.length === 0) {
-      throw new AIError(
-        'Invalid response structure received from AI provider.',
-        'MALFORMED_RESPONSE',
-        502
-      );
-    }
-
-    const choice = payload.choices[0];
-    const generatedText = choice.message?.content || choice.text || '';
-
-    if (!generatedText || !generatedText.trim()) {
-      throw new AIError(
-        'AI model generated an empty response. Please try rephrasing your prompt.',
-        'MALFORMED_RESPONSE',
-        502
-      );
-    }
-
-    const responseModel = payload.model || model;
-    const finishReason = choice.finish_reason || undefined;
-
-    const usage = payload.usage
-      ? {
-          promptTokens: payload.usage.prompt_tokens,
-          completionTokens: payload.usage.completion_tokens,
-          totalTokens: payload.usage.total_tokens,
+        const payload: any = await res.json();
+        if (!payload || !Array.isArray(payload.choices) || payload.choices.length === 0) {
+          console.warn(`⚠️ [AI-GATEWAY] Model "${currentModel}" returned empty choices. Trying next...`);
+          lastError = new AIError('Invalid response from AI model.', 'MALFORMED_RESPONSE', 502);
+          continue;
         }
-      : undefined;
 
-    console.log(`✅ [AI-GATEWAY] AI generation successful using model: ${responseModel}`);
+        const choice = payload.choices[0];
+        const generatedText = choice.message?.content || choice.text || '';
+        if (!generatedText || !generatedText.trim()) {
+          console.warn(`⚠️ [AI-GATEWAY] Model "${currentModel}" returned empty text. Trying next...`);
+          lastError = new AIError('Empty response from AI model.', 'MALFORMED_RESPONSE', 502);
+          continue;
+        }
 
-    return {
-      text: generatedText.trim(),
-      model: responseModel,
-      usage,
-      finishReason,
-    };
+        const responseModel = payload.model || currentModel;
+        console.log(`✅ [AI-GATEWAY] AI generation successful using model: ${responseModel}`);
+
+        return {
+          text: generatedText.trim(),
+          model: responseModel,
+          usage: payload.usage
+            ? {
+                promptTokens: payload.usage.prompt_tokens,
+                completionTokens: payload.usage.completion_tokens,
+                totalTokens: payload.usage.total_tokens,
+              }
+            : undefined,
+          finishReason: choice.finish_reason || undefined,
+        };
+      } catch (err: any) {
+        clearTimeout(timeoutId);
+        if (err instanceof AIError && err.code === 'AUTH_ERROR') {
+          throw err;
+        }
+        console.warn(`⚠️ [AI-GATEWAY] Model "${currentModel}" request error: ${err.message}. Trying next...`);
+        lastError = err instanceof AIError ? err : new AIError(err.message || 'AI request failed', 'PROVIDER_UNAVAILABLE', 503);
+      }
+    }
+
+    throw lastError || new AIError('All configured AI models failed.', 'PROVIDER_UNAVAILABLE', 503);
   }
 }
