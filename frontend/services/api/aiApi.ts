@@ -10,13 +10,17 @@ export const aiApi = {
       throw new Error('Prompt is required for AI generation.');
     }
 
-    return apiClient.post<AIGenerateResponse>('/ai/generate', {
-      prompt: payload.prompt.trim(),
-      system: payload.system?.trim(),
-      model: payload.model,
-      temperature: payload.temperature,
-      maxTokens: payload.maxTokens,
-    });
+    return apiClient.post<AIGenerateResponse>(
+      '/ai/generate',
+      {
+        prompt: payload.prompt.trim(),
+        system: payload.system?.trim(),
+        model: payload.model,
+        temperature: payload.temperature,
+        maxTokens: payload.maxTokens,
+      },
+      { timeoutMs: 30000 }
+    );
   },
 
   /**

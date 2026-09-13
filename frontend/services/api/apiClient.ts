@@ -42,7 +42,7 @@ async function singleFetch(url: string, config: RequestInit, timeoutMs: number):
       );
     }
     throw new ApiError(
-      "You're offline. Check your internet connection and try again.",
+      'Unable to connect to the server. Please check your connection and try again.',
       0,
       err,
       'NETWORK'

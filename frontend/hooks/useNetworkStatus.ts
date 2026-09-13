@@ -43,13 +43,7 @@ export function useNetworkStatus(): NetworkStatus {
     let status: NetworkStatusType = 'online';
     let isOffline = false;
 
-    if (isConnected === null) {
-      status = 'checking';
-      isOffline = false;
-    } else if (isConnected === false) {
-      status = 'offline';
-      isOffline = true;
-    } else if (isInternetReachable === false) {
+    if (isConnected === false) {
       status = 'offline';
       isOffline = true;
     } else {
