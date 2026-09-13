@@ -23,7 +23,14 @@ export class OpenRouterProvider implements AIProvider {
   }
 
   private getModel(requestedModel?: string): string {
-    return requestedModel || process.env.OPENROUTER_MODEL || BEST_FREE_MODEL;
+    const envModel = process.env.OPENROUTER_MODEL;
+    if (requestedModel && requestedModel !== 'openrouter/free') {
+      return requestedModel;
+    }
+    if (envModel && envModel !== 'openrouter/free') {
+      return envModel;
+    }
+    return BEST_FREE_MODEL;
   }
 
   public async generate(options: AIRequestOptions): Promise<AIResponse> {
