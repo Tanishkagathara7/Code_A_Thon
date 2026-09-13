@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { getStoredToken } from '../../context/AuthContext';
 import { ApiError } from '../../types/domain';
 import { UploadedFile, FileUploadResponse } from '../../types/file';
@@ -18,7 +19,7 @@ export const fileApi = {
     const formData = new FormData();
 
     // Cross-platform FormData handling (Web vs Mobile Native)
-    if (typeof window !== 'undefined' && (fileUri.startsWith('blob:') || fileUri.startsWith('data:') || fileUri.startsWith('http'))) {
+    if (Platform.OS === 'web' && (fileUri.startsWith('blob:') || fileUri.startsWith('data:') || fileUri.startsWith('http'))) {
       try {
         const res = await fetch(fileUri);
         const blob = await res.blob();
