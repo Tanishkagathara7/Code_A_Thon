@@ -11,6 +11,8 @@ interface AIResponseCardProps {
   usage?: AIUsageInfo;
   onDismiss?: () => void;
   style?: StyleProp<ViewStyle>;
+  showModelBadge?: boolean;
+  showTokenUsage?: boolean;
 }
 
 export const AIResponseCard: React.FC<AIResponseCardProps> = ({
@@ -20,6 +22,8 @@ export const AIResponseCard: React.FC<AIResponseCardProps> = ({
   usage,
   onDismiss,
   style,
+  showModelBadge = false,
+  showTokenUsage = false,
 }) => {
   return (
     <View style={[styles.card, style]} testID="ai-response-card">
@@ -30,7 +34,7 @@ export const AIResponseCard: React.FC<AIResponseCardProps> = ({
         </View>
 
         <View style={styles.rightHeaderGroup}>
-          {model ? (
+          {showModelBadge && model ? (
             <View style={styles.modelBadge}>
               <Text style={styles.modelText}>{model}</Text>
             </View>
@@ -46,7 +50,7 @@ export const AIResponseCard: React.FC<AIResponseCardProps> = ({
 
       <Text style={styles.contentText}>{text}</Text>
 
-      {usage && (usage.promptTokens || usage.completionTokens || usage.totalTokens) ? (
+      {showTokenUsage && usage && (usage.promptTokens || usage.completionTokens || usage.totalTokens) ? (
         <View style={styles.footer}>
           <Text style={styles.usageText}>
             Tokens: {usage.totalTokens ?? ((usage.promptTokens || 0) + (usage.completionTokens || 0))}
