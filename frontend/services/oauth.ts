@@ -268,10 +268,7 @@ export const startGitHubAuthFlow = async (): Promise<any> => {
         console.warn('[AUTH] Direct GitHub token exchange failed:', directErr.message || directErr);
       }
 
-      return { code };
-    }
-
-    return null;
+    return { code };
   } catch (err: any) {
     console.error('[AUTH] OAuth error (GitHub):', err.message || err);
     throw err;
