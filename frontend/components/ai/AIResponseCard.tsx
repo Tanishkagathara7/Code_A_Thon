@@ -2,28 +2,23 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, StyleProp, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, Radii } from '../../theme/colors';
-import { AIUsageInfo } from '../../types/ai';
 
 interface AIResponseCardProps {
   title?: string;
   text: string;
   model?: string;
-  usage?: AIUsageInfo;
   onDismiss?: () => void;
   style?: StyleProp<ViewStyle>;
   showModelBadge?: boolean;
-  showTokenUsage?: boolean;
 }
 
 export const AIResponseCard: React.FC<AIResponseCardProps> = ({
   title = 'AI Insight',
   text,
   model,
-  usage,
   onDismiss,
   style,
-  showModelBadge = false,
-  showTokenUsage = false,
+  showModelBadge = true,
 }) => {
   return (
     <View style={[styles.card, style]} testID="ai-response-card">
@@ -49,14 +44,6 @@ export const AIResponseCard: React.FC<AIResponseCardProps> = ({
       </View>
 
       <Text style={styles.contentText}>{text}</Text>
-
-      {showTokenUsage && usage && (usage.promptTokens || usage.completionTokens || usage.totalTokens) ? (
-        <View style={styles.footer}>
-          <Text style={styles.usageText}>
-            Tokens: {usage.totalTokens ?? ((usage.promptTokens || 0) + (usage.completionTokens || 0))}
-          </Text>
-        </View>
-      ) : null}
     </View>
   );
 };
@@ -118,16 +105,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.text,
     lineHeight: 20,
-  },
-  footer: {
-    marginTop: Spacing.xs + 4,
-    paddingTop: Spacing.xs,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-    alignItems: 'flex-end',
-  },
-  usageText: {
-    fontSize: 11,
-    color: Colors.subtleText,
   },
 });
