@@ -16,12 +16,27 @@ export const fileApi = {
     const url = `${getBaseUrl()}/files`;
 
     const formData = new FormData();
-    // React Native FormData structure for URI uploads
-    formData.append('file', {
-      uri: fileUri,
-      name: fileName || 'upload_file',
-      type: mimeType || 'application/octet-stream',
-    } as any);
+
+    // Cross-platform FormData handling (Web vs Mobile Native)
+    if (typeof window !== 'undefined' && (fileUri.startsWith('blob:') || fileUri.startsWith('data:') || fileUri.startsWith('http'))) {
+      try {
+        const res = await fetch(fileUri);
+        const blob = await res.blob();
+        formData.append('file', blob, fileName || 'upload_file');
+      } catch {
+        formData.append('file', {
+          uri: fileUri,
+          name: fileName || 'upload_file',
+          type: mimeType || 'application/octet-stream',
+        } as any);
+      }
+    } else {
+      formData.append('file', {
+        uri: fileUri,
+        name: fileName || 'upload_file',
+        type: mimeType || 'application/octet-stream',
+      } as any);
+    }
 
     let response: Response;
     try {
@@ -35,7 +50,7 @@ export const fileApi = {
       });
     } catch (err: any) {
       throw new ApiError(
-        'Network request failed during file upload. Please check your connection.',
+        err.message || 'Network request failed during file upload. Please check your connection.',
         0,
         err
       );
