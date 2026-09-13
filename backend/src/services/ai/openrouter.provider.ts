@@ -1,3 +1,5 @@
+import { AIProvider, AIRequestOptions, AIResponse, AIError } from './ai.types';
+
 // Active high-performance free models verified on OpenRouter
 const BEST_FREE_MODEL = 'nvidia/nemotron-3.5-lightning:free';
 const FALLBACK_FREE_MODEL = 'cohere/north-mini-code:free';
