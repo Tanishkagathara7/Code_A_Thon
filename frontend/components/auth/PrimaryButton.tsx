@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   ViewStyle,
   TextStyle,
+  Platform,
 } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -13,6 +14,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import { AppTheme, DefaultTheme } from '../../theme/config';
+import { Typography } from '../../theme/typography';
 
 interface PrimaryButtonProps {
   title: string;
@@ -59,8 +61,8 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
           styles.button,
           {
             backgroundColor: theme.colors.accent,
-            borderRadius: theme.radii.md,
-            opacity: disabled ? 0.6 : 1,
+            borderRadius: 14,
+            opacity: disabled ? 0.65 : 1,
           },
         ]}
         accessibilityRole="button"
@@ -81,17 +83,29 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    marginVertical: 4,
+    marginVertical: 6,
   },
   button: {
     width: '100%',
-    height: 48,
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#18181B',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.16,
+        shadowRadius: 10,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
   buttonText: {
+    fontFamily: Typography.buttonPrimary.fontFamily,
     fontSize: 15.5,
     fontWeight: '600',
-    letterSpacing: -0.2,
+    letterSpacing: -0.3,
   },
 });

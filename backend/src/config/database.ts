@@ -27,7 +27,7 @@ export const connectDatabase = async (): Promise<void> => {
 
   try {
     await mongoose.connect(MONGODB_URI);
-    console.log('✅ Connected to MongoDB Atlas (Database: mindbloom)');
+    console.log('✅ Connected to MongoDB Atlas');
   } catch (err: any) {
     console.error('❌ MongoDB connection error:', err.message);
   }

@@ -149,14 +149,14 @@ async function runNotificationFrontendTests() {
   console.log('✅ 5. Entity navigation metadata structure passed');
 
   // Test 6: Offline cached fallback simulation
-  await mockStorage.setItem('mindbloom_cached_unread_count', '5');
+  await mockStorage.setItem('app_cached_unread_count', '5');
   await mockStorage.setItem(
-    'mindbloom_cached_notifications',
+    'app_cached_notifications',
     JSON.stringify(listRes)
   );
 
-  const cachedCountStr = await mockStorage.getItem('mindbloom_cached_unread_count');
-  const cachedNotifsStr = await mockStorage.getItem('mindbloom_cached_notifications');
+  const cachedCountStr = await mockStorage.getItem('app_cached_unread_count');
+  const cachedNotifsStr = await mockStorage.getItem('app_cached_notifications');
 
   assert(cachedCountStr === '5', 'Cached unread count should be retrieved when offline');
   assert(cachedNotifsStr !== null, 'Cached notifications should be retrieved when offline');

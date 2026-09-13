@@ -13,7 +13,7 @@ export const HeaderSection: React.FC<HeaderSectionProps> = ({ authMode, onSkip }
 
   return (
     <View style={styles.container}>
-      {/* Brand Header Row: Butterfly Logo + MindBloom + Guest Login Button */}
+      {/* Brand Header Row: Logo + App Name + Guest Login Button */}
       <View style={styles.brandRow}>
         <View style={styles.brandTitleWrapper}>
           {/* Luminous Butterfly/Bloom Gradient Logo */}
@@ -50,7 +50,7 @@ export const HeaderSection: React.FC<HeaderSectionProps> = ({ authMode, onSkip }
           </Svg>
 
           <View style={styles.brandTextGroup}>
-            <Text style={styles.brandName}>MindBloom</Text>
+            <Text style={styles.brandName}>APP</Text>
             <Text style={styles.brandTagline}>IDEAS  •  PEOPLE  •  IMPACT</Text>
           </View>
         </View>

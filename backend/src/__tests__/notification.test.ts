@@ -89,7 +89,7 @@ describe('2. Notification Service & Event Trigger Integration Tests', () => {
     const notif = await NotificationService.createNotification({
       recipient: USER_A_ID,
       type: 'SYSTEM',
-      title: 'Welcome to MindBloom',
+      title: 'Welcome to App',
       message: 'Your notification system is live.',
       data: { systemKey: 'welcome' },
     });

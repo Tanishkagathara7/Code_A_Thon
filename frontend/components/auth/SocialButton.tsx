@@ -5,10 +5,11 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
+  Platform,
 } from 'react-native';
-import { GoogleIcon, GitHubIcon, AppleIcon } from '../icons/Icons';
+import { GoogleIcon, GitHubIcon } from '../icons/Icons';
 import { AppTheme, DefaultTheme } from '../../theme/config';
+import { Typography } from '../../theme/typography';
 
 interface SocialButtonProps {
   onGooglePress: () => void;
@@ -25,13 +26,6 @@ export const SocialButton: React.FC<SocialButtonProps> = ({
   gitHubLoading = false,
   theme = DefaultTheme,
 }) => {
-  const handleApplePress = () => {
-    Alert.alert(
-      'Apple Sign In',
-      'Apple Sign In is enabled for iOS devices and supported web configurations.'
-    );
-  };
-
   return (
     <View style={styles.container}>
       {/* Google Button */}
@@ -44,7 +38,7 @@ export const SocialButton: React.FC<SocialButtonProps> = ({
           {
             backgroundColor: theme.colors.socialBg,
             borderColor: theme.colors.socialBorder,
-            borderRadius: theme.radii.md,
+            borderRadius: 14,
           },
         ]}
         accessibilityRole="button"
@@ -72,7 +66,7 @@ export const SocialButton: React.FC<SocialButtonProps> = ({
           {
             backgroundColor: theme.colors.socialBg,
             borderColor: theme.colors.socialBorder,
-            borderRadius: theme.radii.md,
+            borderRadius: 14,
           },
         ]}
         accessibilityRole="button"
@@ -89,28 +83,6 @@ export const SocialButton: React.FC<SocialButtonProps> = ({
           </>
         )}
       </TouchableOpacity>
-
-      {/* Apple Button */}
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={handleApplePress}
-        disabled={googleLoading || gitHubLoading}
-        style={[
-          styles.socialBtn,
-          {
-            backgroundColor: theme.colors.socialBg,
-            borderColor: theme.colors.socialBorder,
-            borderRadius: theme.radii.md,
-          },
-        ]}
-        accessibilityRole="button"
-        accessibilityLabel="Continue with Apple"
-      >
-        <AppleIcon size={18} color={theme.colors.text} />
-        <Text style={[styles.btnText, { color: theme.colors.socialText }]}>
-          Apple
-        </Text>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -119,22 +91,34 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
     width: '100%',
-    marginVertical: 4,
+    marginVertical: 6,
   },
   socialBtn: {
     flex: 1,
-    height: 44,
-    borderWidth: 1,
+    height: 48,
+    borderWidth: 1.2,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
+    gap: 8,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.04,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 1,
+      },
+    }),
   },
   btnText: {
-    fontSize: 14,
+    fontFamily: Typography.socialButton.fontFamily,
+    fontSize: 14.5,
     fontWeight: '600',
-    letterSpacing: -0.1,
+    letterSpacing: -0.2,
   },
 });

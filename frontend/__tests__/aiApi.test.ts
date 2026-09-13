@@ -11,7 +11,7 @@ class MockFrontendAiApi {
   public mockResponse: AIGenerateResponse = {
     success: true,
     data: {
-      text: 'Summary: MindBloom is a cross-platform mobile application.',
+      text: 'Summary: App is a cross-platform mobile application.',
       model: 'openrouter/free',
       usage: {
         promptTokens: 12,
@@ -59,7 +59,7 @@ async function runFrontendAiTests() {
     prompt: 'Explain React Native Expo in one sentence.',
   });
   assert(genRes.success === true, 'Generation request should succeed');
-  assert(genRes.data.text.includes('MindBloom'), 'Result text should match mock output');
+  assert(genRes.data.text.includes('App'), 'Result text should match mock output');
   assert(genRes.data.model === 'openrouter/free', 'Model should be openrouter/free');
   assert(genRes.data.usage?.totalTokens === 22, 'Usage totalTokens should match');
   console.log('✅ 1. Frontend AI generation response parsing passed');

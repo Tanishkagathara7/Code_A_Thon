@@ -49,7 +49,7 @@ export const getRedirectUri = (customScheme?: string) => {
   if (Platform.OS === 'web') {
     return AuthSession.makeRedirectUri();
   }
-  const scheme = customScheme || process.env.EXPO_PUBLIC_APP_SCHEME || 'mindbloom';
+  const scheme = customScheme || process.env.EXPO_PUBLIC_APP_SCHEME || 'app';
   return AuthSession.makeRedirectUri({
     scheme,
     path: 'oauthredirect',
@@ -141,7 +141,7 @@ export const startGoogleAuthFlow = async (): Promise<any> => {
     ) {
       console.error('[AUTH] DEVELOPER_ERROR in Native Google Sign-In');
       throw new Error(
-        'DEVELOPER_ERROR: Android SHA-1 fingerprint (5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25) for com.mindbloom.app must be added to an Android OAuth Client ID in Google Cloud Console.'
+        'DEVELOPER_ERROR: Android SHA-1 fingerprint (5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25) for com.app.mobile must be added to an Android OAuth Client ID in Google Cloud Console.'
       );
     } else {
       console.error('[AUTH] Native Google Sign-In error:', error.message || error);
@@ -276,7 +276,7 @@ export const fetchGitHubUserProfile = async (token: string) => {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: 'application/vnd.github.v3+json',
-        'User-Agent': 'MindBloom-App',
+        'User-Agent': 'App',
       },
     });
     return await response.json();
@@ -292,7 +292,7 @@ export const fetchGitHubPrimaryEmail = async (token: string): Promise<string | n
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: 'application/vnd.github.v3+json',
-        'User-Agent': 'MindBloom-App',
+        'User-Agent': 'App',
       },
     });
     if (response.ok) {

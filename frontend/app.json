@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "MindBloom",
+    "name": "APP",
     "owner": "tvkms-team",
     "slug": "tanis",
     "scheme": [
-      "mindbloom",
-      "com.mindbloom.app",
+      "app",
+      "com.app.mobile",
       "com.googleusercontent.apps.878949461550-s6de153nvgoq1gb94191i1pgqfqbv1jd"
     ],
     "version": "1.0.0",
@@ -14,10 +14,10 @@
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mindbloom.app"
+      "bundleIdentifier": "com.app.mobile"
     },
     "android": {
-      "package": "com.mindbloom.app",
+      "package": "com.app.mobile",
       "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "backgroundColor": "#0D111F",

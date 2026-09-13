@@ -90,14 +90,14 @@ function runTests() {
   console.log('✅ 5. Skip button & Guest Mode navigation passed');
 
   // Test 6: JWT Token Storage Key & Authorization Header formatting
-  const TOKEN_KEY = 'mindbloom_auth_token';
+  const TOKEN_KEY = 'app_auth_token';
   const mockJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXJfMTIzIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIn0.signature';
   const formatAuthHeader = (token: string | null) => {
     if (!token) return {};
     return { Authorization: `Bearer ${token}` };
   };
 
-  assert(TOKEN_KEY === 'mindbloom_auth_token', 'TOKEN_KEY should match');
+  assert(TOKEN_KEY === 'app_auth_token', 'TOKEN_KEY should match');
   const headers = formatAuthHeader(mockJwtToken);
   assert(headers.Authorization === `Bearer ${mockJwtToken}`, 'Authorization header should be Bearer token');
   console.log('✅ 6. JWT Token Storage & Authorization header formatting passed');

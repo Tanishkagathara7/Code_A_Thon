@@ -6,8 +6,8 @@ import {
 } from '../../types/notification';
 import { storage } from '../../context/AuthContext';
 
-export const NOTIFICATIONS_CACHE_KEY = 'mindbloom_cached_notifications';
-export const UNREAD_COUNT_CACHE_KEY = 'mindbloom_cached_unread_count';
+export const NOTIFICATIONS_CACHE_KEY = 'app_cached_notifications';
+export const UNREAD_COUNT_CACHE_KEY = 'app_cached_unread_count';
 
 export interface ApiResponse<T> {
   success: boolean;

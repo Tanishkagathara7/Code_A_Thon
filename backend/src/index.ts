@@ -70,7 +70,7 @@ app.use(errorHandler);
 
 // Start Express server
 app.listen(PORT, () => {
-  console.log(`🚀 MindBloom Backend API running on http://localhost:${PORT}`);
+  console.log(`🚀 Backend API running on http://localhost:${PORT}`);
 });
 
 export default app;

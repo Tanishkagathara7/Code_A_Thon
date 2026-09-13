@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
+import { Platform, AppState, AppStateStatus } from 'react-native';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { startGoogleAuthFlow, startGitHubAuthFlow } from '../services/oauth';
 
@@ -9,7 +9,7 @@ export interface User {
   email: string;
   name: string;
   avatarUrl?: string;
-  provider?: 'email' | 'google' | 'apple' | 'github';
+  provider?: 'email' | 'google' | 'github';
 }
 
 interface AuthContextType {
@@ -29,8 +29,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const TOKEN_KEY = 'mindbloom_auth_token';
-export const USER_KEY = 'mindbloom_user_profile';
+export const TOKEN_KEY = 'app_auth_token';
+export const USER_KEY = 'app_user_profile';
 
 export const storage = {
   async getItem(key: string): Promise<string | null> {
@@ -102,55 +102,105 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    // Restore persistent session on launch & verify JWT against backend
+    // Restore persistent session instantly from local storage & verify JWT asynchronously in background
     const loadSession = async () => {
+      let storedToken: string | null = null;
+      let storedUser: string | null = null;
+
       try {
         console.log('[AUTH] Restoring session from storage...');
-        const storedToken = await storage.getItem(TOKEN_KEY);
-        const storedUser = await storage.getItem(USER_KEY);
+        storedToken = await storage.getItem(TOKEN_KEY);
+        storedUser = await storage.getItem(USER_KEY);
 
         if (storedToken && storedUser) {
           const parsedUser = JSON.parse(storedUser);
           setUser(parsedUser);
-          console.log('[AUTH] Session restored from storage:', parsedUser.email);
-
-          // Verify token against backend /api/auth/me if online
-          const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
-          try {
-            const meRes = await fetch(`${apiUrl}/auth/me`, {
-              headers: { Authorization: `Bearer ${storedToken}` },
-            });
-            if (meRes.ok) {
-              const meData = await meRes.json();
-              if (meData.user) {
-                const updatedUser: User = {
-                  id: meData.user.id || meData.user._id,
-                  email: meData.user.email,
-                  name: meData.user.name,
-                  avatarUrl: meData.user.avatarUrl,
-                  provider: meData.user.provider,
-                };
-                setUser(updatedUser);
-                await storage.setItem(USER_KEY, JSON.stringify(updatedUser));
-                console.log('[AUTH] User profile refreshed from /api/auth/me');
-              }
-            } else if (meRes.status === 401) {
-              console.warn('[AUTH] Stored token expired or invalid (HTTP 401). Clearing session...');
-              await logout();
-            }
-          } catch (meErr) {
-            console.warn('[AUTH] Offline / backend unreachable during startup token check. Preserving local session.');
-          }
+          console.log('[AUTH] Session restored instantly from storage:', parsedUser.email);
         } else {
           console.log('[AUTH] No stored session found.');
         }
       } catch (err) {
-        console.warn('[AUTH] Failed to restore auth session:', err);
+        console.warn('[AUTH] Failed to restore auth session from storage:', err);
       } finally {
+        // Immediately unblock app rendering without waiting for network cold-starts
         setIsLoading(false);
       }
+
+      // Background non-blocking verification of stored token
+      if (storedToken) {
+        const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
+        try {
+          const controller = new AbortController();
+          const meTimeout = setTimeout(() => controller.abort(), 5000);
+
+          const meRes = await fetch(`${apiUrl}/auth/me`, {
+            headers: { Authorization: `Bearer ${storedToken}` },
+            signal: controller.signal,
+          });
+          clearTimeout(meTimeout);
+
+          if (meRes.ok) {
+            const meData = await meRes.json();
+            if (meData.user) {
+              const updatedUser: User = {
+                id: meData.user.id || meData.user._id,
+                email: meData.user.email,
+                name: meData.user.name,
+                avatarUrl: meData.user.avatarUrl,
+                provider: meData.user.provider,
+              };
+              setUser(updatedUser);
+              await storage.setItem(USER_KEY, JSON.stringify(updatedUser));
+              console.log('[AUTH] User profile refreshed from /api/auth/me');
+            }
+          } else if (meRes.status === 401) {
+            console.warn('[AUTH] Stored token expired or invalid (HTTP 401). Clearing session...');
+            await logout();
+          }
+        } catch (meErr) {
+          console.warn('[AUTH] Background token check timed out or unreachable. Preserving local session.');
+        }
+      }
     };
+
     loadSession();
+  }, []);
+
+  // Periodic keep-alive ping & refocus warmup to prevent Render free-tier cold starts
+  useEffect(() => {
+    const pingBackend = async () => {
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 4000);
+        await fetch(`${apiUrl}/health`, { signal: controller.signal });
+        clearTimeout(timeout);
+      } catch {}
+    };
+
+    // Ping every 10 minutes while app is running
+    const interval = setInterval(pingBackend, 10 * 60 * 1000);
+
+    // Warmup ping on app/tab focus
+    let appStateSub: any;
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      const handleFocus = () => pingBackend();
+      window.addEventListener('focus', handleFocus);
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('focus', handleFocus);
+      };
+    } else {
+      appStateSub = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
+        if (nextAppState === 'active') {
+          pingBackend();
+        }
+      });
+      return () => {
+        clearInterval(interval);
+        appStateSub?.remove?.();
+      };
+    }
   }, []);
 
   const persistSession = async (userProfile: User, token: string) => {

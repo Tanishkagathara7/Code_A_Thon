@@ -2,7 +2,7 @@ import { apiClient } from './apiClient';
 import { AnalyticsOverviewResponse, AnalyticsOverviewData } from '../../types/analytics';
 import { storage } from '../../context/AuthContext';
 
-export const ANALYTICS_CACHE_KEY = 'mindbloom_cached_analytics';
+export const ANALYTICS_CACHE_KEY = 'app_cached_analytics';
 
 export const analyticsApi = {
   /**

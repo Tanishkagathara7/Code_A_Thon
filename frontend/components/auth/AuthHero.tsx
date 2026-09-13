@@ -7,6 +7,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { AppTheme, DefaultTheme } from '../../theme/config';
+import { Typography } from '../../theme/typography';
 
 export type AuthMode = 'login' | 'signup' | 'forgot-password';
 
@@ -46,12 +47,12 @@ export const AuthHero: React.FC<AuthHeroProps> = ({
       case 'login':
         return {
           heading: 'Welcome back',
-          subheading: 'Sign in to continue',
+          subheading: 'Sign in to access your dashboard & sync data',
         };
       case 'signup':
         return {
           heading: 'Create your account',
-          subheading: 'Start with a few details',
+          subheading: 'Get started in seconds with a free account',
         };
       case 'forgot-password':
         return {
@@ -84,18 +85,20 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   textWrapper: {
-    gap: 4,
+    gap: 6,
   },
   headingText: {
+    fontFamily: Typography.headline.fontFamily,
     fontSize: 28,
-    fontWeight: '800',
+    fontWeight: '700',
     letterSpacing: -0.8,
     lineHeight: 34,
   },
   subheadingText: {
-    fontSize: 15,
+    fontFamily: Typography.subtitle.fontFamily,
+    fontSize: 14.5,
     fontWeight: '400',
-    letterSpacing: -0.1,
+    letterSpacing: -0.2,
     lineHeight: 21,
   },
 });

@@ -121,7 +121,7 @@ export class AuthService {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        'User-Agent': 'MindBloom-App',
+        'User-Agent': 'App',
       },
       body: JSON.stringify(tokenParams),
     });
@@ -143,7 +143,7 @@ export class AuthService {
       headers: {
         Authorization: `Bearer ${accessToken}`,
         Accept: 'application/vnd.github.v3+json',
-        'User-Agent': 'MindBloom-App',
+        'User-Agent': 'App',
       },
     });
 
@@ -164,7 +164,7 @@ export class AuthService {
           headers: {
             Authorization: `Bearer ${accessToken}`,
             Accept: 'application/vnd.github.v3+json',
-            'User-Agent': 'MindBloom-App',
+            'User-Agent': 'App',
           },
         });
         if (emailsResponse.ok) {
@@ -235,10 +235,11 @@ export class AuthService {
     }
 
     const normalizedEmail = email.trim().toLowerCase();
-    let user = await User.findOne({ email: normalizedEmail });
 
     if (mode === 'signup') {
-      if (user) {
+      // Fast index existence check using MongoDB projection
+      const existingUser = await User.exists({ email: normalizedEmail });
+      if (existingUser) {
         const error: any = new Error('An account already exists with this email address.');
         error.statusCode = 400;
         throw error;
@@ -254,15 +255,28 @@ export class AuthService {
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      user = new User({
+      const newUser = new User({
         email: normalizedEmail,
         name: name ? name.trim() : normalizedEmail.split('@')[0],
         provider: 'email',
         passwordHash: hashedPassword,
       });
-      await user.save();
-      console.log(`👤 New user registered via email: ${user.email}`);
+      await newUser.save();
+      console.log(`👤 New user registered via email: ${newUser.email}`);
+
+      return {
+        success: true,
+        token: generateToken((newUser._id as any).toString(), newUser.email),
+        user: {
+          id: newUser._id,
+          email: newUser.email,
+          name: newUser.name,
+          provider: newUser.provider,
+          avatarUrl: newUser.avatarUrl,
+        },
+      };
     } else {
+      let user = await User.findOne({ email: normalizedEmail });
       // Mode: 'login' - User MUST be registered
       if (!user) {
         const error: any = new Error('No account found with this email. Please sign up first.');
@@ -347,14 +361,14 @@ export class AuthService {
     }
 
     const mailOptions = {
-      from: process.env.SMTP_FROM || `"MindBloom" <${process.env.SMTP_USER || 'security@mindbloom.app'}>`,
+      from: process.env.SMTP_FROM || `"App" <${process.env.SMTP_USER || 'security@app.com'}>`,
       to: normalizedEmail,
-      subject: 'MindBloom Password Reset Verification Code',
+      subject: 'Password Reset Verification Code',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 28px; border-radius: 16px; background-color: #f8fafc; border: 1px solid #e2e8f0;">
           <h2 style="color: #1e293b; margin-top: 0;">Password Reset Verification</h2>
           <p style="color: #475569; font-size: 15px; line-height: 22px;">
-            You recently requested to reset the password for your <strong>MindBloom</strong> account.
+            You recently requested to reset the password for your account.
           </p>
           <div style="margin: 24px 0; padding: 18px; background-color: #ffffff; border-radius: 12px; text-align: center; border: 1.5px dashed #6366f1;">
             <span style="font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #4f46e5;">${otp}</span>

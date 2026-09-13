@@ -24,7 +24,7 @@ export interface AppConfig {
 }
 
 export const appConfig: AppConfig = {
-  appName: 'MindBloom',
+  appName: 'APP',
   tagline: 'AI-Powered Hackathon Pivot Kit',
   primaryEntityName: 'Item',
   entityPluralName: 'Items',

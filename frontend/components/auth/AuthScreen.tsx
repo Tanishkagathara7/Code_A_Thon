@@ -258,12 +258,12 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
                     {
                       backgroundColor:
                         banner.type === 'error'
-                          ? theme.colors.errorBg
-                          : theme.colors.successBg,
+                          ? '#FEF2F2'
+                          : '#F0FDF4',
                       borderColor:
                         banner.type === 'error'
-                          ? theme.colors.error
-                          : theme.colors.success,
+                          ? '#FCA5A5'
+                          : '#86EFAC',
                     },
                   ]}
                 >
@@ -273,11 +273,12 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
                       {
                         color:
                           banner.type === 'error'
-                            ? theme.colors.error
-                            : theme.colors.success,
+                            ? '#DC2626'
+                            : '#16A34A',
                       },
                     ]}
                   >
+                    {banner.type === 'error' ? '⚠️ ' : '✅ '}
                     {banner.text}
                   </Text>
                 </Animated.View>
@@ -328,6 +329,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
                     activeOpacity={0.7}
                     style={styles.forgotRow}
                     accessibilityRole="button"
+                    accessibilityLabel="Forgot password"
                   >
                     <Text style={[styles.forgotText, { color: theme.colors.mutedText }]}>
                       Forgot password?
@@ -404,6 +406,20 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
                     error={signupErrors.confirmPassword}
                     theme={theme}
                   />
+
+                  {/* Real-time Password Requirements Badges */}
+                  <View style={styles.reqRow}>
+                    <View style={[styles.reqPill, signupPassword.length >= 8 && styles.reqPillActive]}>
+                      <Text style={[styles.reqText, signupPassword.length >= 8 && styles.reqTextActive]}>
+                        {signupPassword.length >= 8 ? '✓ 8+ characters' : '• 8+ characters'}
+                      </Text>
+                    </View>
+                    <View style={[styles.reqPill, signupPassword.length > 0 && signupPassword === signupConfirm && styles.reqPillActive]}>
+                      <Text style={[styles.reqText, signupPassword.length > 0 && signupPassword === signupConfirm && styles.reqTextActive]}>
+                        {signupPassword.length > 0 && signupPassword === signupConfirm ? '✓ Passwords match' : '• Passwords match'}
+                      </Text>
+                    </View>
+                  </View>
                 </Animated.View>
               )}
 
@@ -487,26 +503,53 @@ const styles = StyleSheet.create({
   },
   forgotRow: {
     alignSelf: 'flex-end',
-    marginTop: -4,
-    marginBottom: 14,
+    marginTop: -6,
+    marginBottom: 16,
     paddingVertical: 4,
   },
   forgotText: {
-    fontSize: 14,
+    fontSize: 13.5,
     fontWeight: '600',
-    letterSpacing: -0.1,
+    letterSpacing: -0.2,
   },
   banner: {
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 12,
     paddingVertical: 10,
     paddingHorizontal: 14,
-    marginBottom: 14,
+    marginBottom: 16,
   },
   bannerText: {
     fontSize: 13.5,
-    fontWeight: '500',
+    fontWeight: '600',
     textAlign: 'center',
     lineHeight: 19,
+  },
+  reqRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: -6,
+    marginBottom: 16,
+  },
+  reqPill: {
+    backgroundColor: '#F3F4F6',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  reqPillActive: {
+    backgroundColor: '#DCFCE7',
+    borderColor: '#86EFAC',
+  },
+  reqText: {
+    fontSize: 11.5,
+    fontWeight: '500',
+    color: '#6B7280',
+  },
+  reqTextActive: {
+    color: '#15803D',
+    fontWeight: '600',
   },
 });

@@ -2,11 +2,13 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, StyleProp, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, Radii } from '../../theme/colors';
+import { AIUsageInfo } from '../../types/ai';
 
 interface AIResponseCardProps {
   title?: string;
   text: string;
   model?: string;
+  usage?: AIUsageInfo;
   onDismiss?: () => void;
   style?: StyleProp<ViewStyle>;
   showModelBadge?: boolean;
@@ -16,6 +18,7 @@ export const AIResponseCard: React.FC<AIResponseCardProps> = ({
   title = 'AI Insight',
   text,
   model,
+  usage,
   onDismiss,
   style,
   showModelBadge = true,
@@ -32,6 +35,12 @@ export const AIResponseCard: React.FC<AIResponseCardProps> = ({
           {showModelBadge && model ? (
             <View style={styles.modelBadge}>
               <Text style={styles.modelText}>{model}</Text>
+            </View>
+          ) : null}
+
+          {usage?.totalTokens ? (
+            <View style={styles.usageBadge}>
+              <Text style={styles.usageText}>{usage.totalTokens} tokens</Text>
             </View>
           ) : null}
 
@@ -94,6 +103,20 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
   },
   modelText: {
+    fontSize: 11,
+    color: Colors.mutedText,
+    fontWeight: '500',
+  },
+  usageBadge: {
+    backgroundColor: Colors.surfaceHover,
+    paddingHorizontal: Spacing.xs + 4,
+    paddingVertical: 2,
+    borderRadius: Radii.xs,
+    marginRight: Spacing.xs,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  usageText: {
     fontSize: 11,
     color: Colors.mutedText,
     fontWeight: '500',

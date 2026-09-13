@@ -73,7 +73,7 @@ async function runNetworkResilienceTests() {
     },
   };
 
-  const ANALYTICS_CACHE_KEY = 'mindbloom_cached_analytics';
+  const ANALYTICS_CACHE_KEY = 'app_cached_analytics';
   const mockOverview = {
     overview: { total: 10, completed: 6, inProgress: 3, pending: 1, completionRate: 60 },
     categories: [{ category: 'Engineering', count: 6, percentage: 60 }],

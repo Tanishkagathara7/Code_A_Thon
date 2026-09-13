@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   TextInputProps,
+  Platform,
 } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -15,6 +16,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { EyeIcon } from '../icons/Icons';
 import { AppTheme, DefaultTheme } from '../../theme/config';
+import { Typography } from '../../theme/typography';
 
 interface InputFieldProps extends TextInputProps {
   label: string;
@@ -63,8 +65,8 @@ export const InputField: React.FC<InputFieldProps> = ({
       ? theme.colors.borderFocus
       : theme.colors.border;
     const backgroundColor = focused
-      ? theme.colors.surface
-      : theme.colors.surface;
+      ? '#FFFFFF'
+      : '#F8F9FA';
 
     return {
       borderColor,
@@ -87,6 +89,7 @@ export const InputField: React.FC<InputFieldProps> = ({
           secureTextEntry={isPassword && !showPassword}
           onFocus={handleFocus}
           onBlur={handleBlur}
+          accessibilityLabel={label}
           {...props}
         />
 
@@ -119,22 +122,34 @@ export const InputField: React.FC<InputFieldProps> = ({
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginBottom: 14,
+    marginBottom: 16,
     width: '100%',
   },
   label: {
-    fontSize: 14,
+    fontFamily: Typography.inputLabel.fontFamily,
+    fontSize: 13.5,
     fontWeight: '600',
-    marginBottom: 6,
-    letterSpacing: -0.1,
+    marginBottom: 7,
+    letterSpacing: -0.2,
   },
   inputBox: {
-    height: 48,
-    borderRadius: 12,
-    borderWidth: 1,
+    height: 50,
+    borderRadius: 14,
+    borderWidth: 1.5,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.03,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 1,
+      },
+    }),
   },
   leftIcon: {
     marginRight: 10,
@@ -148,14 +163,15 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
-    fontSize: 15.5,
+    fontFamily: Typography.inputText.fontFamily,
+    fontSize: 15,
     fontWeight: '500',
     height: '100%',
   },
   errorText: {
     fontSize: 12.5,
     fontWeight: '500',
-    marginTop: 4,
-    marginLeft: 2,
+    marginTop: 5,
+    marginLeft: 4,
   },
 });

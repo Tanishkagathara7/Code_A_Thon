@@ -8,6 +8,7 @@ import {
   Image,
   Platform,
   RefreshControl,
+  AppState,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -50,18 +51,21 @@ export default function HomeScreen() {
       return;
     }
 
-    setAnalyticsLoading(true);
     setAnalyticsError(null);
 
-    // If device is offline, attempt to load cached analytics immediately
+    // Stale-While-Revalidate: Load cached analytics instantly first (0ms delay)
+    const cached = await analyticsApi.getCachedOverview();
+    if (cached) {
+      setAnalyticsData(cached);
+      setIsStaleAnalytics(true);
+      setAnalyticsLoading(false);
+    } else {
+      setAnalyticsLoading(true);
+    }
+
     if (isOffline) {
-      const cached = await analyticsApi.getCachedOverview();
-      if (cached) {
-        setAnalyticsData(cached);
-        setIsStaleAnalytics(true);
-        setAnalyticsLoading(false);
-        return;
-      }
+      setAnalyticsLoading(false);
+      return;
     }
 
     try {
@@ -69,10 +73,10 @@ export default function HomeScreen() {
       setAnalyticsData(data);
       setIsStaleAnalytics(false);
     } catch (err: any) {
-      // Fall back to cached data if fetch failed (e.g. timeout or network failure)
-      const cached = await analyticsApi.getCachedOverview();
-      if (cached) {
-        setAnalyticsData(cached);
+      // Fall back to cached data if fetch failed (e.g. timeout or cold backend wake up)
+      const fallbackCache = await analyticsApi.getCachedOverview();
+      if (fallbackCache) {
+        setAnalyticsData(fallbackCache);
         setIsStaleAnalytics(true);
       } else {
         setAnalyticsError(err.message || 'Failed to fetch analytics data');
@@ -90,23 +94,44 @@ export default function HomeScreen() {
       setUnreadCount(0);
       return;
     }
-    if (isOffline) {
-      const cached = await notificationApi.getCachedUnreadCount();
-      setUnreadCount(cached);
-      return;
-    }
+    // Set cached unread count immediately
+    const cached = await notificationApi.getCachedUnreadCount();
+    setUnreadCount(cached);
+
+    if (isOffline) return;
+
     try {
       const count = await notificationApi.getUnreadCount();
       setUnreadCount(count);
     } catch {
-      const cached = await notificationApi.getCachedUnreadCount();
-      setUnreadCount(cached);
+      // Retain cached count on network cold-start failure
     }
   }, [user, isOffline]);
 
   React.useEffect(() => {
     fetchAnalytics();
     fetchUnreadCount();
+  }, [fetchAnalytics, fetchUnreadCount]);
+
+  // Refocus / AppState listener to automatically refresh dashboard when returning after 15-20 min
+  React.useEffect(() => {
+    let sub: any;
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      const handleFocus = () => {
+        fetchAnalytics();
+        fetchUnreadCount();
+      };
+      window.addEventListener('focus', handleFocus);
+      return () => window.removeEventListener('focus', handleFocus);
+    } else {
+      sub = AppState.addEventListener('change', (state) => {
+        if (state === 'active') {
+          fetchAnalytics();
+          fetchUnreadCount();
+        }
+      });
+      return () => sub?.remove?.();
+    }
   }, [fetchAnalytics, fetchUnreadCount]);
 
   const onRefresh = React.useCallback(async () => {

@@ -17,7 +17,7 @@ async function testSendEmail() {
     console.log('Without real Gmail SMTP credentials, emails are sent to Ethereal sandbox (not real Gmail).');
     console.log('\nTo receive real emails in oneloki05@gmail.com:');
     console.log('1. Go to https://myaccount.google.com/apppasswords');
-    console.log('2. Create an App Password for "MindBloom"');
+    console.log('2. Create an App Password for "App"');
     console.log('3. Add these lines to your backend/.env and Render Environment Variables:');
     console.log('   SMTP_USER=your_sending_gmail@gmail.com');
     console.log('   SMTP_PASS=your_16_char_app_password');
@@ -38,14 +38,14 @@ async function testSendEmail() {
   const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
 
   const mailOptions = {
-    from: process.env.SMTP_FROM || `"MindBloom" <${smtpUser}>`,
+    from: process.env.SMTP_FROM || `"App" <${smtpUser}>`,
     to: recipient,
-    subject: 'MindBloom Password Reset Verification Code',
+    subject: 'Password Reset Verification Code',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 28px; border-radius: 16px; background-color: #f8fafc; border: 1px solid #e2e8f0;">
         <h2 style="color: #1e293b; margin-top: 0;">Password Reset Verification</h2>
         <p style="color: #475569; font-size: 15px; line-height: 22px;">
-          You requested to reset your password for <strong>MindBloom</strong>.
+          You requested to reset your password for <strong>App</strong>.
         </p>
         <div style="margin: 24px 0; padding: 18px; background-color: #ffffff; border-radius: 12px; text-align: center; border: 1.5px dashed #6366f1;">
           <span style="font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #4f46e5;">${otpCode}</span>
