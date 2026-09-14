@@ -1,79 +1,65 @@
 # 11 — Demo Plan
 
 > **STATUS**: TEMPLATE / UNGENERATED  
-> *This document will be updated by Antigravity after completing [`10_TEST_PLAN.md`](file:///d:/Code_A_Thon/hackathon/10_TEST_PLAN.md).*
+> *This document will be updated by Antigravity after completing [`10_TEST_PLAN.md`](file:///c:/Users/a2z/Code_A_Thon/hackathon/10_TEST_PLAN.md).*
 
 ---
 
-## Demo Goal
+## Demo Goal & Audience Impact
 
-Within the **first 60 seconds**, judges must clearly understand:
-1. Who the target user is.
-2. What acute problem they face.
-3. How this application solves it effortlessly.
-4. The unique power of the **Winning Feature**.
+Within the **first 60 seconds**, judges must clearly grasp:
+1. **Who** the target user is.
+2. **What** acute pain point they face.
+3. **How** this multi-platform application solves it with speed and precision.
+4. The unique technical superiority of the **Winning Feature**.
 
 ---
 
-## Demo Flow (2-Minute Timed Breakdown)
+## 2-Minute Presentation Breakdown (Web & Cross-Platform Flow)
 
 ```text
-[0:00 - 0:20] Context & Hook
-  ↳ Open on polished Onboarding screen. State the target user and acute pain point.
+[0:00 - 0:25] Context & Hook
+  ↳ Open on the high-conversion Web Landing Page (http://localhost:3000).
+  ↳ State target user persona and acute operational pain point in 2 punchy sentences.
 
-[0:20 - 0:45] Core Dashboard & Seed Realism
-  ↳ Navigate to Dashboard. Show category filtering & search. Highlight status distribution.
+[0:25 - 0:55] Core Operational Workspace & Realism
+  ↳ Log in as demo user into `/dashboard`.
+  ↳ Point out real-time KPI metrics, category breakdowns, and high-density Data Table.
+  ↳ Filter by category and search keyword to demonstrate speed and zero lag.
 
-[0:45 - 1:20] Creation & Winning Feature ("WOW Moment")
-  ↳ Create a new item live. Trigger AI auto-summarization / subtask generation.
-  ↳ Execute the Winning Feature action with instant visual feedback.
+[0:55 - 1:30] Creation & The Winning Feature ("WOW Moment")
+  ↳ Navigate to `/items/new`.
+  ↳ Enter domain entity details and trigger AI auto-enrichment.
+  ↳ Execute the Winning Feature action live with visible visual feedback (modal, chart update).
 
-[1:20 - 1:45] Analytics & Value Summary
-  ↳ Show Analytics dashboard metrics auto-updating. Point out real-time notifications.
+[1:30 - 1:45] Cross-Platform Parity Showcase
+  ↳ Pull up Mobile Client (or responsive mobile viewport) showing the newly created item 
+    instantly visible via the shared backend API.
 
-[1:45 - 2:00] Closing Statement & Impact
-  ↳ Recap core impact, scalability, and wrap up presentation.
+[1:45 - 2:00] Closing Impact & Scalability
+  ↳ Summarize measurable time saved, architecture cleanliness, and open for judge questions.
 ```
 
 ---
 
-## "Wow Moment"
+## Standout "Wow Moment"
 
 * **Target Feature**: [Winning Feature Name]
-* **Exact Step**: [The exact click/tap action during demo]
-* **Visual Impact**: [What appears on screen—e.g., instant AI insights modal, dynamic visual transition, notification badge animation]
-* **Why Judges Care**: Demonstrates real technical execution over slide deck promises.
+* **Exact Step**: [The exact click/action taken during presentation]
+* **Visual Impact**: [Instant AI synthesis, kinetic visualization, dynamic data recalculation]
+* **Why Judges Care**: Demonstrates full-stack technical execution over static prototypes or slide decks.
 
 ---
 
-## Backup Demo Flow
+## Presentation Backup Protocols
 
-What happens if live failure occurs during presentation:
+If unexpected failures occur during the live judge demo:
 
-* **If OpenRouter AI fails or lags**:  
-  ↳ System automatically switches to pre-built offline fallback responses. Continue presentation seamlessly without mentioning network delay.
-* **If live network fails**:  
-  ↳ App operates on local cached state. Demonstrate offline resilience banner as an intentional feature.
-* **If API server stops**:  
-  ↳ Keep demo database pre-seeded (`npm run seed:reset`) and restart backend script immediately using backup terminal window.
-* **If mobile screen mirroring disconnects**:  
-  ↳ Have Expo web browser build pre-loaded in browser tab (`localhost:8081`).
-
----
-
-## Demo Data Strategy
-
-* **Dataset File**: [`backend/src/seeds/datasets/generic.ts`](file:///d:/Code_A_Thon/backend/src/seeds/datasets/generic.ts)
-* **Pre-seeded Items**: 6 realistic, highly descriptive domain records.
-* **Demo User Credentials**: `demo@app.com` / `Demo123!`
-
----
-
-## Demo Preparation Checklist
-
-- [ ] Run `npm run seed:reset` to guarantee clean initial state.
-- [ ] Log in as demo user and verify dashboard is populated.
-- [ ] Confirm screen brightness is set to high for display/mirroring.
-- [ ] Open backup browser window pointing to web build.
-- [ ] Test audio/screen recording if remote pitch.
-- [ ] Perform full 2-minute trial run-through.
+* **If OpenRouter AI lags or times out**:
+  ↳ The application automatically displays a pre-cached offline domain analysis. Proceed without pausing or mentioning API latency.
+* **If live WiFi disconnects**:
+  ↳ Demonstrate local UI responsiveness and explain that offline state handling is an intentional resilience feature.
+* **If API server terminates**:
+  ↳ Keep a secondary terminal window ready to run `npm run backend` and `npm run seed:reset`.
+* **If mobile mirroring fails**:
+  ↳ Switch immediately to the desktop browser in responsive mobile viewport mode (`Ctrl+Shift+M`).

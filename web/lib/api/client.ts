@@ -7,13 +7,13 @@ const getBaseUrl = (): string => {
   return process.env.NEXT_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
 };
 
-export const TOKEN_STORAGE_KEY = 'pulse_web_token';
-export const USER_STORAGE_KEY = 'pulse_web_user';
+export const TOKEN_STORAGE_KEY = 'app_web_token';
+export const USER_STORAGE_KEY = 'app_web_user';
 
 export function getStoredToken(): string | null {
   if (typeof window === 'undefined') return null;
   try {
-    return localStorage.getItem(TOKEN_STORAGE_KEY);
+    return localStorage.getItem(TOKEN_STORAGE_KEY) || localStorage.getItem('pulse_web_token');
   } catch {
     return null;
   }

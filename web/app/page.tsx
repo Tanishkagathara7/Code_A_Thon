@@ -28,10 +28,104 @@ import { SmoothScrollProvider } from '@/components/marketing/SmoothScrollProvide
 import { createHeroEntranceTimeline } from '@/lib/animations/hero';
 import { initScrollStory } from '@/lib/animations/scroll';
 import { initHeroTypographyAnimation } from '@/lib/animations/heroTypography';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { SITE_CONFIG, getSiteUrl } from '@/lib/seo';
 
 export default function MarketingPage() {
   const rootRef = useRef<HTMLDivElement>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
+  const siteUrl = getSiteUrl();
+
+  // Valid Schema.org structured data declarations
+  const jsonLdSchemas = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: SITE_CONFIG.name,
+      alternateName: SITE_CONFIG.fullName,
+      url: siteUrl,
+      description: SITE_CONFIG.shortDescription,
+      inLanguage: 'en-US',
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: SITE_CONFIG.name,
+      url: siteUrl,
+      logo: `${siteUrl}/icon.png`,
+      description: SITE_CONFIG.shortDescription,
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: SITE_CONFIG.name,
+      operatingSystem: 'Web, iOS, Android',
+      applicationCategory: 'BusinessApplication, DeveloperApplication',
+      description: SITE_CONFIG.fullDescription,
+      offers: {
+        '@type': 'Offer',
+        price: '0.00',
+        priceCurrency: 'USD',
+      },
+      featureList: [
+        'Real-time state synchronization between Next.js and React Native',
+        'OpenRouter AI Gateway task synthesis and categorization',
+        'Cryptographic JWT Bearer token authentication and SecureStore integration',
+        'Offline-first mobile agility with React Native Expo SDK 57',
+        'High-density operational dashboard and domain items CRUD pipeline',
+      ],
+      author: {
+        '@type': 'Organization',
+        name: SITE_CONFIG.author,
+      },
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'How is state synchronized between Next.js and React Native?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Both clients consume a unified Node.js / Express REST API backed by MongoDB Atlas. Authentication is maintained via cryptographically verified JWT tokens (stored in secure browser storage for web, and expo-secure-store for native mobile). Cache invalidation triggers immediate re-fetches for consistent operational metrics across both platforms.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What AI gateway capabilities are natively integrated?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The shared backend incorporates OpenRouter AI Gateway integration. It executes structured entity summarization, priority classification, and action plan generation across your operations items with strict rate-limiting and token usage tracking.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can this architecture pivot to new hackathon problem statements?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. The core data model is designed around extensible domain entities, automated file storage (via Multer), notification routing, and dynamic analytics. New domain attributes can be mapped in the shared contracts without altering the base cross-platform plumbing.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Does the mobile application support native offline-first workflows?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. The React Native Expo mobile client utilizes Reanimated 4.5.1 gesture handling, persistent secure credentials, local caching, and automated network detection to provide seamless mobile agility in spotty network environments.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Is the web application production-ready and accessible?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The web client is built on Next.js App Router with strict WCAG AA contrast ratios, keyboard navigation, full semantic HTML5 elements, and dynamic client-side rendering with motion fallbacks for users preferring reduced motion.',
+          },
+        },
+      ],
+    },
+  ];
 
   useEffect(() => {
     const heroCtx = createHeroEntranceTimeline(rootRef.current);
@@ -51,6 +145,9 @@ export default function MarketingPage() {
         ref={rootRef}
         className="min-h-screen text-zinc-900 selection:bg-zinc-900 selection:text-white relative font-sans bg-[#FAFAFA]"
       >
+        {/* Schema.org Structured Data */}
+        <JsonLd data={jsonLdSchemas} />
+
         <MarketingNav />
 
         {/* ========================================================
@@ -452,7 +549,7 @@ export default function MarketingPage() {
                 <div className="relative aspect-[2083/755] w-full rounded-xl bg-zinc-50 p-2 overflow-hidden border border-black/[0.06]">
                   <Image
                     src="/code.png"
-                    alt="Code-A-Thon Architecture"
+                    alt="APP multi-platform engineering architecture diagram illustrating Next.js, React Native Expo, and Express REST integration"
                     fill
                     sizes="(max-width: 768px) 100vw, 700px"
                     className="object-contain p-2"

@@ -2,13 +2,13 @@
 
 > **One Product • Two First-Class Clients • One Shared Backend**
 
-Pulse is a synchronized cross-platform operational intelligence platform featuring an Expo React Native mobile client, a Next.js App Router web application, and a shared Node.js/Express REST backend backed by MongoDB Atlas and the OpenRouter AI Gateway.
+Pulse is a synchronized cross-platform operational intelligence platform featuring an **Expo React Native mobile client**, a **Next.js App Router web application**, and a **shared Node.js/Express REST backend** backed by MongoDB Atlas and the OpenRouter AI Gateway.
 
 ---
 
-## 🏛️ Conceptual & Repository Architecture
+## 🏛️ Monorepo & Client Architecture
 
-```
+```text
 Code_A_Thon/
 ├── backend/                  # Shared Node.js + Express REST API
 │   ├── src/
@@ -26,7 +26,7 @@ Code_A_Thon/
 │   ├── services/api/        # Mobile API service layer
 │   └── package.json
 │
-├── web/                      # Next.js App Router Web Application (Web Client)
+├── web/                      # Next.js 16 App Router Web Application (Web Client)
 │   ├── app/
 │   │   ├── page.tsx         # Premium multi-platform landing page (Hero, Ecosystem, FAQ)
 │   │   ├── (auth)/          # Desktop & mobile responsive Login, Signup, Forgot Password
@@ -40,6 +40,9 @@ Code_A_Thon/
 │   ├── src/constants/       # System categories, statuses, branding defaults
 │   └── src/validation/      # Password strength and email regex validators
 │
+├── hackathon/                # Hackathon execution operating pipeline (01_ through 13_)
+├── .agents/                  # Antigravity AI engineering skills (pivot, code review, mobile UX, web UX)
+├── HACKATHON_PIVOT_CHECKLIST.md # 3-hour rapid pivot guide
 ├── PROJECT_ARCHITECTURE.md   # Architectural blueprint and API contract inventory
 └── package.json             # Root monorepo orchestrator
 ```
@@ -49,7 +52,7 @@ Code_A_Thon/
 ## 🚀 Quickstart & Local Development
 
 ### 1. Prerequisites
-- **Node.js**: v18+ (tested on Node v24)
+- **Node.js**: v18+ (tested on Node v20 & v24)
 - **npm**: v9+
 - **MongoDB Atlas Connection URI**
 
@@ -59,7 +62,7 @@ Code_A_Thon/
 Create `backend/.env` from `backend/.env.example`:
 ```env
 PORT=5000
-MONGODB_URI=mongodb+srv://<user>:<pass>@<cluster>.mongodb.net/pulse?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/pulse?retryWrites=true&w=majority
 JWT_SECRET=your_jwt_secret_key
 OPENROUTER_API_KEY=your_openrouter_key
 OPENROUTER_MODEL=openrouter/free
@@ -69,13 +72,15 @@ OPENROUTER_MODEL=openrouter/free
 Create `web/.env.local` from `web/.env.local.example`:
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id.apps.googleusercontent.com
+NEXT_PUBLIC_GITHUB_CLIENT_ID=your_github_client_id
 ```
 
 #### Mobile Client (`frontend/.env`)
 Create `frontend/.env` from `frontend/.env.example`:
 ```env
 EXPO_PUBLIC_API_URL=http://localhost:5000/api
-# Or use your deployed Render / local IP address for physical devices
+# Or use your deployed backend / local IP address for physical devices
 ```
 
 ---
@@ -112,6 +117,11 @@ npm run dev
   ```
   *Runs Express server at [http://localhost:5000](http://localhost:5000)*
 
+- **Seed Demo Data**:
+  ```bash
+  npm run seed:reset
+  ```
+
 - **Production Web Build Verification**:
   ```bash
   npm run web:build
@@ -123,3 +133,4 @@ npm run dev
 - **Strict Client Separation**: Web and mobile share TypeScript contracts and Express REST endpoints, but retain dedicated native UX paradigms.
 - **Mobile Integrity Preserved**: `frontend/` retains its verified Expo 57 setup, Reanimated 4.5 bindings, Metro configurations, and native bundle IDs without breaking changes.
 - **JWT & Rate Limiting**: Express backend applies `helmet()`, general and endpoint-specific rate limiters, bcrypt password hashing, and 6-digit OTP verification codes.
+- **Web Defense in Depth**: Strict form input validation, client/server secret isolation (`NEXT_PUBLIC_` prefix enforcement), safe token lifecycle handling, and route protection.

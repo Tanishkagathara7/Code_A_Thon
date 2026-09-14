@@ -111,7 +111,7 @@ export default function FilesPage() {
                     <a
                       href={(() => {
                         const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
-                        const token = typeof window !== 'undefined' ? localStorage.getItem('pulse_web_token') : '';
+                        const token = typeof window !== 'undefined' ? (localStorage.getItem('app_web_token') || localStorage.getItem('pulse_web_token')) : '';
                         const downloadPath = file.downloadUrl || `/files/download/${file.id}`;
                         const fullUrl = downloadPath.startsWith('http') 
                           ? downloadPath 

@@ -1,106 +1,91 @@
 # 03 — UX / UI Plan
 
 > **STATUS**: TEMPLATE / UNGENERATED  
-> *This document will be updated by Antigravity after completing [`02_PRODUCT_SPEC.md`](file:///d:/Code_A_Thon/hackathon/02_PRODUCT_SPEC.md).*
+> *This document will be updated by Antigravity after completing [`02_PRODUCT_SPEC.md`](file:///c:/Users/a2z/Code_A_Thon/hackathon/02_PRODUCT_SPEC.md).*
 
 ---
 
-## UX Principles
+## UX Principles (Web & Mobile)
 
-1. **Mobile-First Clarity**: Focus on key information hierarchy with zero clutter.
-2. **Speed & Minimal Taps**: Ensure the core user action can be completed in under 3 taps.
-3. **Instant Feedback**: Visible visual state changes for loading, error, and success events.
-4. **Starter Kit Visual Consistency**: Harness theme tokens (`accentColor`, `themeGradient`) from [`frontend/config/appConfig.ts`](file:///d:/Code_A_Thon/frontend/config/appConfig.ts).
-
----
-
-## Screen Inventory
-
-### Screen Classification Summary
-* **MUST BUILD**: Core screen required for P0 flow
-* **SHOULD BUILD**: Enhances P1 workflow if time permits
-* **SKIP**: Explicitly excluded from hackathon build
+1. **Dual-Platform Ergonomics**:
+   - **Web UX**: Information-dense multi-column bento grids, sortable data tables, keyboard shortcuts, sticky sidebar/topbar navigation.
+   - **Mobile UX**: Touch targets $\ge$ 44pt, single-column vertical flow, bottom navigation dock, smooth Reanimated swipe/tap transitions.
+2. **Speed & Minimal Interaction Friction**: The primary domain action must be achievable in 3 clicks/taps or fewer.
+3. **Comprehensive State Feedback**: Explicit handling of Loading (skeletons), Empty (call-to-action illustrations), Error (inline retry banners), and Success (toasts).
+4. **Visual Cohesion**: Consistent color palette, typography hierarchy, and status badges aligned between Web and Mobile via `shared/src/constants/index.ts` and `web/DESIGN_SYSTEM.md`.
 
 ---
 
-### Screen: [Screen 1 Name - e.g., Onboarding / Hero]
-* **Category**: MUST BUILD
-* **Purpose**: [Introduce product and capture initial state]
-* **Entry**: [App launch]
-* **Primary Action**: [Get Started / Login]
-* **Secondary Actions**: [Learn more]
-* **Data Displayed**: [App title, tagline, branding summary]
-* **Components Reused**: [`HeaderSection`, `GradientView`]
-* **New Components**: [None / Specic card component]
-
----
-
-### Screen: [Screen 2 Name - e.g., Main Dashboard / Feed]
-* **Category**: MUST BUILD
-* **Purpose**: [List primary entities, search, filter, and view status]
-* **Entry**: [Post authentication / Get Started]
-* **Primary Action**: [Create New Entity / Tap item for details]
-* **Secondary Actions**: [Filter by category, search text, pull to refresh]
-* **Data Displayed**: [`HackathonItem` cards list, status badges, summary count]
-* **Components Reused**: [`ItemCard`, `SearchBar`, `FilterPills`, `StatusBadge`]
-* **New Components**: [Domain-tailored visual widget if required]
-
----
-
-### Screen: [Screen 3 Name - e.g., Entity Creation & AI Assist]
-* **Category**: MUST BUILD
-* **Purpose**: [Input new item details with optional AI auto-enrichment]
-* **Entry**: [Floating action button / Create button]
-* **Primary Action**: [Submit entity]
-* **Secondary Actions**: [Trigger AI Summary/Subtasks, Upload image]
-* **Data Displayed**: [Input forms, category selector, status picker, AI suggestion box]
-* **Components Reused**: [`CustomInput`, `CategoryPicker`, `AIButton`, `ImageUploader`]
-* **New Components**: [Winning feature creation widget]
-
----
-
-### Screen: [Screen 4 Name - e.g., Item Detail & Action View]
-* **Category**: SHOULD BUILD
-* **Purpose**: [View entity details, complete lifecycle action, view AI recommendations]
-* **Entry**: [Tap item card from list]
-* **Primary Action**: [Mark Complete / Execute lifecycle action]
-* **Secondary Actions**: [Delete, Edit, View AI subtasks]
-* **Data Displayed**: [Full entity description, author info, timestamps, AI outputs]
-* **Components Reused**: [`DetailView`, `ActionBanner`, `AIOutputBox`]
-* **New Components**: [None]
-
----
-
-## User Flow
+## Platform Viewport & Surface Strategy
 
 ```text
-Launch App 
-  → Onboarding / Splash 
-  → Dashboard (View & Search Items) 
-  → Create Item (Input Data + AI Assist) 
-  → Item Detail (Execute Winning Action) 
-  → Status Updated / Notification Triggered
+Web Desktop (>= 1024px)       Web Mobile (< 768px)          Mobile Native (Expo)
+┌────────────────────────┐    ┌────────────────────┐        ┌────────────────────┐
+│Sidebar│ Topbar         │    │ Topbar (Logo/Menu) │        │ Native Status Bar  │
+│       ├────────────────┤    ├────────────────────┤        ├────────────────────┤
+│Nav    │ Bento Grid     │    │ Single-Column Feed │        │ Native Safe Area   │
+│Links  │ or Data Table  │    │ Card View          │        │ Reanimated List    │
+│       │                │    │                    │        │ Touch Gestures     │
+│       │                │    ├────────────────────┤        ├────────────────────┤
+│       │                │    │ Bottom Nav Bar     │        │ Bottom Tab Bar     │
+└───────┴────────────────┘    └────────────────────┘        └────────────────────┘
 ```
 
 ---
 
-## Interaction States
+## Screen & Route Inventory
 
-* **Loading**: Skeleton loaders or subtle spinner overlays during network fetches & AI generation.
-* **Empty**: Helpful domain-specific empty state screen with single button CTA to seed or create.
-* **Error**: Inline error banners with clear retry triggers.
-* **Success**: Instant visual feedback toast + badge refresh on state changes.
-* **Offline**: Cached local state banner using built-in network resilience handling.
-
----
-
-## Existing UI Reuse
-
-* **Components Reused**: `HeaderSection`, `ItemCard`, `SearchBar`, `FilterPills`, `StatusBadge`, `CustomInput`, `Button`, `GradientView`, `NotificationBadge`, `AIButton`.
-* **Config Integration**: Pull colors, badges, and titles dynamically from [`frontend/config/appConfig.ts`](file:///d:/Code_A_Thon/frontend/config/appConfig.ts).
+### Classification Summary
+* **MUST BUILD (P0)**: Essential for core user journey and winning feature demo.
+* **SHOULD BUILD (P1)**: Important secondary workflows (filtering, edit, notifications).
+* **SKIP (P2/P3)**: Defer until core flows are 100% stable.
 
 ---
 
-## New UI
+### Route / Screen 1: Dashboard & Intelligence Hub
+* **Platform Support**: Web (`/dashboard`) & Mobile (`app/home.tsx`)
+* **Category**: MUST BUILD (P0)
+* **Purpose**: Overview of operational metrics, primary entity feed, quick actions, and recent activity.
+* **Web Implementation**: Desktop sidebar shell, KPI summary cards, interactive filter bar, high-density entity data table.
+* **Mobile Implementation**: Vertical scroll container, metric carousel, swipeable card feed, floating action button.
+* **Components Reused**:
+  - Web: `web/components/layout/Sidebar.tsx`, `web/components/layout/Topbar.tsx`
+  - Mobile: `frontend/components/common/HeaderSection.tsx`, `frontend/components/domain/ItemCard.tsx`
 
-* **New Components Needed**: Only create a new UI component if required for the **Winning Feature**. Keep UI scope minimal.
+---
+
+### Route / Screen 2: Entity Creation & AI Copilot
+* **Platform Support**: Web (`/items/new`) & Mobile (`app/items/create.tsx`)
+* **Category**: MUST BUILD (P0)
+* **Purpose**: Capture new domain entities with AI-assisted enrichment and auto-completion.
+* **Web Implementation**: Two-column layout (form on left, AI copilot preview and prompt generator on right).
+* **Mobile Implementation**: Clean form with keyboard-avoiding container and "Generate with AI" toggle button.
+* **Components Reused**:
+  - Web: Form inputs, `web/lib/api/domain.ts`
+  - Mobile: `CustomInput`, `CategoryPicker`, `AIButton`
+
+---
+
+### Route / Screen 3: Entity Detail & Lifecycle Manager
+* **Platform Support**: Web (`/items/[id]`) & Mobile (`app/items/[id].tsx`)
+* **Category**: MUST BUILD (P0)
+* **Purpose**: Inspect single record, update status lifecycle, view timeline, download attachments.
+* **Web Implementation**: Bento grid card container with status dropdown, action bar, and full file previews.
+* **Mobile Implementation**: Card view with status badge pills, native document previewer, and delete confirmation sheet.
+
+---
+
+### Route / Screen 4: Dedicated AI Assistant / Synthesis Hub
+* **Platform Support**: Web (`/ai-assistant`) & Mobile (in-dashboard modal or tab)
+* **Category**: SHOULD BUILD (P1)
+* **Purpose**: Free-form domain synthesis, task decomposition, and prompt generation via OpenRouter.
+* **Web Implementation**: Split-pane prompt editor and formatted markdown response viewer with copy-to-clipboard.
+
+---
+
+### Route / Screen 5: Asset & File Manager
+* **Platform Support**: Web (`/files`) & Mobile (`frontend/components/FilePicker.tsx`)
+* **Category**: SHOULD BUILD (P1)
+* **Purpose**: Upload, preview, and download project attachments and images.
+* **Web Implementation**: Drag-and-drop file upload zone with file size/type validation and grid preview.
+* **Mobile Implementation**: Native image/document picker with camera integration.

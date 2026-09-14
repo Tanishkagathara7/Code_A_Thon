@@ -69,9 +69,9 @@ export default function DashboardPage() {
             <Sparkles className="w-3 h-3" />
             <span>Multi-Platform Operations Center</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            Welcome back, {user?.name || 'Pulse Operator'}
-          </h2>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950">
+            Welcome back, {user?.name || 'APP Operator'}
+          </h1>
           <p className="text-zinc-400 text-sm max-w-xl">
             Real-time synchronization active across mobile (React Native) and desktop (Next.js). View workflow metrics and intelligence below.
           </p>

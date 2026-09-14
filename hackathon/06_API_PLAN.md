@@ -1,83 +1,61 @@
 # 06 — API Plan
 
 > **STATUS**: TEMPLATE / UNGENERATED  
-> *This document will be updated by Antigravity after completing [`05_DATA_MODEL.md`](file:///d:/Code_A_Thon/hackathon/05_DATA_MODEL.md).*
+> *This document will be updated by Antigravity after completing [`05_DATA_MODEL.md`](file:///c:/Users/a2z/Code_A_Thon/hackathon/05_DATA_MODEL.md).*
 
 ---
 
-## Existing Endpoint Inventory
+## Shared Backend API Inventory & Client Mapping
 
-### Auth Routes (`/api/auth`)
-* `POST /api/auth/register` — **REUSE** (User registration)
-* `POST /api/auth/login` — **REUSE** (JWT Login)
-* `POST /api/auth/google` — **REUSE** (Google OAuth exchange)
-* `GET /api/auth/me` — **REUSE** (Fetch authenticated profile)
+Both the Web Client (`web/lib/api/`) and Mobile Client (`frontend/services/api/`) consume these standardized endpoints:
 
-### Item Routes (`/api/items`)
-* `GET /api/items` — **REUSE** (Paginated list with search & filters)
-* `GET /api/items/:id` — **REUSE** (Fetch item detail by ID)
-* `POST /api/items` — **REUSE** (Create new item)
-* `PUT /api/items/:id` — **REUSE** (Update item)
-* `DELETE /api/items/:id` — **REUSE** (Delete item)
+### 1. Authentication Routes (`/api/auth`)
+* `POST /api/auth/email` — Dual-mode Login / Sign up returning JWT token and user profile.
+  - **Web**: Invoked by `web/lib/api/auth.ts` -> stores session in `localStorage`.
+  - **Mobile**: Invoked by `frontend/services/api/auth.ts` -> stores token in `expo-secure-store`.
+* `POST /api/auth/sync` — Social OAuth profile synchronization (Google / Native).
+* `POST /api/auth/github` — GitHub OAuth authorization code exchange.
+* `POST /api/auth/forgot-password` — Initiates 6-digit OTP reset email.
+* `POST /api/auth/reset-password` — Validates OTP and updates account password.
+* `GET /api/auth/me` — Retrieves currently authenticated profile (Bearer JWT).
 
-### Analytics Routes (`/api/analytics`)
-* `GET /api/analytics/dashboard` — **REUSE** (Summary statistics & breakdowns)
+### 2. Core Entity Routes (`/api/items`)
+* `GET /api/items` — Query items with search query, category, status, pagination (`page`, `limit`), and sort parameters.
+  - **Web**: Populates the workspace Data Table with sorting and pagination controls.
+  - **Mobile**: Populates the vertical feed with pull-to-refresh.
+* `POST /api/items` — Creates a new domain entity.
+* `GET /api/items/:id` — Fetches complete entity details.
+* `PUT /api/items/:id` — Updates entity properties and status lifecycle.
+* `DELETE /api/items/:id` — Removes entity from database.
 
-### AI Routes (`/api/ai`)
-* `POST /api/ai/summarize` — **REUSE** (OpenRouter AI item summary)
-* `POST /api/ai/generate-subtasks` — **REUSE** (OpenRouter AI subtask generation)
+### 3. Analytics Routes (`/api/analytics`)
+* `GET /api/analytics/overview` — Returns aggregate KPI counts, completion rates, category distributions, and activity metrics.
+  - **Web**: Feeds the Dashboard visual overview, completion donuts, and category distribution cards.
+  - **Mobile**: Feeds the header KPI summary cards.
 
-### Upload & Notification Routes
-* `POST /api/upload` — **REUSE** (File/image attachment upload)
-* `GET /api/notifications` — **REUSE** (Fetch user notifications)
-* `PUT /api/notifications/:id/read` — **REUSE** (Mark notification as read)
+### 4. AI Gateway Routes (`/api/ai`)
+* `POST /api/ai/generate` — Sends structured prompts to the OpenRouter LLM gateway.
+  - **Web**: Powers the dedicated `/ai-assistant` prompt copilot.
+  - **Mobile**: Powers the item creation AI assistant and summary widgets.
 
----
-
-## Requirement Endpoint Classification
-
-| Feature Requirement | Existing Endpoint | Classification (REUSE / EXTEND / NEW) |
-| ------------------- | ----------------- | ------------------------------------- |
-| List & Filter Items | `GET /api/items` | **REUSE** |
-| Create Item | `POST /api/items` | **REUSE** |
-| Dashboard Analytics | `GET /api/analytics/dashboard` | **REUSE** |
-| AI Processing | `POST /api/ai/summarize` | **REUSE / EXTEND** |
-| Winning Feature Endpoint | N/A | **NEW** (If specific custom endpoint is required) |
-
----
-
-## New Endpoints Specification
-
-> **CRITICAL RULE**: Create new endpoints ONLY if existing APIs cannot support the requirement.
-
-### Endpoint: [New Endpoint Name - e.g. POST /api/items/:id/process-action]
-* **METHOD**: `POST`
-* **PATH**: `/api/items/:id/process-action`
-* **AUTH**: Required (JWT Bearer Token)
-* **REQUEST**:
-  ```json
-  {
-    "actionType": "string",
-    "parameters": {}
-  }
-  ```
-* **RESPONSE**:
-  ```json
-  {
-    "success": true,
-    "data": {},
-    "message": "Action executed successfully"
-  }
-  ```
-* **VALIDATION**: `actionType` must be non-empty string.
-* **ERRORS**: `400 Bad Request`, `401 Unauthorized`, `404 Not Found`.
-* **OWNER**: Backend controller.
+### 5. File & Notification Routes
+* `POST /api/files` — Multer disk storage upload for multipart attachments (max 20MB).
+* `GET /api/files/:id` — Inspects file metadata.
+* `GET /api/files/download/*` — Downloads or streams stored assets.
+* `GET /api/notifications` — Returns paginated user notifications.
+* `GET /api/notifications/unread-count` — Returns unread badge count for Topbar and Mobile Dock.
+* `PATCH /api/notifications/:id/read` — Marks single notification as read.
+* `PATCH /api/notifications/read-all` — Marks all user notifications as read.
 
 ---
 
-## API Contract Rules
+## Endpoint Classification Matrix
 
-1. **Do Not Break Existing Contracts**: Keep parameter names and JSON response envelopes (`{ success, data, message }`) consistent across all endpoints.
-2. **Preserve Authentication**: All data mutation endpoints must validate JWT via `authMiddleware`.
-3. **Preserve Error Conventions**: Return uniform HTTP status codes (`400`, `401`, `403`, `404`, `500`).
-4. **Preserve Ownership Rules**: Ensure users can only modify or delete records owned by their account (`userId`).
+| Feature Requirement | Backend Route | Classification (REUSE / EXTEND / NEW) | Web Consumer | Mobile Consumer |
+| :--- | :--- | :--- | :--- | :--- |
+| User Session | `/api/auth/email` | **REUSE** | `web/lib/api/auth.ts` | `frontend/services/api/auth.ts` |
+| Primary Entity List | `/api/items` | **REUSE** | `web/lib/api/domain.ts` | `frontend/services/api/hackathonItemApi.ts` |
+| Entity Lifecycle | `/api/items/:id` | **REUSE** | `web/lib/api/domain.ts` | `frontend/services/api/hackathonItemApi.ts` |
+| Operational Metrics | `/api/analytics/overview` | **REUSE** | `web/lib/api/domain.ts` | `frontend/services/api/analyticsApi.ts` |
+| AI Synthesizer | `/api/ai/generate` | **REUSE** | `web/lib/api/domain.ts` | `frontend/services/api/aiApi.ts` |
+| Winning Feature Endpoint | `/api/...` | **NEW** (Only if strictly required) | Custom caller | Custom caller |

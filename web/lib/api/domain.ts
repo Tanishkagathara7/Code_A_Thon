@@ -50,7 +50,7 @@ export const aiApi = {
   async summarize(prompt: string, systemPrompt?: string): Promise<{ success: boolean; data: AIGeneratedResult }> {
     return apiClient.post<{ success: boolean; data: AIGeneratedResult }>('/ai/generate', {
       prompt,
-      system: systemPrompt || 'You are Pulse AI, an intelligent workspace copilot. Summarize the text clearly with key takeaways and actionable bullet points.',
+      system: systemPrompt || 'You are APP AI, an intelligent workspace copilot. Summarize the text clearly with key takeaways and actionable bullet points.',
     });
   },
 };

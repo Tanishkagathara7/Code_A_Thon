@@ -1,177 +1,276 @@
-# Project Architecture: Multi-Platform Evolution (Mobile, Web, Backend)
+# Pulse — Multi-Platform Architecture & System Specification
 
-## 1. Executive Summary & Product Identity
-- **Product Name**: Pulse (Configurable Hackathon Pivot Engine / Operations & Intelligence Hub)
-- **Tagline**: Real-Time Operational Intelligence & AI-Assisted Workflow Platform
-- **Core Architecture**:
-  - **Shared Backend API**: Node.js + Express + TypeScript + Mongoose (MongoDB Atlas), Helmet, Express Rate Limiting, JWT auth, Multer file processing, OpenRouter AI Gateway integration.
-  - **Mobile Client**: React Native + Expo (v57) + Expo Router + Reanimated 4.5.1 + Native Biometrics & Storage (`expo-secure-store`). Located in `frontend/` (preserved safely to protect native build & Expo Metro paths).
-  - **Web Client**: Next.js 14/15 App Router + TypeScript + Tailwind CSS + Lucide Icons + Framer Motion. Located in `web/`.
-  - **Shared Contract Layer**: `shared/` directory providing common TypeScript interfaces, domain types, API response contracts, validation schemas, and constants without pulling in platform-specific UI.
+> **The Definitive Blueprint for Web, Mobile, and Backend Co-Development**
 
 ---
 
-## 2. Current Repository Analysis
+## 1. Executive Summary & Product Vision
 
-### 2.1 File Structure & Locations
-```
-Code_A_Thon/
-├── backend/                  # Node.js + Express TypeScript API
-│   ├── src/
-│   │   ├── config/          # database.ts
-│   │   ├── controllers/     # auth, hackathonItem, ai, file, analytics, notification
-│   │   ├── middleware/      # auth (JWT, rate limiters), errorHandler
-│   │   ├── models/          # User, HackathonItem, Notification, UploadedFile
-│   │   ├── routes/          # auth, hackathonItem, ai, file, analytics, notification
-│   │   ├── services/        # auth, email, openrouter, storage
-│   │   └── utils/           # validation, fileValidation
-│   ├── package.json
-│   └── tsconfig.json
-├── frontend/                 # React Native + Expo 57 Application (Mobile Client)
-│   ├── app/                 # Expo Router file system routing:
-│   │   ├── (auth)/          # Authentication screen & OAuth handler
-│   │   ├── home.tsx         # Dashboard with metrics, quick actions, AI summary, files
-│   │   ├── items/           # CRUD: index (list/filter/sort), create, [id] detail, edit/[id]
-│   │   ├── notifications/   # Real-time / paginated notification feed
-│   │   └── onboarding.tsx   # Gesture-driven animated onboarding sequence
-│   ├── components/          # ai, analytics, auth, domain, file, navigation, notifications
-│   ├── context/             # AuthContext, NetworkContext, ToastContext
-│   ├── services/api/        # apiClient, auth, hackathonItemApi, aiApi, fileApi, analyticsApi, notificationApi
-│   ├── theme/               # config, colors, typography, motion
-│   ├── types/               # domain, ai, analytics, file, notification
-│   ├── app.json             # Expo project configuration (bundle IDs, schemes, plugins)
-│   └── package.json
-├── package.json             # Root monorepo runner (`concurrently`)
-└── .agents/                 # Antigravity skills & hackathon rules
-```
+**Pulse** is an agile, multi-platform operational intelligence and hackathon pivot system. It delivers **two first-class client experiences**—a responsive desktop/tablet/mobile **Web application** and a gesture-driven **Mobile application**—powered by a **shared Node.js/Express REST API**, a shared MongoDB Atlas database, and unified TypeScript domain contracts.
 
-### 2.2 Preserving Mobile Safety (`frontend/` vs `mobile/`)
-- **Critical Finding**: Expo Router, Metro config, `app.json` (bundle identifier `com.tvkms.app`, slug `tanis`, eas projectId `bc0e2321-ddf3-4df9-b813-e6e8c3549eeb`), native plugins, and root `package.json` scripts (`frontend`, `frontend:web`, `install:all`) specifically reference `frontend/`.
-- **Decision**: In strict accordance with user prompt ("*If moving it creates unnecessary risk, keep the existing directory and treat that directory as the mobile application. FUNCTIONALITY AND STABILITY ARE MORE IMPORTANT THAN THE FOLDER NAME.*"), we **keep `frontend/` as the mobile application**. We add symlink/scripts in root `package.json` to allow both `npm run mobile` and `npm run frontend`.
+```text
+                                 ┌─────────────────────────────────┐
+                                 │          User / Judge           │
+                                 └────────────────┬────────────────┘
+                                                  │
+                         ┌────────────────────────┴────────────────────────┐
+                         │                                                 │
+                         ▼                                                 ▼
+            ┌─────────────────────────┐                       ┌─────────────────────────┐
+            │     Web Application     │                       │   Mobile Application    │
+            │  Next.js 16 App Router  │                       │ React Native / Expo 57  │
+            │    Tailwind CSS v4      │                       │     Expo Router v57     │
+            │  Desktop / Tablet / PWA │                       │  Android / iOS / Native │
+            └────────────┬────────────┘                       └────────────┬────────────┘
+                         │                                                 │
+                         │              Shared Contracts Layer             │
+                         │             `shared/` TypeScript types          │
+                         │                                                 │
+                         └────────────────────────┬────────────────────────┘
+                                                  │
+                                                  ▼
+                                     ┌─────────────────────────┐
+                                     │    API / Backend Layer   │
+                                     │     Node.js + Express   │
+                                     │   JWT • Helmet • Rate   │
+                                     └────────────┬────────────┘
+                                                  │
+                         ┌────────────────────────┴────────────────────────┐
+                         │                                                 │
+                         ▼                                                 ▼
+            ┌─────────────────────────┐                       ┌─────────────────────────┐
+            │      Database Layer     │                       │     External Services   │
+            │   MongoDB Atlas Cluster │                       │  OpenRouter AI Gateway  │
+            │      Mongoose ODM       │                       │  Nodemailer SMTP Mailer │
+            └─────────────────────────┘                       └─────────────────────────┘
+```
 
 ---
 
-## 3. Backend & API Inventory (Source of Truth)
+## 2. Platform Comparison & Responsibility Matrix
 
-The shared Express backend exposes all core services at `/api/*`:
+Web and Mobile share the same domain contracts and backend endpoints, but deliberately implement platform-native UI/UX patterns.
 
-| Endpoint Group | Route | Method | Description | Auth Required |
+| Architectural Dimension | Web Application (`web/`) | Mobile Application (`frontend/`) | Shared Backend (`backend/`) | Shared Layer (`shared/`) |
 | :--- | :--- | :--- | :--- | :--- |
-| **Health** | `/api/health` | GET | Server & MongoDB readiness state | No |
-| **Auth** | `/api/auth/email` | POST | Login (`mode: 'login'`) & Sign up (`mode: 'signup'`) | No (Rate limited) |
-| **Auth** | `/api/auth/sync` | POST | OAuth profile synchronization (Google / Native) | No |
-| **Auth** | `/api/auth/github` | POST | Exchange GitHub code for JWT session | No |
-| **Auth** | `/api/auth/forgot-password` | POST | Trigger 6-digit OTP email reset | No (Rate limited) |
-| **Auth** | `/api/auth/reset-password` | POST | Verify OTP & set new password | No (Rate limited) |
-| **Auth** | `/api/auth/me` | GET | Retrieve authenticated profile | Yes (Bearer JWT) |
-| **Items (CRUD)** | `/api/items` | GET | Filter, search, paginate, sort items | Yes |
-| **Items (CRUD)** | `/api/items` | POST | Create domain entity | Yes |
-| **Items (CRUD)** | `/api/items/:id` | GET | Fetch single item details | Yes |
-| **Items (CRUD)** | `/api/items/:id` | PUT | Update domain entity | Yes |
-| **Items (CRUD)** | `/api/items/:id` | DELETE | Remove item | Yes |
-| **Analytics** | `/api/analytics/overview` | GET | Aggregated counts, completion rates, category metrics, activity timeline | Yes |
-| **AI Gateway** | `/api/ai/generate` | POST | OpenRouter AI summarization & action plan generation | Yes (AI rate limited) |
-| **File Storage** | `/api/files` | POST | Upload file (multipart/form-data, max 20MB) | Yes |
-| **File Storage** | `/api/files/:id` | GET | File metadata inspection | Yes |
-| **File Storage** | `/api/files/download/*` | GET | Download uploaded asset | Yes |
-| **File Storage** | `/api/files/:id` | DELETE | Delete uploaded asset | Yes |
-| **Notifications** | `/api/notifications` | GET | Paginated notification inbox | Yes |
-| **Notifications** | `/api/notifications/unread-count`| GET | Unread counter | Yes |
-| **Notifications** | `/api/notifications/:id/read` | PATCH | Mark single notification as read | Yes |
-| **Notifications** | `/api/notifications/read-all` | PATCH | Mark all notifications read | Yes |
+| **Framework** | Next.js 16.3.5 (App Router, React 19.2.8) | Expo 57.0.21 (React Native 0.86.3) | Express 4.21.2 (Node.js 18+) | TypeScript 5.7+ |
+| **Routing** | File-based App Router (`app/(app)`, `app/(auth)`) | Expo Router v57 file-based routing (`app/`) | Express centralized router (`/api/*`) | N/A |
+| **Styling & Theme** | Tailwind CSS v4, Lucide React, Glass tokens | Vanilla RN StyleSheet, theme tokens, Vector Icons | N/A | Theme constants (`config.ts`) |
+| **Motion** | GSAP 3.15, Lenis Smooth Scroll 1.3, CSS transforms | React Native Reanimated 4.5.1 Worklets | N/A | N/A |
+| **State Management**| React Context (`AuthContext`, `ToastContext`) | React Context (`AuthContext`, `NetworkContext`) | Stateless JWT sessions | Shared interfaces |
+| **Session Storage** | Browser `localStorage` / HTTP Bearer | `expo-secure-store` encrypted keychain | JWT signature (7 days expiration) | Token schemas |
+| **File Handling** | Drag-and-drop HTML5 File API + FormData | `expo-image-picker`, `expo-document-picker` | Multer disk storage (`backend/uploads/`) | File metadata types |
+| **Hardware / OS** | Keyboard shortcuts, mouse hover, window resize | Touch gestures, safe areas, haptics, back button | Server OS / container | N/A |
+| **SEO & Indexing** | OpenGraph, Twitter cards, meta tags, sitemap | Not applicable (app store listing) | N/A | N/A |
+| **Deployment** | Vercel, Netlify, Docker | EAS Build (APK/AAB/IPA), Expo Go | Render, Railway, AWS ECS, Fly.io | npm / workspace link |
 
 ---
 
-## 4. Authentication Architecture
+## 3. Directory Structure & Codebase Map
 
-### 4.1 Token & Session Handling
-- **JWT Mechanism**: Backend signs standard HMAC SHA-256 JWT tokens containing `{ id: user._id, email: user.email }` with a 7-day validity.
-- **Mobile**: Persisted securely in `expo-secure-store` (`app_auth_token` and `app_user_profile`).
-- **Web**: Persisted in browser `localStorage` and synchronized via reactive `AuthContext` with an HTTP Bearer header attached to every API call.
-
-### 4.2 Web Auth Flow:
-1. **Login Screen (`/login`)**: Email + Password with validation, password visibility toggle, error display, instant redirect to `/dashboard`.
-2. **Signup Screen (`/signup`)**: Full Name, Email, Strong Password verification (minimum 6 chars), instant session creation, redirect to `/dashboard`.
-3. **Forgot Password Screen (`/forgot-password`)**: Two-step verification UI:
-   - Step 1: Submit email to receive 6-digit OTP.
-   - Step 2: Enter 6-digit OTP code + new password with confirmation, instant update.
-4. **Protected Route Guard**: Web middleware / route layout verifying session state, automatically routing unauthenticated visitors to `/login` with return redirect support.
-
----
-
-## 5. Web Application Architecture (`web/`)
-
-The web client is built with Next.js 14 App Router, structured strictly for high-information density, desktop productivity, and responsive layouts:
-
-```
-web/
-├── app/
-│   ├── (marketing)/
-│   │   ├── layout.tsx         # Marketing navbar & footer
-│   │   └── page.tsx           # Premium landing page (Hero, Ecosystem, Features, Live Demo, FAQ, CTA)
-│   ├── (auth)/
-│   │   ├── layout.tsx         # Minimal centered clean auth layout
-│   │   ├── login/page.tsx     # Full desktop & mobile responsive login
-│   │   ├── signup/page.tsx    # Full registration with validation
-│   │   └── forgot-password/page.tsx # OTP-based verification & reset
-│   ├── (app)/                 # Protected Application Routes
-│   │   ├── layout.tsx         # Desktop sidebar + Topbar + User Profile + Notification menu
-│   │   ├── dashboard/page.tsx # Operational analytics, quick metrics, activity charts, AI cards
-│   │   ├── items/
-│   │   │   ├── page.tsx       # Desktop data table & card grid with filters, search, pagination
-│   │   │   ├── new/page.tsx   # Entity creation form with AI assistance
-│   │   │   ├── [id]/page.tsx  # Detailed entity overview with status updater & actions
-│   │   │   └── [id]/edit/page.tsx # Full entity editing form
-│   │   ├── ai-assistant/page.tsx # Dedicated desktop AI text analysis, decomposition & summarization
-│   │   ├── files/page.tsx     # File asset manager with drag-and-drop file upload & preview
-│   │   └── notifications/page.tsx # Full notification inbox with bulk read & filter
-│   ├── globals.css
-│   └── layout.tsx             # Root layout with Fonts, AuthProvider, ToastProvider
-├── components/
-│   ├── ui/                    # Reusable button, input, badge, modal, dropdown, card, table
-│   ├── layout/                # Sidebar, Header, MobileNav, Footer
-│   ├── marketing/             # Hero, FeatureGrid, MultiPlatformShowcase, HowItWorks, FAQ
-│   └── domain/                # ItemCard, ItemTable, ItemForm, AnalyticsChart, AICard, FileUploader
-├── lib/
-│   ├── api/                   # Centralized client.ts, auth.ts, items.ts, analytics.ts, ai.ts, files.ts, notifications.ts
-│   └── utils.ts               # cn() helper, date formatters, status helpers
-└── package.json
-```
-
----
-
-## 6. Shared Module Architecture (`shared/`)
-
-A platform-independent TypeScript package:
-```
-shared/
-├── src/
-│   ├── types/
-│   │   ├── auth.ts            # User, Session, AuthCredentials
-│   │   ├── domain.ts          # HackathonItem, ItemStatus, ItemListQuery, PaginationMeta
-│   │   ├── analytics.ts       # AnalyticsOverviewData, CategoryMetric, ActivityMetric
-│   │   ├── ai.ts              # AIGeneratePayload, AIGeneratedResult
-│   │   ├── file.ts            # UploadedFile, FileUploadResponse
-│   │   └── notification.ts    # AppNotification, PaginatedNotifications
-│   ├── constants/
-│   │   └── config.ts          # Default statuses, categories, brand colors
-│   └── validation/
-│       └── authValidation.ts  # Email, password strength validator
-├── package.json
-└── tsconfig.json
+```text
+Code_A_Thon/
+├── backend/                      # Node.js + Express REST API
+│   ├── src/
+│   │   ├── config/              # database.ts (Mongoose Atlas connection)
+│   │   ├── controllers/         # auth, hackathonItem, ai, file, analytics, notification
+│   │   ├── middleware/          # auth (JWT), errorHandler, rateLimiter
+│   │   ├── models/              # User, HackathonItem, Notification, UploadedFile
+│   │   ├── routes/              # /api/auth, /api/items, /api/ai, /api/files, /api/analytics
+│   │   ├── seeds/               # Deterministic demo dataset seeds (`npm run seed:reset`)
+│   │   ├── services/            # authService, emailService, openrouterService, storageService
+│   │   └── utils/               # validators, fileValidators
+│   ├── uploads/                 # Local filesystem upload destination
+│   └── package.json
+│
+├── frontend/                     # React Native + Expo 57 Mobile Application
+│   │                            # NOTE: Retained as "frontend/" to safeguard native Metro/EAS configs
+│   ├── app/                     # Expo Router file system routing:
+│   │   ├── (auth)/              # Mobile auth & OAuth callbacks
+│   │   ├── home.tsx             # Mobile dashboard, metrics, quick actions, AI cards
+│   │   ├── items/               # CRUD: index, create, [id], edit/[id]
+│   │   ├── notifications/       # Native notification drawer
+│   │   └── onboarding.tsx       # Kinetic onboarding carousel
+│   ├── components/              # Native UI components (auth, domain, common, navigation)
+│   ├── config/                  # appConfig.ts (Central pivot config for mobile)
+│   ├── context/                 # AuthContext, NetworkContext, ToastContext
+│   ├── services/api/            # Mobile HTTP client layer
+│   ├── theme/                   # colors.ts, typography.ts, motion.ts
+│   ├── app.json                 # Expo bundle IDs, schemes, EAS project keys
+│   └── package.json
+│
+├── web/                          # Next.js 16 App Router Web Application
+│   ├── app/
+│   │   ├── page.tsx             # Editorial landing page (Hero, Ecosystem, FAQ, CTA)
+│   │   ├── layout.tsx           # Root layout with Fonts, AuthProvider, ToastProvider
+│   │   ├── globals.css          # Tailwind CSS v4 design tokens and core variables
+│   │   ├── (auth)/              # Centered auth flow:
+│   │   │   ├── login/page.tsx   # Login with password strength & OAuth
+│   │   │   ├── signup/page.tsx  # Registration with validation
+│   │   │   └── forgot-password/page.tsx # 2-step OTP email recovery
+│   │   ├── (app)/               # Protected workspace shell:
+│   │   │   ├── layout.tsx       # Desktop Sidebar + Topbar + Navigation
+│   │   │   ├── dashboard/page.tsx # Operational analytics, KPIs, activity timeline
+│   │   │   ├── items/           # CRUD: data table, search, filter, pagination
+│   │   │   │   ├── page.tsx     # Items list view & search
+│   │   │   │   ├── new/page.tsx # Create entity with AI co-generation
+│   │   │   │   ├── [id]/page.tsx # Item detail, status transition, timeline
+│   │   │   │   └── [id]/edit/page.tsx # Full entity editing form
+│   │   │   ├── ai-assistant/page.tsx # Desktop AI workspace & prompt synthesizer
+│   │   │   ├── files/page.tsx   # Asset repository with drag-and-drop
+│   │   │   └── notifications/page.tsx # Notification feed with bulk-actions
+│   │   └── auth/callback/       # OAuth redirect landing pages (Google, GitHub)
+│   ├── components/
+│   │   ├── auth/                # KineticHeadline, InteractiveGridTiles, UnifiedAuthView
+│   │   ├── layout/              # Sidebar, Topbar, MobileNav
+│   │   └── marketing/           # HeroProductShowcase, AmbientHeroScene, ArchitectureDiagram
+│   ├── lib/
+│   │   ├── api/                 # Centralized client.ts, auth.ts, domain.ts
+│   │   ├── animations/          # GSAP & Lenis smooth scroll drivers
+│   │   ├── context/             # AuthContext.tsx, ToastContext.tsx
+│   │   ├── types.ts             # Web-specific interfaces & view models
+│   │   └── utils.ts             # cn() Tailwind merger and formatting helpers
+│   ├── DESIGN_SYSTEM.md         # Visual tokens, typography, surfaces & layout specs
+│   └── package.json
+│
+├── shared/                       # Cross-platform TypeScript contracts (Zero UI)
+│   ├── src/
+│   │   ├── constants/           # Branding, default categories, item statuses
+│   │   ├── types/               # Auth, HackathonItem, Analytics, AI, File, Notification
+│   │   └── validation/          # Email regex, password complexity rules
+│   └── package.json
+│
+├── hackathon/                    # Hackathon execution operating pipeline (01_ through 13_)
+├── .agents/                      # Antigravity AI engineering skills (pivot, code review, mobile UX, web UX)
+├── HACKATHON_PIVOT_CHECKLIST.md  # 3-hour rapid pivot guide
+├── PROJECT_ARCHITECTURE.md       # This document
+└── package.json                  # Root monorepo runner (`concurrently`)
 ```
 
 ---
 
-## 7. Migration & Implementation Phases
+## 4. Shared Backend & API Inventory
 
-1. **Phase 1: Analysis & Architecture Approval** (Completed with this document).
-2. **Phase 2: Shared Layer Creation (`shared/`)** - Extract common interfaces and validation.
-3. **Phase 3: Next.js Web Client Initialization (`web/`)** - Initialize Next.js 14 App Router, Tailwind CSS, Lucide icons, setup layout & design tokens.
-4. **Phase 4: Centralized API Service Layer (`web/lib/api/`)** - Standardized HTTP client with JWT interceptor, timeout handling, and type safety.
-5. **Phase 5: Web Authentication UX** - Complete AuthContext, Login, Signup, Forgot Password & OTP flows.
-6. **Phase 6: Core Web Product Experiences** - Dashboard with interactive analytics, Item CRUD with data table + card views, AI summarizer suite, file manager, notifications center.
-7. **Phase 7: Premium Marketing Landing Page** - Hero section with live product visual, Multi-Platform ecosystem story ("One Product, Everywhere"), Feature deep-dive, Live stats, FAQ, high-conversion CTA.
-8. **Phase 8: Micro-Interactions & Styling Polish** - Polished animations, skeleton loaders, error states, empty states, responsive viewports (375px to 1440px+).
-9. **Phase 9: Root Scripts & Monorepo Configuration** - Update root `package.json` to concurrently run `backend`, `frontend` (mobile), and `web`.
-10. **Phase 10: Verification & Mobile Protection** - Run TypeScript type checks, verify backend endpoints, ensure mobile Expo build/config is pristine and untouched.
+The shared backend (`backend/`) exposes RESTful endpoints at `/api/*`. Both the Web and Mobile clients consume these exact endpoints:
+
+| Domain | Route | Method | Payload / Query | Auth Required | Description |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **System** | `/api/health` | GET | None | No | Server status & MongoDB connection state |
+| **Auth** | `/api/auth/email` | POST | `{ mode: 'login' \| 'signup', email, password, name? }` | No (Rate limited) | Dual-mode email auth returning JWT session |
+| **Auth** | `/api/auth/sync` | POST | `{ email, name, avatar?, provider, providerId }` | No | Social profile synchronization |
+| **Auth** | `/api/auth/github` | POST | `{ code: string }` | No | GitHub OAuth code exchange for JWT session |
+| **Auth** | `/api/auth/forgot-password` | POST | `{ email: string }` | No (Rate limited) | Triggers 6-digit OTP reset email |
+| **Auth** | `/api/auth/reset-password` | POST | `{ email, otp, newPassword }` | No (Rate limited) | Verifies OTP code and sets new password |
+| **Auth** | `/api/auth/me` | GET | None | Yes (Bearer JWT) | Returns current authenticated user record |
+| **Items** | `/api/items` | GET | `?search=&category=&status=&page=&limit=&sort=` | Yes | Paginated, filtered, sorted entity list |
+| **Items** | `/api/items` | POST | `{ title, description, category, status, priority?, tags?, ... }` | Yes | Creates new domain entity |
+| **Items** | `/api/items/:id` | GET | URL param `:id` | Yes | Retrieves single entity by ID |
+| **Items** | `/api/items/:id` | PUT | Partial entity payload | Yes | Updates entity properties |
+| **Items** | `/api/items/:id` | DELETE | URL param `:id` | Yes | Deletes entity |
+| **Analytics** | `/api/analytics/overview` | GET | None | Yes | Aggregated counts, completion ratios, category breakdown |
+| **AI Copilot** | `/api/ai/generate` | POST | `{ prompt: string, system?: string }` | Yes (AI rate limited) | OpenRouter LLM text generation & synthesis |
+| **Files** | `/api/files` | POST | `multipart/form-data` (file) | Yes | Uploads asset (max 20MB) |
+| **Files** | `/api/files/:id` | GET | URL param `:id` | Yes | Inspects file metadata |
+| **Files** | `/api/files/download/*` | GET | Relative path | Yes | Downloads or streams stored file |
+| **Files** | `/api/files/:id` | DELETE | URL param `:id` | Yes | Deletes stored file |
+| **Notifications** | `/api/notifications` | GET | `?page=&limit=` | Yes | Paginated user notification inbox |
+| **Notifications** | `/api/notifications/unread-count` | GET | None | Yes | Returns integer badge counter |
+| **Notifications** | `/api/notifications/:id/read` | PATCH | URL param `:id` | Yes | Marks single notification as read |
+| **Notifications** | `/api/notifications/read-all` | PATCH | None | Yes | Marks all notifications read |
+
+---
+
+## 5. Authentication & Session Architecture
+
+```text
+       Web Browser (Next.js)                      Mobile Device (Expo)
+   ┌───────────────────────────┐              ┌───────────────────────────┐
+   │ localStorage ('pulse_web_')│              │ SecureStore (Encrypted)   │
+   └─────────────┬─────────────┘              └─────────────┬─────────────┘
+                 │                                          │
+                 ▼                                          ▼
+   Authorization: Bearer <jwt>                Authorization: Bearer <jwt>
+                 │                                          │
+                 └────────────────────┬─────────────────────┘
+                                      │
+                                      ▼
+                        ┌───────────────────────────┐
+                        │  Express auth Middleware  │
+                        │   jwt.verify(token, key)  │
+                        └─────────────┬─────────────┘
+                                      │
+                         Success: req.user = decoded
+```
+
+1. **Token Signature**: Backend signs standard HMAC SHA-256 JWT tokens containing `{ id: user._id, email: user.email }` with a 7-day expiration.
+2. **Web Token Persistence**: `web/lib/api/client.ts` stores tokens under `pulse_web_token` and user profiles under `pulse_web_user` in browser `localStorage`.
+3. **Web Route Protection**: `web/app/(app)/layout.tsx` checks authentication state on mount. If no token is found, visitors are redirected to `/login` with clean query parameter preservation.
+4. **Mobile Token Persistence**: `frontend/context/AuthContext.tsx` stores tokens securely in native keychain via `expo-secure-store`.
+
+---
+
+## 6. Shared vs Platform-Specific Architecture
+
+### 6.1 Shared Architecture (`shared/`)
+- **Domain Interfaces**: `HackathonItem`, `ItemStatus`, `ItemPriority`, `User`, `AppNotification`, `UploadedFile`, `AnalyticsOverviewData`.
+- **Validation Rules**: Password strength evaluation (`shared/src/validation/index.ts`), email format regex.
+- **Default Constants**: Categories (`Engineering`, `Design`, `Product`, `Marketing`, `General`), Status metadata (colors, labels).
+
+### 6.2 Web-Specific Architecture (`web/`)
+- **Desktop Information Density**: High-density Data Tables with sortable column headers, pagination controls, and batch actions.
+- **Responsive Layout Shell**: Collapsible sidebar navigation for desktop (`lg:w-64`), compact top navigation on tablet, and bottom/drawer menu on mobile viewports.
+- **Micro-Animations & Smoothness**: GSAP hero typography animations, Lenis inertia scrolling for editorial landing sections, and CSS transitions on interactive elements.
+- **Keyboard & Accessibility**: Full tab order navigation, visible focus rings (`focus-visible:ring-2`), semantic HTML5 tags (`<main>`, `<nav>`, `<aside>`, `<header>`).
+
+### 6.3 Mobile-Specific Architecture (`frontend/`)
+- **Touch-First Mechanics**: Minimum touch targets of 44×44pt, pull-to-refresh list behaviors, swipe gestures.
+- **Native Device Access**: Camera/Gallery via `expo-image-picker`, system documents via `expo-document-picker`, native haptics.
+- **Screen Safety**: `SafeAreaView` wrapping top and bottom notches, Android hardware back-button handlers.
+
+---
+
+## 7. Environment Variables Matrix
+
+Environment variables are partitioned into **Client/Public** variables (exposed to the browser) and **Server/Private** variables (strictly confidential).
+
+| Variable Name | Layer | Purpose | Public / Private | Example / Default |
+| :--- | :--- | :--- | :--- | :--- |
+| `PORT` | Backend | Express HTTP server listening port | **Private** | `5000` |
+| `MONGODB_URI` | Backend | MongoDB Atlas connection string | **Private** | `mongodb+srv://<user>:<pass>@...` |
+| `JWT_SECRET` | Backend | Key used to sign session tokens | **Private** | `YOUR_SECURE_JWT_SECRET` |
+| `OPENROUTER_API_KEY` | Backend | AI Gateway API Key | **Private** | `YOUR_OPENROUTER_KEY` |
+| `OPENROUTER_MODEL` | Backend | Default LLM model identifier | **Private** | `openrouter/free` |
+| `SMTP_USER` / `SMTP_PASS` | Backend | Nodemailer Gmail credentials | **Private** | `YOUR_EMAIL@gmail.com` |
+| `GITHUB_CLIENT_SECRET` | Backend | GitHub OAuth secret | **Private** | `YOUR_GITHUB_SECRET` |
+| `NEXT_PUBLIC_API_URL` | Web | Root backend REST API endpoint | **Public** | `http://localhost:5000/api` |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID`| Web | Google OAuth Web Client ID | **Public** | `YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com` |
+| `NEXT_PUBLIC_GITHUB_CLIENT_ID`| Web | GitHub OAuth Client ID | **Public** | `YOUR_GITHUB_CLIENT_ID` |
+| `EXPO_PUBLIC_API_URL` | Mobile | Root backend REST API for Expo | **Public** | `http://10.0.2.2:5000/api` or Deployed URL |
+
+> [!CAUTION]
+> Never commit actual secret keys (`JWT_SECRET`, `OPENROUTER_API_KEY`, `MONGODB_URI`, `SMTP_PASS`, `GITHUB_CLIENT_SECRET`) into Git. Only use sample `.env.example` templates in the repository.
+
+---
+
+## 8. Development & Deployment Lifecycle
+
+### 8.1 Local Multi-Platform Bootstrapping
+```bash
+# 1. Install all dependencies across monorepo
+npm run install:all
+
+# 2. Seed database with realistic demo records
+npm run seed:reset
+
+# 3. Boot all services concurrently (Mobile, Web, Backend)
+npm run dev
+```
+
+### 8.2 Deployment Targets
+- **Web**: Hosted on **Vercel** with Next.js edge runtime support. Set environment variable `NEXT_PUBLIC_API_URL`.
+- **Backend**: Hosted on **Render** / **Railway** / **Fly.io**. Ensure `MONGODB_URI`, `JWT_SECRET`, and `OPENROUTER_API_KEY` are configured in project environment.
+- **Mobile**: Built via **Expo Application Services (EAS)**:
+  ```bash
+  cd frontend
+  eas build --platform android --profile preview
+  ```
