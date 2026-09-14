@@ -148,7 +148,7 @@ export default function MarketingPage() {
         {/* ========================================================
             01. HERO SECTION: BENTO COMPOSITION & EDITORIAL TYPOGRAPHY
            ======================================================== */}
-        <section className="hero-section relative pt-32 sm:pt-40 pb-20 sm:pb-28 px-4 sm:px-6 overflow-hidden border-b border-black/[0.06]">
+        <section className="hero-section relative pt-20 sm:pt-24 pb-20 sm:pb-28 px-4 sm:px-6 overflow-hidden border-b border-black/[0.06]">
           {/* Interactive Cursor Reactive Grid Tiles Animation (Code-A-Thon Cyber Neon & Crosshairs) */}
           <InteractiveGridTiles tileSize={42} className="z-0" />
 
@@ -293,7 +293,7 @@ export default function MarketingPage() {
                       style={{ backgroundColor: '#10B981' }}
                     />
                     <span className="word-text relative z-10 text-[#1E1B4B] font-extrabold tracking-tight">
-                      Mobile.
+                      Mobile
                     </span>
                   </span>
                 </div>

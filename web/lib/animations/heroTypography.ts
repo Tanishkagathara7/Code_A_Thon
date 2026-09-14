@@ -70,7 +70,7 @@ export const HERO_WORD_SEQUENCE: WordHighlightItem[] = [
   },
   {
     id: 'mobile',
-    word: 'Mobile.',
+    word: 'Mobile',
     bgColor: '#10B981',       // Vibrant Emerald
     textColor: '#FFFFFF',
     borderColor: '#059669',
