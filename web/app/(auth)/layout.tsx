@@ -1,73 +1,53 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Terminal, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
-import { Highlight } from '@/components/marketing/Highlight';
+import { InteractiveGridTiles } from '@/components/auth/InteractiveGridTiles';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[#FAFAFA]">
-      {/* Left Brand Panel: Editorial Bento Showcase */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-zinc-50 to-zinc-100/80 p-12 lg:p-16 text-zinc-900 flex-col justify-between relative overflow-hidden border-r border-black/[0.06]">
-        {/* Subtle ambient lighting */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen flex flex-col bg-[#FAFAFA] text-zinc-900 selection:bg-blue-600 selection:text-white relative overflow-x-hidden">
+      {/* Interactive Cursor Reactive Grid Tiles Animation */}
+      <InteractiveGridTiles tileSize={42} />
 
-        {/* Brand Identity */}
-        <div className="relative z-10">
-          <Link href="/" className="inline-flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded-xl bg-zinc-900 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-zinc-950/20 group-hover:scale-105 transition-transform">
-              A
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold tracking-tight text-zinc-900">
-                APP
-              </span>
-            </div>
-          </Link>
-        </div>
+      {/* Subtle Ambient Lighting Vignette */}
+      <div className="fixed top-0 left-1/4 w-[600px] h-[600px] bg-blue-500/[0.03] rounded-full blur-3xl pointer-events-none -translate-y-1/2" />
+      <div className="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-emerald-500/[0.02] rounded-full blur-3xl pointer-events-none translate-y-1/2" />
 
-        {/* Narrative & Real Project Asset Context */}
-        <div className="relative z-10 max-w-lg space-y-6">
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight text-zinc-950">
-            AUTHORITATIVE SESSION ON{' '}
-            <Highlight variant="blue">WEB</Highlight> AND{' '}
-            <Highlight variant="green">MOBILE.</Highlight>
-          </h1>
-
-          <p className="text-zinc-600 text-sm leading-relaxed font-normal">
-            One shared Express backend, cryptographically secure JWT authentication, and zero latency across React Native Expo and Next.js 14 workspaces.
-          </p>
-
-          {/* Real asset framed with bento shadow */}
-          <div className="pt-2">
-            <div className="relative aspect-[2083/755] w-full rounded-xl border border-black/[0.06] bg-white p-3 shadow-lg shadow-black/[0.04]">
-              <Image
-                src="/code.png"
-                alt="Code-A-Thon Architecture"
-                fill
-                sizes="(max-width: 1024px) 100vw, 500px"
-                className="object-contain p-1"
-              />
-            </div>
+      {/* Brand Header Navigation */}
+      <header className="relative z-30 w-full max-w-7xl mx-auto px-6 sm:px-8 pt-6 sm:pt-8 flex items-center justify-between">
+        {/* Compact Premium Wordmark */}
+        <Link href="/" className="inline-flex items-center gap-2.5 group">
+          <div className="w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center font-bold text-xs tracking-wider shadow-sm group-hover:bg-zinc-800 transition-colors">
+            A
           </div>
-        </div>
-
-        <div className="relative z-10 text-xs font-medium text-zinc-500 flex items-center justify-between border-t border-black/[0.06] pt-6">
-          <span>© {new Date().getFullYear()} APP Engine</span>
-          <div className="flex items-center gap-3">
-            <span>Next.js 14</span>
-            <span>•</span>
-            <span>React Native Expo</span>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-sm font-bold tracking-tight text-zinc-950">
+              APP
+            </span>
+            <span className="text-[10px] font-mono tracking-widest text-zinc-400 uppercase">
+              ENGINE
+            </span>
           </div>
-        </div>
-      </div>
+        </Link>
+      </header>
 
-      {/* Right Form Area: Clean, Focused Modern Card */}
-      <div className="flex-1 flex flex-col justify-center items-center p-6 sm:p-12 lg:w-1/2 bg-[#FAFAFA]">
-        <div className="w-full max-w-md bg-white p-8 sm:p-10 rounded-2xl border border-black/[0.06] shadow-xl shadow-black/[0.04]">
-          {children}
+      {/* Main Content Viewport */}
+      <main className="relative z-20 flex-1 flex flex-col justify-center max-w-7xl w-full mx-auto px-6 sm:px-8 py-8 sm:py-12">
+        {children}
+      </main>
+
+      {/* Technical Footer */}
+      <footer className="relative z-20 w-full max-w-7xl mx-auto px-6 sm:px-8 py-6 flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-zinc-400 border-t border-black/[0.05] gap-2">
+        <div className="flex items-center gap-2">
+          <span>© {new Date().getFullYear()} APP ENGINE ARCHITECTURE</span>
+          <span className="hidden sm:inline text-zinc-300">•</span>
+          <span className="hidden sm:inline">END-TO-END VERIFIED</span>
         </div>
-      </div>
+        <div className="flex items-center gap-4 text-zinc-500">
+          <span>NEXT.js 14 APP ROUTER</span>
+          <span>•</span>
+          <span>REACT NATIVE EXPO 0.81</span>
+        </div>
+      </footer>
     </div>
   );
 }
