@@ -4,7 +4,12 @@ import nodemailer, { SendMailOptions } from 'nodemailer';
  * Dispatches email via Resend HTTPS API (Port 443 - zero firewall blocks on Render).
  */
 async function sendViaResend(apiKey: string, mailOptions: SendMailOptions) {
-  const from = mailOptions.from || process.env.RESEND_FROM || 'onboarding@resend.dev';
+  // Resend requires sending from a verified domain. By default on free accounts, that is onboarding@resend.dev.
+  // Never send from @gmail.com or @yahoo.com through Resend unless the custom domain is verified.
+  let from = process.env.RESEND_FROM?.trim() || 'onboarding@resend.dev';
+  if (typeof mailOptions.from === 'string' && !mailOptions.from.includes('gmail.com') && !mailOptions.from.includes('yahoo.com')) {
+    from = mailOptions.from;
+  }
   const to = Array.isArray(mailOptions.to) ? mailOptions.to : [mailOptions.to as string];
 
   console.log(`🚀 [EMAIL] Dispatching email to ${to.join(', ')} via Resend HTTPS API (Port 443)...`);
