@@ -68,3 +68,41 @@ declare module 'jsonwebtoken' {
   export default jwt;
 }
 
+declare module 'express' {
+  export interface Request {
+    headers: Record<string, string | string[] | undefined>;
+    query: Record<string, any>;
+    params: Record<string, any>;
+    body: any;
+    file?: any;
+    files?: any;
+    [key: string]: any;
+  }
+  export interface Response {
+    status(code: number): this;
+    json(data: any): this;
+    send(data: any): this;
+    sendFile(path: string): this;
+    setHeader(name: string, value: any): this;
+    [key: string]: any;
+  }
+  export type NextFunction = (err?: any) => void;
+  export type RequestHandler = (req: Request, res: Response, next: NextFunction) => any;
+  export function Router(): any;
+  const express: any;
+  export default express;
+}
+
+declare module 'express-rate-limit' {
+  import { RequestHandler } from 'express';
+  export interface Options {
+    windowMs?: number;
+    max?: number;
+    standardHeaders?: boolean;
+    legacyHeaders?: boolean;
+    message?: any;
+    [key: string]: any;
+  }
+  export default function rateLimit(options?: Options): RequestHandler;
+}
+
