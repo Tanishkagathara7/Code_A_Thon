@@ -12,8 +12,11 @@ function OAuthCallbackContent({ provider }: { provider: 'google' | 'github' }) {
   const { loginWithOAuth, loginWithGitHub } = useAuth();
   const { toast } = useToast();
   const [status, setStatus] = useState('Authenticating with ' + (provider === 'google' ? 'Google' : 'GitHub') + '...');
+  const processedRef = React.useRef(false);
 
   useEffect(() => {
+    if (processedRef.current) return;
+
     const handleAuth = async () => {
       try {
         if (provider === 'google') {
@@ -25,6 +28,8 @@ function OAuthCallbackContent({ provider }: { provider: 'google' | 'github' }) {
           if (!accessToken) {
             throw new Error('No access token returned from Google.');
           }
+
+          processedRef.current = true;
 
           // Fetch userinfo from Google
           const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
@@ -50,8 +55,10 @@ function OAuthCallbackContent({ provider }: { provider: 'google' | 'github' }) {
         } else if (provider === 'github') {
           const code = searchParams.get('code');
           if (!code) {
-            throw new Error('No authorization code returned from GitHub.');
+            return;
           }
+
+          processedRef.current = true;
 
           await loginWithGitHub(code, `${window.location.origin}/auth/callback/github`);
           toast('Signed in with GitHub successfully!', 'success');
