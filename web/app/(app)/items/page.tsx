@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Search,
-  Filter,
   Plus,
   Trash2,
   Edit,
@@ -12,7 +11,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Layers,
-  Sparkles,
 } from 'lucide-react';
 import { itemsApi } from '@/lib/api/domain';
 import { HackathonItem, SortOption, PaginationMeta } from '@/lib/types';
@@ -32,7 +30,6 @@ export default function ItemsPage() {
   const [category, setCategory] = useState<string>('');
   const [sort, setSort] = useState<SortOption>('createdAt_desc');
   const [loading, setLoading] = useState(true);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const { toast } = useToast();
 
@@ -56,16 +53,55 @@ export default function ItemsPage() {
           totalPages: 1,
         }
       );
-    } catch (err: any) {
-      toast(err.message || 'Failed to fetch items', 'error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to fetch items';
+      toast(msg, 'error');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchItems(1);
-  }, [status, category, sort]);
+    let active = true;
+    const loadItems = async () => {
+      try {
+        const res = await itemsApi.getItems({
+          page: 1,
+          limit: 10,
+          search: search.trim() || undefined,
+          status: status || undefined,
+          category: category || undefined,
+          sort,
+        });
+        if (active) {
+          setItems(res.data || []);
+          setPagination(
+            res.pagination || {
+              total: res.data?.length || 0,
+              page: 1,
+              limit: 10,
+              totalPages: 1,
+            }
+          );
+        }
+      } catch (err: unknown) {
+        if (active) {
+          const msg = err instanceof Error ? err.message : 'Failed to fetch items';
+          toast(msg, 'error');
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void loadItems();
+
+    return () => {
+      active = false;
+    };
+  }, [status, category, sort, search, toast]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,8 +114,9 @@ export default function ItemsPage() {
       await itemsApi.deleteItem(id);
       toast('Item deleted successfully', 'success');
       fetchItems(pagination.page);
-    } catch (err: any) {
-      toast(err.message || 'Failed to delete item', 'error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to delete item';
+      toast(msg, 'error');
     }
   };
 

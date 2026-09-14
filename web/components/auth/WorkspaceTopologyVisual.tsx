@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Smartphone, Monitor, ShieldCheck, Database, Server, RefreshCw, KeyRound, Cpu } from 'lucide-react';
+import { Smartphone, Monitor, ShieldCheck, RefreshCw, KeyRound, Cpu } from 'lucide-react';
 
 interface WorkspaceTopologyVisualProps {
   mode?: 'signin' | 'signup' | 'reset';

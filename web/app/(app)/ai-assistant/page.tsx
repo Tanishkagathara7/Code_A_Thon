@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Sparkles, ArrowRight, Loader2, Copy, Check, Terminal, FileText, BrainCircuit } from 'lucide-react';
+import { Sparkles, Loader2, Copy, Check, Terminal, FileText, BrainCircuit } from 'lucide-react';
 import { aiApi } from '@/lib/api/domain';
 import { useToast } from '@/lib/context/ToastContext';
 
@@ -37,8 +37,9 @@ export default function AIAssistantPage() {
         setResult(res.data.text);
         toast('AI generation complete', 'success');
       }
-    } catch (err: any) {
-      toast(err.message || 'AI request failed', 'error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'AI request failed';
+      toast(msg, 'error');
     } finally {
       setLoading(false);
     }

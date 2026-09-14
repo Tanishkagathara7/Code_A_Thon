@@ -56,7 +56,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    refreshUser();
+    let active = true;
+    const initAuth = async () => {
+      try {
+        if (typeof window === 'undefined') return;
+        const token = localStorage.getItem(TOKEN_STORAGE_KEY);
+        if (!token) {
+          if (active) {
+            setUser(null);
+            setIsLoading(false);
+          }
+          return;
+        }
+        const cached = localStorage.getItem(USER_STORAGE_KEY);
+        if (cached && active) {
+          try {
+            setUser(JSON.parse(cached));
+          } catch {}
+        }
+        const res = await authApi.getMe();
+        if (active && res.success && res.user) {
+          setUser(res.user);
+          localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(res.user));
+        }
+      } catch {
+        if (active) {
+          setUser(null);
+          localStorage.removeItem(TOKEN_STORAGE_KEY);
+          localStorage.removeItem(USER_STORAGE_KEY);
+        }
+      } finally {
+        if (active) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void initAuth();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   const login = async (email: string, pass: string) => {

@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import gsap from 'gsap';
 import {
   Layers,
-  Sparkles,
   CheckCircle2,
   Clock,
   TrendingUp,
@@ -16,7 +15,6 @@ import {
   Activity,
   ShieldCheck,
   Zap,
-  Terminal,
 } from 'lucide-react';
 import { pauseLenis, resumeLenis } from '@/lib/animations/lenis';
 
@@ -399,7 +397,7 @@ export const HeroProductShowcase: React.FC<HeroProductShowcaseProps> = ({
               </div>
 
               <div className="p-5 rounded-xl bg-zinc-950 text-white font-mono text-xs space-y-2">
-                <div className="text-zinc-400">// System verification output</div>
+                <div className="text-zinc-400">{'// System verification output'}</div>
                 <div className="text-emerald-400">✓ Cryptographic token integrity confirmed</div>
                 <div className="text-blue-400">✓ React 19 hydration completed without drift</div>
                 <div className="text-zinc-300">✓ Native bridge established with Expo SDK 57</div>

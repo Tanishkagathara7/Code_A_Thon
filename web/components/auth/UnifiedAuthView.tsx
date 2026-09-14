@@ -68,9 +68,10 @@ export function UnifiedAuthView({ initialMode = 'signin' }: AuthPageProps) {
       setTimeout(() => {
         router.push('/dashboard');
       }, 600);
-    } catch (err: any) {
-      setError(err.message || (mode === 'signin' ? 'Invalid credentials' : 'Failed to create workspace'));
-      toast(err.message || 'Authentication failed', 'error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : (mode === 'signin' ? 'Invalid credentials' : 'Failed to create workspace');
+      setError(msg);
+      toast(msg, 'error');
       setLoading(false);
     }
   };

@@ -6,17 +6,11 @@ import Image from 'next/image';
 import {
   ArrowRight,
   ArrowUpRight,
-  Terminal,
-  Smartphone,
-  Monitor,
   CheckCircle2,
-  Database,
   Code2,
-  Cpu,
-  Layers,
+  Monitor,
+  Smartphone,
   Sparkles,
-  Zap,
-  ShieldCheck,
 } from 'lucide-react';
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { Highlight } from '@/components/marketing/Highlight';
@@ -349,7 +343,7 @@ export default function MarketingPage() {
         <section className="py-24 sm:py-32 px-4 sm:px-6 bg-white border-b border-black/[0.06]">
           <div className="max-w-5xl mx-auto space-y-6">
             <div className="font-mono text-xs font-semibold uppercase tracking-wider text-blue-600">
-              // 02. ARCHITECTURAL PHILOSOPHY
+              {'// 02. ARCHITECTURAL PHILOSOPHY'}
             </div>
             <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-zinc-950 leading-tight">
               BUILT FOR HIGH VELOCITY.{' '}
@@ -370,7 +364,7 @@ export default function MarketingPage() {
           <div className="max-w-6xl mx-auto space-y-12">
             <div className="max-w-3xl space-y-2">
               <div className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500">
-                // 03. CLIENT PURPOSE & PARITY
+                {'// 03. CLIENT PURPOSE & PARITY'}
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
                 TWO DEDICATED CLIENTS. ONE CORE API.
@@ -447,7 +441,7 @@ export default function MarketingPage() {
           <div className="max-w-6xl mx-auto space-y-12">
             <div className="text-left max-w-3xl space-y-2">
               <div className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500">
-                // 04. SYNCHRONIZATION CORRIDOR
+                {'// 04. SYNCHRONIZATION CORRIDOR'}
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
                 ONE BACKEND. TWO CLIENTS. ZERO DRIFT.
@@ -466,7 +460,7 @@ export default function MarketingPage() {
                   <span className="font-mono text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-200">Port 3000</span>
                 </div>
                 <div className="space-y-2 font-mono text-xs text-zinc-900 bg-zinc-50 p-4 rounded-xl border border-black/[0.06]">
-                  <div className="text-zinc-500">// Dispatching item state change</div>
+                  <div className="text-zinc-500">{'// Dispatching item state change'}</div>
                   <div className="font-semibold">mutateItem(&apos;66f1...&apos;, &#123; status: &apos;resolved&apos; &#125;)</div>
                   <div className="text-emerald-600 font-semibold">✓ Express REST confirmed: HTTP 200 OK</div>
                 </div>
@@ -479,7 +473,7 @@ export default function MarketingPage() {
                   <span className="font-mono text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200">Expo 57</span>
                 </div>
                 <div className="space-y-2 font-mono text-xs text-zinc-900 bg-zinc-50 p-4 rounded-xl border border-black/[0.06]">
-                  <div className="text-zinc-500">// Revalidated via cache invalidation</div>
+                  <div className="text-zinc-500">{'// Revalidated via cache invalidation'}</div>
                   <div className="font-semibold">onItemCacheInvalidate(&apos;66f1...&apos;)</div>
                   <div className="text-emerald-600 font-semibold">✓ Native list updated in &lt; 35ms</div>
                 </div>
@@ -495,7 +489,7 @@ export default function MarketingPage() {
           <div className="max-w-6xl mx-auto space-y-8">
             <div className="max-w-2xl space-y-2">
               <div className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500">
-                // 05. INTERACTIVE WORKFLOW
+                {'// 05. INTERACTIVE WORKFLOW'}
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
                 END-TO-END EXECUTION WITH REAL PAYLOADS
@@ -587,7 +581,7 @@ export default function MarketingPage() {
 
             <div className="lg:col-span-7 space-y-6 order-1 lg:order-2">
               <div className="font-mono text-xs font-bold uppercase tracking-widest text-zinc-500">
-                // 07. ENGINEERING CONTEXT
+                {'// 07. ENGINEERING CONTEXT'}
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 leading-tight">
                 ENGINEERED WITH DISCIPLINE.{' '}
@@ -626,7 +620,7 @@ export default function MarketingPage() {
           <div className="max-w-4xl mx-auto space-y-10">
             <div className="text-left space-y-2">
               <div className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500">
-                // 09. FREQUENTLY ASKED QUESTIONS
+                {'// 09. FREQUENTLY ASKED QUESTIONS'}
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
                 TECHNICAL FAQ

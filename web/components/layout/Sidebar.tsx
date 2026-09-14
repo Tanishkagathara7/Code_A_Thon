@@ -11,7 +11,6 @@ import {
   Bell,
   LogOut,
   ChevronRight,
-  ShieldCheck,
   User as UserIcon,
 } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';

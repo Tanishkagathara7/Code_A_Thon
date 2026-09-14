@@ -3,7 +3,7 @@
 import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, Save } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { itemsApi } from '@/lib/api/domain';
 import { useToast } from '@/lib/context/ToastContext';
 
@@ -21,23 +21,32 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string 
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    let active = true;
     const fetchItem = async () => {
       try {
         const res = await itemsApi.getItem(id);
-        if (res.data) {
+        if (active && res.data) {
           setTitle(res.data.title);
           setDescription(res.data.description || '');
           setCategory(res.data.category || 'Engineering');
           setStatus(res.data.status || 'pending');
         }
-      } catch (err: any) {
-        toast(err.message || 'Failed to load item for edit', 'error');
+      } catch (err: unknown) {
+        if (active) {
+          const msg = err instanceof Error ? err.message : 'Failed to load item for edit';
+          toast(msg, 'error');
+        }
       } finally {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     };
-    fetchItem();
-  }, [id]);
+    void fetchItem();
+    return () => {
+      active = false;
+    };
+  }, [id, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,8 +65,9 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string 
       });
       toast('Item updated successfully', 'success');
       router.push(`/items/${id}`);
-    } catch (err: any) {
-      toast(err.message || 'Failed to update item', 'error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to update item';
+      toast(msg, 'error');
     } finally {
       setSubmitting(false);
     }

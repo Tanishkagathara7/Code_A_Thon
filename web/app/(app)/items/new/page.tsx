@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, Sparkles, Plus } from 'lucide-react';
+import { ArrowLeft, Loader2, Sparkles } from 'lucide-react';
 import { itemsApi, aiApi } from '@/lib/api/domain';
 import { useToast } from '@/lib/context/ToastContext';
 
@@ -35,8 +35,9 @@ export default function CreateItemPage() {
       });
       toast('Item created successfully!', 'success');
       router.push(`/items/${res.data.id}`);
-    } catch (err: any) {
-      toast(err.message || 'Failed to create item', 'error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to create item';
+      toast(msg, 'error');
     } finally {
       setLoading(false);
     }
@@ -57,8 +58,9 @@ export default function CreateItemPage() {
         setDescription(res.data.text);
         toast('Description enhanced with AI!', 'success');
       }
-    } catch (err: any) {
-      toast(err.message || 'AI generation failed', 'error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'AI generation failed';
+      toast(msg, 'error');
     } finally {
       setAiGenerating(false);
     }

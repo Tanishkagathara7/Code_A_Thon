@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Cpu, ArrowRight, Layers, ShieldCheck, Database, Smartphone, Monitor } from 'lucide-react';
-import { Highlight } from './Highlight';
 
 interface ArchNode {
   id: string;
@@ -67,7 +65,7 @@ export const ArchitectureDiagram: React.FC = () => {
     <div className="w-full space-y-8 select-none">
       <div className="max-w-2xl space-y-2">
         <div className="text-xs font-mono font-bold tracking-wider text-zinc-500 uppercase">
-          // 08. TOPOLOGY & DATA BUS
+          {'// 08. TOPOLOGY & DATA BUS'}
         </div>
         <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
           CENTRAL ENGINE & EDGE TOPOLOGY

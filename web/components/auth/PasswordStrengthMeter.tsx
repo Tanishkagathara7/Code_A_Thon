@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Check, X } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 interface PasswordStrengthMeterProps {
   password?: string;

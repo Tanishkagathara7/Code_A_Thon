@@ -1,6 +1,4 @@
-'use client';
-
-import React, { useEffect, useState, useId } from 'react';
+import React, { useId } from 'react';
 
 interface KineticHeadlineProps {
   lines: string[][];
@@ -25,15 +23,6 @@ export const KineticHeadline: React.FC<KineticHeadlineProps> = ({
       return { word, idx };
     })
   );
-  const totalWords = globalCount;
-
-  // Track hydration so CSS keyframes take over smoothly without layout shift or missing words
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, [mode]);
-
   return (
     <div className={`select-none ${className}`}>
       {/* Dynamic Keyframe Injection for silky-smooth hardware-accelerated kinetic animation */}

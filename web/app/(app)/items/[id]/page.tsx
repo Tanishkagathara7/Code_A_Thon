@@ -7,8 +7,6 @@ import {
   ArrowLeft,
   Edit,
   Trash2,
-  Calendar,
-  Layers,
   Sparkles,
   CheckCircle2,
   Clock,
@@ -32,21 +30,32 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
 
-  const fetchItem = async () => {
-    setLoading(true);
-    try {
-      const res = await itemsApi.getItem(id);
-      setItem(res.data);
-    } catch (err: any) {
-      toast(err.message || 'Failed to load item', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchItem();
-  }, [id]);
+    let active = true;
+    const fetchItem = async () => {
+      try {
+        const res = await itemsApi.getItem(id);
+        if (active) {
+          setItem(res.data);
+        }
+      } catch (err: unknown) {
+        if (active) {
+          const msg = err instanceof Error ? err.message : 'Failed to load item';
+          toast(msg, 'error');
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void fetchItem();
+
+    return () => {
+      active = false;
+    };
+  }, [id, toast]);
 
   const handleStatusChange = async (newStatus: string) => {
     if (!item) return;
@@ -55,8 +64,9 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
       const res = await itemsApi.updateItem(item.id, { status: newStatus });
       setItem(res.data);
       toast(`Status updated to ${newStatus}`, 'success');
-    } catch (err: any) {
-      toast(err.message || 'Failed to update status', 'error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to update status';
+      toast(msg, 'error');
     } finally {
       setUpdatingStatus(false);
     }
@@ -68,8 +78,9 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
       await itemsApi.deleteItem(id);
       toast('Item deleted successfully', 'success');
       router.push('/items');
-    } catch (err: any) {
-      toast(err.message || 'Failed to delete item', 'error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to delete item';
+      toast(msg, 'error');
     }
   };
 
@@ -85,8 +96,9 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
         setAiAnalysis(res.data.text);
         toast('AI Intelligence Analysis generated', 'success');
       }
-    } catch (err: any) {
-      toast(err.message || 'AI analysis failed', 'error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'AI analysis failed';
+      toast(msg, 'error');
     } finally {
       setAnalyzing(false);
     }

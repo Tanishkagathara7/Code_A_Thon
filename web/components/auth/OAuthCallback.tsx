@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';
@@ -11,7 +11,7 @@ function OAuthCallbackContent({ provider }: { provider: 'google' | 'github' }) {
   const searchParams = useSearchParams();
   const { loginWithOAuth, loginWithGitHub } = useAuth();
   const { toast } = useToast();
-  const [status, setStatus] = useState('Authenticating with ' + (provider === 'google' ? 'Google' : 'GitHub') + '...');
+  const status = 'Authenticating with ' + (provider === 'google' ? 'Google' : 'GitHub') + '...';
   const processedRef = React.useRef(false);
 
   useEffect(() => {
@@ -64,14 +64,15 @@ function OAuthCallbackContent({ provider }: { provider: 'google' | 'github' }) {
           toast('Signed in with GitHub successfully!', 'success');
           router.push('/dashboard');
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('OAuth callback error:', err);
-        toast(err.message || 'Social authentication failed.', 'error');
+        const msg = err instanceof Error ? err.message : 'Social authentication failed.';
+        toast(msg, 'error');
         router.push('/login');
       }
     };
 
-    handleAuth();
+    void handleAuth();
   }, [provider, searchParams, loginWithOAuth, loginWithGitHub, router, toast]);
 
   return (

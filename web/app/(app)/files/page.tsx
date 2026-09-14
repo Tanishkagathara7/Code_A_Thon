@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { FolderOpen, UploadCloud, Trash2, File, CheckCircle2, Loader2, ExternalLink } from 'lucide-react';
+import { UploadCloud, Trash2, File, Loader2, ExternalLink } from 'lucide-react';
 import { filesApi } from '@/lib/api/domain';
 import { UploadedFile } from '@/lib/types';
 import { formatDate } from '@/lib/utils';
@@ -25,8 +25,9 @@ export default function FilesPage() {
         setFiles((prev) => [res.data, ...prev]);
         toast(`Uploaded ${file.name} successfully`, 'success');
       }
-    } catch (err: any) {
-      toast(err.message || 'File upload failed', 'error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'File upload failed';
+      toast(msg, 'error');
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -38,8 +39,9 @@ export default function FilesPage() {
       await filesApi.deleteFile(id);
       setFiles((prev) => prev.filter((f) => f.id !== id));
       toast('File removed', 'success');
-    } catch (err: any) {
-      toast(err.message || 'Failed to remove file', 'error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to remove file';
+      toast(msg, 'error');
     }
   };
 

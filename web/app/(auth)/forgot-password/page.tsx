@@ -36,9 +36,10 @@ export default function ForgotPasswordPage() {
       }
       toast('Verification code sent!', 'success');
       setStep('reset');
-    } catch (err: any) {
-      setError(err.message || 'Failed to request reset code.');
-      toast(err.message || 'Request failed', 'error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to request reset code.';
+      setError(msg);
+      toast(msg, 'error');
     } finally {
       setLoading(false);
     }
@@ -60,9 +61,10 @@ export default function ForgotPasswordPage() {
       const res = await authApi.resetPassword(email, otp, newPassword);
       toast(res.message || 'Password reset successful!', 'success');
       router.push('/login');
-    } catch (err: any) {
-      setError(err.message || 'Verification failed. Check the code.');
-      toast(err.message || 'Reset failed', 'error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Verification failed. Check the code.';
+      setError(msg);
+      toast(msg, 'error');
     } finally {
       setLoading(false);
     }

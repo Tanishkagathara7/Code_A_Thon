@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Terminal, ArrowRight, Sparkles, CheckCircle2, Layers, Cpu, ShieldCheck } from 'lucide-react';
-import { Highlight } from './Highlight';
+import { Terminal, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 export const InteractiveDemonstrator: React.FC = () => {
   const [activeStep, setActiveStep] = useState<number>(0);

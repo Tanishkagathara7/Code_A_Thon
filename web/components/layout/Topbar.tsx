@@ -3,8 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bell, Plus, Search, ExternalLink, ShieldCheck } from 'lucide-react';
-import { useAuth } from '@/lib/context/AuthContext';
+import { Bell, Plus } from 'lucide-react';
 
 interface TopbarProps {
   unreadCount?: number;
@@ -12,7 +11,6 @@ interface TopbarProps {
 
 export const Topbar: React.FC<TopbarProps> = ({ unreadCount = 0 }) => {
   const pathname = usePathname();
-  const { user } = useAuth();
 
   const getPageTitle = () => {
     if (pathname.startsWith('/dashboard')) return 'Dashboard Analytics';

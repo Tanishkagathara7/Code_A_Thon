@@ -13,21 +13,32 @@ export default function NotificationsPage() {
   const [markingAll, setMarkingAll] = useState(false);
   const { toast } = useToast();
 
-  const fetchNotifications = async () => {
-    setLoading(true);
-    try {
-      const res = await notificationsApi.getNotifications(1, 30);
-      setNotifications(res.data || []);
-    } catch (err: any) {
-      toast(err.message || 'Failed to load notifications', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchNotifications();
-  }, []);
+    let active = true;
+    const loadNotifications = async () => {
+      try {
+        const res = await notificationsApi.getNotifications(1, 30);
+        if (active) {
+          setNotifications(res.data || []);
+        }
+      } catch (err: unknown) {
+        if (active) {
+          const msg = err instanceof Error ? err.message : 'Failed to load notifications';
+          toast(msg, 'error');
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void loadNotifications();
+
+    return () => {
+      active = false;
+    };
+  }, [toast]);
 
   const handleMarkAllRead = async () => {
     setMarkingAll(true);
@@ -35,8 +46,9 @@ export default function NotificationsPage() {
       await notificationsApi.markAllAsRead();
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       toast('All marked as read', 'success');
-    } catch (err: any) {
-      toast(err.message || 'Failed to mark notifications', 'error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to mark notifications';
+      toast(msg, 'error');
     } finally {
       setMarkingAll(false);
     }

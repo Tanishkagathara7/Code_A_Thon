@@ -6,14 +6,12 @@ import {
   TrendingUp,
   CheckCircle2,
   Clock,
-  AlertCircle,
   Plus,
   ArrowUpRight,
   Sparkles,
   Layers,
   ArrowRight,
   RefreshCw,
-  FolderOpen,
 } from 'lucide-react';
 import { analyticsApi, itemsApi } from '@/lib/api/domain';
 import { AnalyticsOverviewData, HackathonItem } from '@/lib/types';
@@ -29,8 +27,9 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   const loadData = async (isRefresh = false) => {
-    if (isRefresh) setRefreshing(true);
-    else setLoading(true);
+    if (isRefresh) {
+      setRefreshing(true);
+    }
     setError(null);
 
     try {
@@ -40,8 +39,9 @@ export default function DashboardPage() {
       ]);
       setAnalytics(analyticsRes);
       setRecentItems(itemsRes.data || []);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load dashboard operational data');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to load dashboard operational data';
+      setError(msg);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -49,7 +49,34 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    loadData();
+    let active = true;
+    const fetchDashboard = async () => {
+      try {
+        const [analyticsRes, itemsRes] = await Promise.all([
+          analyticsApi.getOverview(),
+          itemsApi.getItems({ limit: 5, sort: 'createdAt_desc' }),
+        ]);
+        if (active) {
+          setAnalytics(analyticsRes);
+          setRecentItems(itemsRes.data || []);
+        }
+      } catch (err: unknown) {
+        if (active) {
+          const msg = err instanceof Error ? err.message : 'Failed to load dashboard operational data';
+          setError(msg);
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void fetchDashboard();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   const overview = analytics?.overview || {

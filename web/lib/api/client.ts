@@ -3,6 +3,8 @@
  * Handles base URL, auth token injection, structured errors, and standard methods.
  */
 
+import { User } from '../types';
+
 const getBaseUrl = (): string => {
   return process.env.NEXT_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
 };
@@ -19,7 +21,7 @@ export function getStoredToken(): string | null {
   }
 }
 
-export function setStoredSession(token: string, user: any): void {
+export function setStoredSession(token: string, user: User | Record<string, unknown>): void {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(TOKEN_STORAGE_KEY, token);
@@ -41,9 +43,9 @@ export function clearStoredSession(): void {
 
 export class ApiError extends Error {
   status: number;
-  data: any;
+  data: unknown;
 
-  constructor(message: string, status: number = 500, data: any = null) {
+  constructor(message: string, status: number = 500, data: unknown = null) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
@@ -92,7 +94,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
     body: isFormData ? body : (body ? (typeof body === 'string' ? body : JSON.stringify(body)) : undefined),
   });
 
-  let data: any;
+  let data: unknown;
   const contentType = response.headers.get('content-type');
   if (contentType && contentType.includes('application/json')) {
     data = await response.json();
@@ -101,8 +103,10 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
   }
 
   if (!response.ok) {
+    const errorObj = typeof data === 'object' && data !== null ? (data as Record<string, unknown>) : null;
     const errorMessage =
-      (typeof data === 'object' && (data?.error || data?.message)) ||
+      (typeof errorObj?.error === 'string' && errorObj.error) ||
+      (typeof errorObj?.message === 'string' && errorObj.message) ||
       response.statusText ||
       `Request failed with status ${response.status}`;
     throw new ApiError(errorMessage, response.status, data);
@@ -112,17 +116,17 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
 }
 
 export const apiClient = {
-  get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
-    return request<T>(endpoint, { method: 'GET', params });
+  get<T>(endpoint: string, params?: Record<string, unknown> | object): Promise<T> {
+    return request<T>(endpoint, { method: 'GET', params: params as Record<string, string | number | boolean | undefined> });
   },
-  post<T>(endpoint: string, body?: any): Promise<T> {
-    return request<T>(endpoint, { method: 'POST', body });
+  post<T>(endpoint: string, body?: unknown): Promise<T> {
+    return request<T>(endpoint, { method: 'POST', body: body as BodyInit });
   },
-  put<T>(endpoint: string, body?: any): Promise<T> {
-    return request<T>(endpoint, { method: 'PUT', body });
+  put<T>(endpoint: string, body?: unknown): Promise<T> {
+    return request<T>(endpoint, { method: 'PUT', body: body as BodyInit });
   },
-  patch<T>(endpoint: string, body?: any): Promise<T> {
-    return request<T>(endpoint, { method: 'PATCH', body });
+  patch<T>(endpoint: string, body?: unknown): Promise<T> {
+    return request<T>(endpoint, { method: 'PATCH', body: body as BodyInit });
   },
   delete<T>(endpoint: string): Promise<T> {
     return request<T>(endpoint, { method: 'DELETE' });

@@ -81,11 +81,11 @@ export const notificationsApi = {
     return res.data?.count ?? 0;
   },
 
-  async markAsRead(id: string): Promise<any> {
-    return apiClient.patch(`/notifications/${id}/read`);
+  async markAsRead(id: string): Promise<{ success: boolean; message?: string }> {
+    return apiClient.patch<{ success: boolean; message?: string }>(`/notifications/${id}/read`);
   },
 
-  async markAllAsRead(): Promise<any> {
-    return apiClient.patch('/notifications/read-all');
+  async markAllAsRead(): Promise<{ success: boolean; message?: string }> {
+    return apiClient.patch<{ success: boolean; message?: string }>('/notifications/read-all');
   },
 };
