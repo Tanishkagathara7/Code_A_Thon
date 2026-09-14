@@ -42,11 +42,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <span className="hidden sm:inline text-zinc-300">•</span>
           <span className="hidden sm:inline">END-TO-END VERIFIED</span>
         </div>
-        <div className="flex items-center gap-4 text-zinc-500">
-          <span>NEXT.js 14 APP ROUTER</span>
-          <span>•</span>
-          <span>REACT NATIVE EXPO 0.81</span>
-        </div>
       </footer>
     </div>
   );
