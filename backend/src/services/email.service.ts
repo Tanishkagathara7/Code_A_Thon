@@ -20,7 +20,9 @@ export const sendEmailWithRetries = async (mailOptions: SendMailOptions, maxRetr
       console.log(`📧 [SMTP] Attempt ${attempt}/${maxRetries}: Dispatching email to ${mailOptions.to} via smtp.gmail.com:${port}...`);
 
       const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port,
+        secure,
         auth: {
           user: smtpUser,
           pass: smtpPass,
@@ -28,9 +30,11 @@ export const sendEmailWithRetries = async (mailOptions: SendMailOptions, maxRetr
         tls: {
           rejectUnauthorized: false,
         },
-        connectionTimeout: 20000,
-        greetingTimeout: 20000,
-        socketTimeout: 20000,
+        // Force IPv4 because cloud runners like Render do not support outbound IPv6
+        family: 4,
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 15000,
       } as any);
 
       const info = await transporter.sendMail(mailOptions);
