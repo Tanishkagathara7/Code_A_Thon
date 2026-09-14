@@ -147,7 +147,7 @@ export default function LoginPage() {
         <button
           type="button"
           onClick={() => {
-            const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '878949461550-s6de153nvgoq1gb94191i1pgqfqbv1jd.apps.googleusercontent.com';
+            const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '878949461550-qkl6f8n7k2n1lnveen5uofs6ddb654j9.apps.googleusercontent.com';
             const redirectUri = encodeURIComponent(`${window.location.origin}/auth/callback/google`);
             const scope = encodeURIComponent('email profile openid');
             window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=${scope}`;
