@@ -14,7 +14,6 @@ export default function OAuthRedirectScreen() {
 
     // If user is already authenticated by AuthContext, navigate to home immediately
     if (user) {
-      console.log('[AUTH] User authenticated, navigating to home...');
       router.replace('/home');
       return;
     }
@@ -27,8 +26,7 @@ export default function OAuthRedirectScreen() {
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#6366F1" />
-      <Text style={styles.text}>Completing authentication...</Text>
+      <ActivityIndicator size="small" color="#0F172A" />
     </View>
   );
 }
@@ -36,16 +34,8 @@ export default function OAuthRedirectScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0D111F',
+    backgroundColor: '#FBF9F5',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
-  },
-  text: {
-    color: '#E2E8F0',
-    fontSize: 16,
-    fontWeight: '600',
-    marginTop: 16,
-    fontFamily: 'PlusJakartaSans_600SemiBold',
   },
 });
