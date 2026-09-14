@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight, Menu, X, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Menu, X } from 'lucide-react';
 
 export const MarketingNav: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -21,8 +21,8 @@ export const MarketingNav: React.FC = () => {
       <div
         className={`w-full max-w-6xl transition-all duration-300 rounded-2xl flex items-center justify-between px-4 sm:px-6 py-2.5 ${
           scrolled
-            ? 'glass-panel shadow-lg shadow-black/[0.03] border-black/[0.08]'
-            : 'bg-white/70 backdrop-blur-md border border-black/[0.06] shadow-sm'
+            ? 'bg-white/95 backdrop-blur-xl shadow-lg shadow-black/[0.04] border border-zinc-200/90'
+            : 'bg-white/90 backdrop-blur-xl border border-zinc-200/80 shadow-xs'
         }`}
       >
         {/* Brand identity: Sleek, high-precision */}
@@ -106,18 +106,12 @@ export const MarketingNav: React.FC = () => {
 
       {/* Mobile Menu Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-x-4 top-20 glass-panel rounded-2xl p-6 flex flex-col gap-4 z-50 border border-black/[0.08] shadow-2xl">
-          <div className="flex items-center justify-between border-b border-black/[0.06] pb-3 text-xs font-semibold text-zinc-500">
-            <span className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" /> NAVIGATION DIRECTORY
-            </span>
-            <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">READY</span>
-          </div>
-          <nav className="flex flex-col gap-1 text-sm font-medium text-zinc-700">
+        <div className="md:hidden fixed inset-x-4 top-20 bg-white/95 backdrop-blur-xl rounded-2xl p-5 flex flex-col gap-3 z-50 border border-zinc-200/90 shadow-2xl shadow-zinc-950/15">
+          <nav className="flex flex-col gap-1 text-sm font-medium text-zinc-800">
             <a
               href="#product"
               onClick={() => setMobileMenuOpen(false)}
-              className="py-2.5 px-3 rounded-lg hover:bg-zinc-100/70 hover:text-zinc-950 transition-colors"
+              className="py-2.5 px-3 rounded-xl hover:bg-zinc-100 hover:text-zinc-950 transition-colors font-semibold"
             >
               Product
             </a>
