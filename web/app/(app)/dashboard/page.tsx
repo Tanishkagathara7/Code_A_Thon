@@ -96,7 +96,7 @@ export default function DashboardPage() {
             <Sparkles className="w-3 h-3" />
             <span>Multi-Platform Operations Center</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
             Welcome back, {user?.name || 'APP Operator'}
           </h1>
           <p className="text-zinc-400 text-sm max-w-xl">

@@ -12,6 +12,7 @@ export default function WorkspaceShell({ children }: { children: React.ReactNode
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -39,10 +40,17 @@ export default function WorkspaceShell({ children }: { children: React.ReactNode
 
   return (
     <div className="min-h-screen flex bg-[#FAFAFA]">
-      <Sidebar unreadNotifications={unreadCount} />
+      <Sidebar
+        unreadNotifications={unreadCount}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
       <div className="flex-1 flex flex-col min-w-0">
-        <Topbar unreadCount={unreadCount} />
-        <main className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full">{children}</main>
+        <Topbar
+          unreadCount={unreadCount}
+          onMenuClick={() => setSidebarOpen(true)}
+        />
+        <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full overflow-x-hidden">{children}</main>
       </div>
     </div>
   );

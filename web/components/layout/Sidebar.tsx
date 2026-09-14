@@ -12,15 +12,22 @@ import {
   LogOut,
   ChevronRight,
   User as UserIcon,
+  X,
 } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
   unreadNotifications?: number;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ unreadNotifications = 0 }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  unreadNotifications = 0,
+  isOpen = false,
+  onClose,
+}) => {
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
@@ -38,32 +45,58 @@ export const Sidebar: React.FC<SidebarProps> = ({ unreadNotifications = 0 }) => 
   ];
 
   return (
-    <aside className="w-64 bg-white border-r border-black/[0.06] flex flex-col justify-between h-screen sticky top-0 z-30 select-none">
-      {/* Top Brand Header */}
-      <div>
-        <div className="h-16 flex items-center px-6 border-b border-black/[0.06]">
-          <Link href="/dashboard" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded-xl bg-zinc-900 flex items-center justify-center font-bold text-white shadow-sm font-sans text-xs group-hover:scale-105 transition-transform">
-              A
-            </div>
-            <div>
-              <span className="font-bold text-base tracking-tight text-zinc-900">APP</span>
-              <span className="ml-1.5 text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                Workspace
-              </span>
-            </div>
-          </Link>
-        </div>
+    <>
+      {/* Mobile Backdrop */}
+      {isOpen && (
+        <div
+          onClick={onClose}
+          className="fixed inset-0 bg-black/50 backdrop-blur-xs z-40 lg:hidden transition-opacity"
+          aria-hidden="true"
+        />
+      )}
 
-        {/* Navigation Links */}
-        <nav className="p-4 space-y-1">
-          {navigation.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
+      {/* Sidebar Container */}
+      <aside
+        className={cn(
+          'w-64 bg-white border-r border-black/[0.06] flex flex-col justify-between h-screen fixed inset-y-0 left-0 z-50 transition-transform duration-200 ease-in-out select-none lg:static lg:translate-x-0',
+          isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+        )}
+      >
+        {/* Top Brand Header */}
+        <div>
+          <div className="h-16 flex items-center justify-between px-6 border-b border-black/[0.06]">
+            <Link href="/dashboard" onClick={onClose} className="flex items-center gap-3 group">
+              <div className="w-8 h-8 rounded-xl bg-zinc-900 flex items-center justify-center font-bold text-white shadow-sm font-sans text-xs group-hover:scale-105 transition-transform">
+                A
+              </div>
+              <div>
+                <span className="font-bold text-base tracking-tight text-zinc-900">APP</span>
+                <span className="ml-1.5 text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                  Workspace
+                </span>
+              </div>
+            </Link>
+
+            {/* Mobile close button */}
+            <button
+              onClick={onClose}
+              className="lg:hidden p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"
+              aria-label="Close sidebar"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="p-4 space-y-1">
+            {navigation.map((item) => {
+              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={onClose}
                 className={cn(
                   'flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all group',
                   isActive

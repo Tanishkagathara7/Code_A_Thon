@@ -3,13 +3,14 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bell, Plus } from 'lucide-react';
+import { Bell, Plus, Menu } from 'lucide-react';
 
 interface TopbarProps {
   unreadCount?: number;
+  onMenuClick?: () => void;
 }
 
-export const Topbar: React.FC<TopbarProps> = ({ unreadCount = 0 }) => {
+export const Topbar: React.FC<TopbarProps> = ({ unreadCount = 0, onMenuClick }) => {
   const pathname = usePathname();
 
   const getPageTitle = () => {
@@ -23,9 +24,20 @@ export const Topbar: React.FC<TopbarProps> = ({ unreadCount = 0 }) => {
   };
 
   return (
-    <header className="h-16 glass-panel border-b border-black/[0.06] px-6 flex items-center justify-between sticky top-0 z-20">
-      <div>
-        <h1 className="text-base font-bold text-zinc-900 tracking-tight">{getPageTitle()}</h1>
+    <header className="h-16 bg-white/95 backdrop-blur-md border-b border-black/[0.06] px-4 sm:px-6 flex items-center justify-between sticky top-0 z-20">
+      <div className="flex items-center gap-3">
+        {/* Mobile Hamburger Button */}
+        <button
+          onClick={onMenuClick}
+          className="lg:hidden p-2 rounded-xl text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 transition-colors cursor-pointer"
+          aria-label="Open workspace navigation"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+
+        <h1 className="text-sm sm:text-base font-bold text-zinc-900 tracking-tight truncate">
+          {getPageTitle()}
+        </h1>
       </div>
 
       <div className="flex items-center gap-3">
