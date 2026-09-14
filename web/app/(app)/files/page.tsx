@@ -107,12 +107,21 @@ export default function FilesPage() {
                 </div>
 
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  {file.url && (
+                  {file && (
                     <a
-                      href={file.url}
+                      href={(() => {
+                        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
+                        const token = typeof window !== 'undefined' ? localStorage.getItem('pulse_web_token') : '';
+                        const downloadPath = file.downloadUrl || `/files/download/${file.id}`;
+                        const fullUrl = downloadPath.startsWith('http') 
+                          ? downloadPath 
+                          : `${baseUrl.replace(/\/api$/, '')}${downloadPath.startsWith('/') ? '' : '/'}${downloadPath}`;
+                        return token ? `${fullUrl}${fullUrl.includes('?') ? '&' : '?'}token=${token}` : fullUrl;
+                      })()}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100"
+                      className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"
+                      title="Open file"
                     >
                       <ExternalLink className="w-4 h-4" />
                     </a>
