@@ -11,6 +11,8 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, pass: string) => Promise<void>;
   signup: (name: string, email: string, pass: string) => Promise<void>;
+  loginWithOAuth: (payload: { email: string; name?: string; provider: 'google' | 'github'; providerId?: string; avatarUrl?: string }) => Promise<void>;
+  loginWithGitHub: (code: string, redirectUri?: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -73,6 +75,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const loginWithOAuth = async (payload: { email: string; name?: string; provider: 'google' | 'github'; providerId?: string; avatarUrl?: string }) => {
+    const res = await authApi.syncOAuthUser(payload);
+    if (res.success && res.user) {
+      setUser(res.user);
+      router.push('/dashboard');
+    }
+  };
+
+  const loginWithGitHub = async (code: string, redirectUri?: string) => {
+    const res = await authApi.githubLogin(code, redirectUri);
+    if (res.success && res.user) {
+      setUser(res.user);
+      router.push('/dashboard');
+    }
+  };
+
   const logout = () => {
     authApi.logout();
     setUser(null);
@@ -80,7 +98,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, isLoading, login, signup, loginWithOAuth, loginWithGitHub, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

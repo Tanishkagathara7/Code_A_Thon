@@ -56,6 +56,28 @@ export const authApi = {
     return apiClient.get<{ success: boolean; user: User }>('/auth/me');
   },
 
+  async syncOAuthUser(payload: {
+    email: string;
+    name?: string;
+    provider: 'google' | 'github';
+    providerId?: string;
+    avatarUrl?: string;
+  }): Promise<AuthResponse> {
+    const res = await apiClient.post<AuthResponse>('/auth/sync', payload);
+    if (res.success && res.token) {
+      setStoredSession(res.token, res.user);
+    }
+    return res;
+  },
+
+  async githubLogin(code: string, redirectUri?: string): Promise<AuthResponse> {
+    const res = await apiClient.post<AuthResponse>('/auth/github', { code, redirectUri });
+    if (res.success && res.token) {
+      setStoredSession(res.token, res.user);
+    }
+    return res;
+  },
+
   logout(): void {
     clearStoredSession();
   },
