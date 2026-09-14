@@ -52,7 +52,6 @@ export const getRedirectUri = (customScheme?: string) => {
   const scheme = customScheme || process.env.EXPO_PUBLIC_APP_SCHEME || 'com.tvkms.app';
   return AuthSession.makeRedirectUri({
     scheme,
-    path: 'oauthredirect',
   });
 };
 

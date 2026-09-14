@@ -14,20 +14,14 @@ export default function OAuthRedirectScreen() {
 
     // If user is already authenticated by AuthContext, navigate to home immediately
     if (user) {
-      console.log('[AUTH] User authenticated on redirect screen, navigating to home...');
+      console.log('[AUTH] User authenticated, navigating to home...');
       router.replace('/home');
       return;
     }
 
     // Only redirect back to login if session restoration and active auth flows are finished and user is still null
     if (!isLoading && !isAuthenticating && !user) {
-      const timer = setTimeout(() => {
-        if (!user && !isAuthenticating) {
-          console.log('[AUTH] No user session found after auth flow completed, returning to auth screen...');
-          router.replace('/(auth)');
-        }
-      }, 1000);
-      return () => clearTimeout(timer);
+      router.replace('/(auth)');
     }
   }, [user, isLoading, isAuthenticating, router]);
 
