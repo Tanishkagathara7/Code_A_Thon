@@ -351,10 +351,14 @@ export class AuthService {
     user.resetPasswordExpires = expiresAt;
     await user.save();
 
-    const hasRealSmtp = Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
+    const hasRealEmail = Boolean(
+      process.env.RESEND_API_KEY ||
+      process.env.SENDGRID_API_KEY ||
+      (process.env.SMTP_USER && process.env.SMTP_PASS)
+    );
     const isProduction = process.env.NODE_ENV === 'production';
 
-    if (!hasRealSmtp && !isProduction) {
+    if (!hasRealEmail || !isProduction) {
       console.log(`🔑 Verification code generated for ${normalizedEmail}: ${otp}`);
     } else {
       console.log(`🔑 Verification code generated for ${normalizedEmail}: [REDACTED]`);
@@ -381,16 +385,16 @@ export class AuthService {
     };
 
     // Dispatch verification email in background with 3x retries
-    if (hasRealSmtp) {
+    if (hasRealEmail) {
       (async () => {
         try {
           await sendEmailWithRetries(mailOptions, 3);
         } catch (sendErr: any) {
-          console.error(`❌ [SMTP] Background delivery error for ${normalizedEmail}:`, sendErr.message || sendErr);
+          console.error(`❌ [EMAIL] Background delivery error for ${normalizedEmail}:`, sendErr.message || sendErr);
         }
       })();
     } else {
-      console.warn(`⚠️ [SMTP] Dev Mode: SMTP_USER or SMTP_PASS missing. Dev OTP: ${otp}`);
+      console.warn(`⚠️ [EMAIL] Dev Mode: No email provider configured. Dev OTP: ${otp}`);
     }
 
     return {
