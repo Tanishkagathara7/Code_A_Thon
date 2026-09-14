@@ -1,8 +1,8 @@
-# Pulse — Multi-Platform Operational Intelligence Platform
+# APP — Multi-Platform Operational Intelligence Platform
 
 > **One Product • Two First-Class Clients • One Shared Backend**
 
-Pulse is a synchronized cross-platform operational intelligence platform featuring an **Expo React Native mobile client**, a **Next.js App Router web application**, and a **shared Node.js/Express REST backend** backed by MongoDB Atlas and the OpenRouter AI Gateway.
+APP is a synchronized cross-platform operational intelligence platform featuring an **Expo React Native mobile client**, a **Next.js App Router web application**, and a **shared Node.js/Express REST backend** backed by MongoDB Atlas and the OpenRouter AI Gateway.
 
 ---
 

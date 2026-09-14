@@ -1,4 +1,4 @@
-# Pulse — Multi-Platform Architecture & System Specification
+# APP — Multi-Platform Architecture & System Specification
 
 > **The Definitive Blueprint for Web, Mobile, and Backend Co-Development**
 
@@ -6,7 +6,7 @@
 
 ## 1. Executive Summary & Product Vision
 
-**Pulse** is an agile, multi-platform operational intelligence and hackathon pivot system. It delivers **two first-class client experiences**—a responsive desktop/tablet/mobile **Web application** and a gesture-driven **Mobile application**—powered by a **shared Node.js/Express REST API**, a shared MongoDB Atlas database, and unified TypeScript domain contracts.
+**APP** is an agile, multi-platform operational intelligence and hackathon pivot system. It delivers **two first-class client experiences**—a responsive desktop/tablet/mobile **Web application** and a gesture-driven **Mobile application**—powered by a **shared Node.js/Express REST API**, a shared MongoDB Atlas database, and unified TypeScript domain contracts.
 
 ```text
                                  ┌─────────────────────────────────┐
