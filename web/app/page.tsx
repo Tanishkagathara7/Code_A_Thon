@@ -30,6 +30,7 @@ import { initScrollStory } from '@/lib/animations/scroll';
 import { initHeroTypographyAnimation } from '@/lib/animations/heroTypography';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { SITE_CONFIG, getSiteUrl } from '@/lib/seo';
+import { InteractiveGridTiles } from '@/components/auth/InteractiveGridTiles';
 
 export default function MarketingPage() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -154,11 +155,16 @@ export default function MarketingPage() {
             01. HERO SECTION: BENTO COMPOSITION & EDITORIAL TYPOGRAPHY
            ======================================================== */}
         <section className="hero-section relative pt-32 sm:pt-40 pb-20 sm:pb-28 px-4 sm:px-6 overflow-hidden border-b border-black/[0.06]">
-          {/* Subtle architectural dot grid */}
-          <div className="absolute inset-0 tech-dots opacity-[0.25] pointer-events-none -z-10" />
+          {/* Interactive Cursor Reactive Grid Tiles Animation (Code-A-Thon Cyber Neon & Crosshairs) */}
+          <InteractiveGridTiles tileSize={42} className="z-0" />
 
-          {/* Subtle ambient lighting accent */}
+          {/* Subtle architectural dot grid */}
+          <div className="absolute inset-0 tech-dots opacity-[0.20] pointer-events-none -z-10" />
+
+          {/* Subtle ambient lighting accent matching Auth view */}
           <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-tr from-blue-500/5 via-indigo-500/5 to-transparent blur-3xl pointer-events-none -z-10" />
+          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-blue-500/[0.03] rounded-full blur-3xl pointer-events-none -translate-y-1/2 -z-10" />
+          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-pink-500/[0.025] rounded-full blur-3xl pointer-events-none translate-y-1/2 -z-10" />
 
           <div className="max-w-5xl mx-auto relative z-10 space-y-8 hero-text-container text-center flex flex-col items-center">
             {/* Editorial Display Headline — Unified Color with Kinetic Multi-Color Animated Transitions */}
@@ -325,21 +331,6 @@ export default function MarketingPage() {
               </div>
             </div>
 
-            {/* Technical Verification Strip (Centered Pills) */}
-            <div className="hero-metadata flex flex-wrap items-center justify-center gap-2 pt-1 text-[11px] font-mono font-medium text-zinc-600">
-              <span className="glass-pill px-3 py-1 rounded-full border border-black/[0.06] flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> ZERO-DRIFT JWT AUTH
-              </span>
-              <span className="glass-pill px-3 py-1 rounded-full border border-black/[0.06] flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> NEXT.JS 14 APP ROUTER
-              </span>
-              <span className="glass-pill px-3 py-1 rounded-full border border-black/[0.06] flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> EXPO SDK 57 MOBILE
-              </span>
-              <span className="glass-pill px-3 py-1 rounded-full border border-black/[0.06] flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> OPENROUTER AI GATEWAY
-              </span>
-            </div>
 
             {/* Product Stage Preview */}
             <div className="hero-product-stage">

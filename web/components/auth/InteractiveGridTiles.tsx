@@ -32,15 +32,23 @@ export const InteractiveGridTiles: React.FC<InteractiveGridTilesProps> = ({
       radius: 175,
     };
 
-    const handleResize = () => {
+    const updateDimensions = () => {
       if (!canvas) return;
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+      width = canvas.width = canvas.offsetWidth || window.innerWidth;
+      height = canvas.height = canvas.offsetHeight || window.innerHeight;
+    };
+
+    updateDimensions();
+
+    const handleResize = () => {
+      updateDimensions();
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      mouse.targetX = e.clientX;
-      mouse.targetY = e.clientY;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      mouse.targetX = e.clientX - rect.left;
+      mouse.targetY = e.clientY - rect.top;
     };
 
     const handleMouseLeave = () => {
@@ -169,7 +177,7 @@ export const InteractiveGridTiles: React.FC<InteractiveGridTilesProps> = ({
   return (
     <canvas
       ref={canvasRef}
-      className={`fixed inset-0 pointer-events-none z-0 ${className}`}
+      className={`absolute inset-0 pointer-events-none ${className}`}
     />
   );
 };

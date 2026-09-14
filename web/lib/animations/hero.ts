@@ -59,13 +59,15 @@ export const createHeroEntranceTimeline = (container: HTMLElement | null) => {
       '-=0.25'
     );
 
-    // Technical verification strip appears
-    tl.fromTo(
-      '.hero-metadata',
-      { opacity: 0, y: 10 },
-      { opacity: 1, y: 0, duration: 0.4 },
-      '-=0.2'
-    );
+    // Technical verification strip appears (if present)
+    if (container.querySelector('.hero-metadata')) {
+      tl.fromTo(
+        '.hero-metadata',
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.4 },
+        '-=0.2'
+      );
+    }
 
     // Product visual enters smoothly with realistic elevation
     tl.fromTo(
