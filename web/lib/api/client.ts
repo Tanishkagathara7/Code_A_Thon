@@ -5,8 +5,13 @@
 
 import { User } from '../types';
 
-const getBaseUrl = (): string => {
-  return process.env.NEXT_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
+export const getBaseUrl = (): string => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  return process.env.NODE_ENV === 'production'
+    ? 'https://code-a-thon-9xqm.onrender.com/api'
+    : 'http://localhost:5000/api';
 };
 
 export const TOKEN_STORAGE_KEY = 'app_web_token';

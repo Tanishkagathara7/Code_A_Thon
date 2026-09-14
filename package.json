@@ -11,7 +11,8 @@
     "web": "cd web && npm run dev",
     "web:build": "cd web && npm run build",
     "backend": "cd backend && npm run dev",
-    "install:all": "npm install && cd frontend && npm install && cd ../web && npm install && cd ../backend && npm install"
+    "shared:build": "npm run build --prefix shared",
+    "install:all": "npm install && npm install --prefix shared && npm run build --prefix shared && npm install --prefix backend && npm install --prefix frontend && npm install --prefix web"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

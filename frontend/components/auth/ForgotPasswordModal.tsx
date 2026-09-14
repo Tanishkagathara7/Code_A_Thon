@@ -37,6 +37,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
   const [email, setEmail] = useState(defaultEmail);
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successInfo, setSuccessInfo] = useState<string | null>(null);
@@ -48,6 +49,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
       setStep('email');
       setOtp('');
       setNewPassword('');
+      setConfirmPassword('');
       setErrorMsg(null);
       setSuccessInfo(null);
     }
@@ -90,6 +92,10 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
       !/[!@#$%^&*(),.?":{}|<>\-_=+[\]\\/~`]/.test(newPassword)
     ) {
       setErrorMsg('Password must include uppercase, lowercase, number, and special character (!@#$...).');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setErrorMsg('Passwords do not match.');
       return;
     }
     setErrorMsg(null);
@@ -211,6 +217,19 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                         setErrorMsg(null);
                       }}
                       placeholder="Min 8 chars, 1 uppercase, 1 special (!@#)"
+                      icon={<KeyIcon size={19} color="#72778E" />}
+                      isPassword
+                      authMode="login"
+                    />
+
+                    <AuthInput
+                      label="Confirm New Password"
+                      value={confirmPassword}
+                      onChangeText={(val) => {
+                        setConfirmPassword(val);
+                        setErrorMsg(null);
+                      }}
+                      placeholder="Re-enter your new password"
                       icon={<KeyIcon size={19} color="#72778E" />}
                       isPassword
                       authMode="login"

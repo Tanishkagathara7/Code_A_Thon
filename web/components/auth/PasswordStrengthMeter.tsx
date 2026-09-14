@@ -15,10 +15,10 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({
   if (!password) return null;
 
   const checks = [
-    { label: '6+ characters', valid: password.length >= 6 },
+    { label: '8+ characters', valid: password.length >= 8 },
     { label: 'Contains number', valid: /\d/.test(password) },
     { label: 'Lowercase & uppercase', valid: /[a-z]/.test(password) && /[A-Z]/.test(password) },
-    { label: 'Special symbol', valid: /[^A-Za-z0-9]/.test(password) },
+    { label: 'Special symbol', valid: /[!@#$%^&*(),.?":{}|<>\-_=+[\]\\/~`]/.test(password) },
   ];
 
   const score = checks.filter((c) => c.valid).length;

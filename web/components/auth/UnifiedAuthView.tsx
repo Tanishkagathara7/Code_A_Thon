@@ -19,7 +19,9 @@ export function UnifiedAuthView({ initialMode = 'signin' }: AuthPageProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,6 +33,7 @@ export function UnifiedAuthView({ initialMode = 'signin' }: AuthPageProps) {
   const handleSwitchMode = (newMode: 'signin' | 'signup') => {
     setError(null);
     setMode(newMode);
+    setConfirmPassword('');
     window.history.replaceState(null, '', newMode === 'signin' ? '/login' : '/signup');
   };
 
@@ -43,8 +46,12 @@ export function UnifiedAuthView({ initialMode = 'signin' }: AuthPageProps) {
         setError('Please fill in all required fields.');
         return;
       }
-      if (password.length < 6) {
-        setError('Password must be at least 6 characters.');
+      if (password.length < 8) {
+        setError('Password must be at least 8 characters long.');
+        return;
+      }
+      if (password !== confirmPassword) {
+        setError('Passwords do not match.');
         return;
       }
     } else {
@@ -284,6 +291,44 @@ export function UnifiedAuthView({ initialMode = 'signin' }: AuthPageProps) {
               {/* Password Strength Indicator in Sign Up Mode */}
               {mode === 'signup' && <PasswordStrengthMeter password={password} />}
             </div>
+
+            {/* Confirm Password (Sign Up Mode Only) */}
+            {mode === 'signup' && (
+              <div className="space-y-1">
+                <label className="block text-xs font-semibold text-zinc-700">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    autoComplete="new-password"
+                    className={`w-full pl-10 pr-10 py-2.5 bg-white rounded-xl border text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none transition-all shadow-2xs ${
+                      confirmPassword && confirmPassword !== password
+                        ? 'border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10'
+                        : 'border-zinc-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10'
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-700 transition-colors"
+                    aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                {confirmPassword && confirmPassword !== password && (
+                  <p className="text-[11px] text-rose-500 font-medium">Passwords do not match</p>
+                )}
+              </div>
+            )}
 
             {/* Primary Action Button */}
             <button

@@ -3,6 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { UploadCloud, Trash2, File, Loader2, ExternalLink } from 'lucide-react';
 import { filesApi } from '@/lib/api/domain';
+import { getBaseUrl } from '@/lib/api/client';
 import { UploadedFile } from '@/lib/types';
 import { formatDate } from '@/lib/utils';
 import { useToast } from '@/lib/context/ToastContext';
@@ -112,7 +113,7 @@ export default function FilesPage() {
                   {file && (
                     <a
                       href={(() => {
-                        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://code-a-thon-9xqm.onrender.com/api';
+                        const baseUrl = getBaseUrl();
                         const token = typeof window !== 'undefined' ? (localStorage.getItem('app_web_token') || localStorage.getItem('pulse_web_token')) : '';
                         const downloadPath = file.downloadUrl || `/files/download/${file.id}`;
                         const fullUrl = downloadPath.startsWith('http') 
