@@ -17,22 +17,20 @@ export const sendEmailWithRetries = async (mailOptions: SendMailOptions, maxRetr
       const port = isSslAttempt ? 465 : 587;
       const secure = isSslAttempt;
 
-      console.log(`📧 [SMTP] Attempt ${attempt}/${maxRetries}: Dispatching email to ${mailOptions.to} via smtp.gmail.com:${port} (IPv4 force)...`);
+      console.log(`📧 [SMTP] Attempt ${attempt}/${maxRetries}: Dispatching email to ${mailOptions.to} via smtp.gmail.com:${port}...`);
 
       const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port,
-        secure,
-        requireTLS: !secure,
-        // Force IPv4 to prevent 'connect ENETUNREACH 2607:f8b0:400e:c00::6c:587' on cloud runners (Render/AWS)
-        family: 4,
-        connectionTimeout: 15000,
-        greetingTimeout: 15000,
-        socketTimeout: 15000,
+        service: 'gmail',
         auth: {
           user: smtpUser,
           pass: smtpPass,
         },
+        tls: {
+          rejectUnauthorized: false,
+        },
+        connectionTimeout: 20000,
+        greetingTimeout: 20000,
+        socketTimeout: 20000,
       } as any);
 
       const info = await transporter.sendMail(mailOptions);

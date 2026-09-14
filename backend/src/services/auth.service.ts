@@ -396,6 +396,7 @@ export class AuthService {
     return {
       success: true,
       message: `A 6-digit verification code has been sent to ${normalizedEmail}.`,
+      otp: !isProduction ? otp : undefined,
     };
   }
 
