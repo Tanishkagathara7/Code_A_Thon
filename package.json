@@ -4,11 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "npm run dev:all",
-    "dev:all": "npx concurrently -n \"frontend,backend\" -c \"cyan,magenta\" \"npm run frontend\" \"npm run backend\"",
+    "dev:all": "npx concurrently -n \"mobile,web,backend\" -c \"cyan,blue,magenta\" \"npm run mobile\" \"npm run web\" \"npm run backend\"",
+    "mobile": "cd frontend && npx expo start",
     "frontend": "cd frontend && npx expo start",
     "frontend:web": "cd frontend && npx expo start --web",
+    "web": "cd web && npm run dev",
+    "web:build": "cd web && npm run build",
     "backend": "cd backend && npm run dev",
-    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
+    "install:all": "npm install && cd frontend && npm install && cd ../web && npm install && cd ../backend && npm install"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

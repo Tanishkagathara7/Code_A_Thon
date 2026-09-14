@@ -1,0 +1,168 @@
+@import "tailwindcss";
+
+:root {
+  /* Canvas foundations - Pure, refined modern product surfaces */
+  --bg-canvas: #FAFAFA;
+  --bg-canvas-subtle: #F4F5F7;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #FFFFFF;
+  
+  /* Text & Ink hierarchy */
+  --text-primary: #09090B;
+  --text-secondary: #52525B;
+  --text-muted: #71717A;
+  --text-subtle: #A1A1AA;
+
+  /* Structural hairline borders */
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-medium: rgba(0, 0, 0, 0.12);
+  --border-strong: rgba(0, 0, 0, 0.18);
+
+  /* Strategic Accents */
+  --accent-primary: #2563EB;
+  --accent-primary-hover: #1D4ED8;
+  --accent-indigo: #4F46E5;
+  --accent-emerald: #10B981;
+  --accent-amber: #F59E0B;
+  --accent-violet: #8B5CF6;
+
+  /* Restrained Glassmorphism Tokens */
+  --glass-bg: rgba(255, 255, 255, 0.78);
+  --glass-bg-hover: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-border-specular: rgba(255, 255, 255, 0.8);
+  --glass-blur: 16px;
+
+  /* Multi-layered Cinematic Shadows */
+  --shadow-ambient: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px -4px rgba(0, 0, 0, 0.06);
+  --shadow-elevated: 0 2px 4px rgba(0, 0, 0, 0.04), 0 12px 32px -4px rgba(0, 0, 0, 0.08);
+  --shadow-modal: 0 24px 64px -12px rgba(0, 0, 0, 0.16);
+}
+
+body {
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle architectural dot grid */
+.tech-dots-refined {
+  background-size: 24px 24px;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+}
+
+.tech-dots-mint {
+  background-size: 32px 32px;
+  background-image: radial-gradient(#059669 1.5px, transparent 1.5px);
+}
+
+/* Restrained Glassmorphism panel utility */
+.glass-panel {
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-ambient);
+}
+
+.glass-pill {
+  background-color: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Bento card base */
+.bento-card {
+  background-color: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-ambient);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+}
+
+.bento-card:hover {
+  border-color: rgba(0, 0, 0, 0.14);
+  box-shadow: var(--shadow-elevated);
+}
+
+/* Premium Buttons */
+.btn-primary,
+.btn-neo-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #09090B;
+  color: #FFFFFF;
+  border: 1px solid #09090B;
+  border-radius: 0.625rem;
+  font-weight: 600;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.12);
+}
+
+.btn-primary:hover,
+.btn-neo-primary:hover {
+  background-color: #27272A;
+  border-color: #27272A;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.18);
+}
+
+.btn-primary:active,
+.btn-neo-primary:active {
+  transform: translateY(0px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.btn-secondary,
+.btn-neo-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #FFFFFF;
+  color: #09090B;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.625rem;
+  font-weight: 600;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.btn-secondary:hover,
+.btn-neo-secondary:hover {
+  background-color: #F8F9FA;
+  border-color: rgba(0, 0, 0, 0.16);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06);
+}
+
+.btn-secondary:active,
+.btn-neo-secondary:active {
+  transform: translateY(0px);
+}
+
+/* Lenis Smooth Scroll Recommended Configuration */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}

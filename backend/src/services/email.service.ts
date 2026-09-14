@@ -13,16 +13,22 @@ export const sendEmailWithRetries = async (mailOptions: SendMailOptions, maxRetr
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      console.log(`📧 [SMTP] Attempt ${attempt}/${maxRetries}: Dispatching email to ${mailOptions.to} via smtp.gmail.com:587...`);
+      const isSslAttempt = attempt === maxRetries;
+      const port = isSslAttempt ? 465 : 587;
+      const secure = isSslAttempt;
+
+      console.log(`📧 [SMTP] Attempt ${attempt}/${maxRetries}: Dispatching email to ${mailOptions.to} via smtp.gmail.com:${port} (IPv4 force)...`);
 
       const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        requireTLS: true,
-        connectionTimeout: 25000,
-        greetingTimeout: 25000,
-        socketTimeout: 25000,
+        port,
+        secure,
+        requireTLS: !secure,
+        // Force IPv4 to prevent 'connect ENETUNREACH 2607:f8b0:400e:c00::6c:587' on cloud runners (Render/AWS)
+        family: 4,
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 15000,
         auth: {
           user: smtpUser,
           pass: smtpPass,
@@ -36,7 +42,7 @@ export const sendEmailWithRetries = async (mailOptions: SendMailOptions, maxRetr
       console.warn(`⚠️ [SMTP] Attempt ${attempt}/${maxRetries} failed: ${err.message || err}`);
       lastError = err;
       if (attempt < maxRetries) {
-        await new Promise((res) => setTimeout(res, 1500));
+        await new Promise((res) => setTimeout(res, 1200));
       }
     }
   }
