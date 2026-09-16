@@ -1,160 +1,78 @@
-# Hackathon Pivot Checklist
+# Hackathon Rapid Pivot Checklist
 
-A rapid, hackathon-day execution guide for pivoting this codebase to any new domain in under 3 hours across **Web, Mobile, or Both Platforms**.
-
----
-
-## 1. Understand the Problem
-
-Run through this quick checklist before touching code:
-
-- [ ] **Target User**: Who is using the app? (e.g., students, disaster victims, citizens, healthcare workers)
-- [ ] **Target Platform**: Is this submission **Web-First**, **Mobile-First**, or **Synchronized Dual-Platform**?
-- [ ] **Actual Problem**: What specific pain point is being solved?
-- [ ] **Primary Entity**: What is the core data unit? (e.g., Incident, Resource, Task, Course, Alert)
-- [ ] **Core User Actions**: What can users do with the entity? (Create, Filter, Mark Complete, Generate AI Insights)
-- [ ] **Unique / Winning Feature**: What single feature will wow the judges?
-- [ ] **Demo Path**: What exact sequence of clicks/taps MUST work flawlessly during the 2-minute demo?
+A battle-tested execution guide for adapting this multi-platform codebase to any hackathon problem statement in **under 2 hours** across **Web (`web/`)**, **Mobile (`frontend/`)**, and **Backend (`backend/`)**.
 
 ---
 
-## 2. Configure the Existing Foundation
+## 1. Decompose the Problem Statement (0:00 – 0:15)
 
-The repository enables rapid rebranding and domain customization across all clients:
-
-### 2.1 Shared Branding & Category Defaults (`shared/src/constants/index.ts`)
-Centralize cross-platform constants for both Web and Mobile:
-```typescript
-export const DEFAULT_CATEGORIES = [
-  'Food', 'Shelter', 'Medical', 'Volunteers', 'General'
-] as const;
-
-export const PRODUCT_BRAND = {
-  name: 'FoodRelief',
-  tagline: 'Community Surplus & Food Security Hub',
-  entityName: 'Donation',
-  entityPlural: 'Donations',
-} as const;
-```
-
-### 2.2 Mobile Configuration (`frontend/config/appConfig.ts`)
-```typescript
-export const appConfig: AppConfig = {
-  appName: 'FoodRelief',
-  tagline: 'Community Surplus & Food Security Hub',
-  primaryEntityName: 'Donation',
-  entityPluralName: 'Donations',
-  categories: ['Food', 'Shelter', 'Medical', 'Volunteers', 'General'],
-  statuses: [
-    { key: 'pending', label: 'Pending', bg: '#FEF3C7', text: '#B45309' },
-    { key: 'in_progress', label: 'In Transit', bg: '#E0E7FF', text: '#4338CA' },
-    { key: 'completed', label: 'Delivered', bg: '#DCFCE7', text: '#15803D' },
-  ],
-  aiSystemPrompt: 'Act as an expert assistant for disaster relief logistics...',
-  accentColor: '#10B981',
-  themeGradient: ['#064E3B', '#047857'],
-};
-```
-
-### 2.3 Backend Environment Notification Overrides (`backend/.env`)
-If custom notification titles/messages are required on the server side without rebuilding code, set environment variables in `backend/.env`:
-```env
-NOTIF_ITEM_CREATED_TITLE="Donation Registered"
-NOTIF_ITEM_CREATED_MSG="Your donation entry has been posted."
-NOTIF_ITEM_COMPLETED_TITLE="Delivery Complete"
-NOTIF_ITEM_COMPLETED_MSG="The donation item was successfully delivered."
-```
+Open `hackathon/PROBLEM_STATEMENT.md` and document:
+- [ ] **Target Users & Roles**: (e.g. `Paramedic`, `ER Nurse`, `Dispatcher`)
+- [ ] **Primary Entity**: (e.g. `TriageCase`, `DonationItem`, `CourseSession`)
+- [ ] **Core User Workflow**: What 3 actions demonstrate real value in the demo?
+- [ ] **Winning Feature**: What unique differentiator wows the judges?
+- [ ] **Target Execution**: Synchronized Dual-Platform (Web command center + Mobile field app).
 
 ---
 
-## 3. Adapt Demo Data
+## 2. Configure the Unified Domain Engine (0:15 – 0:30)
 
-Replace or customize demo data using the dataset seed structure in `backend/src/seeds/`.
+Update **`web/lib/domain.config.ts`** and **`shared/src/config/domain.config.ts`**:
+- [ ] `brand`: App name, tagline, description, theme accent color.
+- [ ] `domain`: Primary entity name, plural, categories, and custom status options.
+- [ ] `navigation`: Routes mapped to Lucide icons (`LayoutDashboard`, `HeartPulse`, `Activity`, `Sparkles`, `Bell`).
+- [ ] `landing`: Dynamic hero headlines, value proposition, and feature cards.
+- [ ] `dashboard`: Problem-relevant KPI cards and metrics.
 
-### Seed Workflow
-1. Edit `backend/src/seeds/datasets/generic.ts` or create a new dataset file conforming to `SeedDataset` (`backend/src/seeds/datasets/types.ts`).
-2. Populate realistic seed items with matching `category`, `status`, `title`, and `description`.
-3. Seed the database cleanly:
-```bash
-# Clean existing demo records and re-seed deterministically
-npm run seed:reset
-
-# Or seed without resetting existing user items
-npm run seed
-```
-*Note: Seeding preserves demo user credentials (`demo@app.com` / `Demo123!`) and maintains full idempotency.*
+*Note: Mobile automatically consumes this via `frontend/config/appConfig.ts`.*
 
 ---
 
-## 4. Reuse Existing Modules (Dual-Platform Capability)
+## 3. Populate Realistic Domain Seeds (0:30 – 0:45)
 
-Rule of thumb: **Reuse existing modules unless the problem statement strictly requires an extension.**
-
-| Capability | Web Application (`web/`) | Mobile Application (`frontend/`) | Backend API |
-| :--- | :--- | :--- | :--- |
-| **Authentication** | `(auth)/login`, `(auth)/signup`, `AuthContext` | `(auth)/`, `AuthContext`, `expo-secure-store` | `POST /api/auth/email`, `POST /api/auth/sync` |
-| **Entity CRUD** | `(app)/items` Data Table, `new/`, `[id]/` detail | `items/` native list, create modal, `[id]` view | `GET /api/items`, `POST /api/items`, `PUT`, `DELETE` |
-| **Search & Filter** | Real-time search bar & category pill selector | Search bar & category horizontal scroll pills | Built-in query filters (`search`, `category`, `status`) |
-| **Analytics** | Dashboard KPI cards, completion donut, bar chart | Dashboard metric cards & activity feed | `GET /api/analytics/overview` |
-| **AI Integration** | `(app)/ai-assistant` prompt copilot & generator | Item creation AI suggestion & summary box | `POST /api/ai/generate` (OpenRouter Gateway) |
-| **File Management** | `(app)/files` drag-and-drop file uploader & preview | Native camera/gallery picker (`FilePicker.tsx`) | `POST /api/files`, `GET /api/files/:id` |
-| **Notifications** | `(app)/notifications` inbox & unread badge count | Native notification feed & badge count | `GET /api/notifications`, `PATCH /api/notifications/*` |
+Never present empty or generic ticket records to judges:
+- [ ] Edit `backend/src/seeds/datasets/generic.ts` with 5–10 realistic domain records.
+- [ ] Use `priority` (`'urgent' | 'high' | 'medium' | 'low'`).
+- [ ] Use the `attributes` map for domain-specific telemetry (e.g. `vitals`, `location`, `assignedUnits`).
+- [ ] Run seed reset:
+  ```bash
+  cd backend && npm run seed:reset
+  ```
 
 ---
 
-## 5. Build the Problem-Specific Feature
+## 4. Implement Dual-Platform Parity (0:45 – 1:30)
 
-Allocate the bulk of hackathon coding time strictly to what makes the hackathon submission stand out:
+Execute Web and Mobile in parallel:
 
-1. **Problem-Specific Functionality**: Implement the exact business logic unique to the problem prompt.
-2. **Platform-Tailored UX**: 
-   - On **Web**: Multi-column layouts, rich data visualization, keyboard efficiency, bento grid showcases.
-   - On **Mobile**: Fluid gesture transitions, bottom dock actions, safe area padding, touch target comfort.
-3. **Meaningful AI / Data Usage**: Use the pre-wired AI summary or prompt endpoints with domain-tailored prompts.
-4. **Demo Reliability**: Test the exact demo sequence end-to-end to guarantee zero unexpected UI crashes during presentation.
+### Web Command Center (`web/`)
+- [ ] Verify data table displays domain items, categories, and priority badges (`/items`).
+- [ ] Check `/items/new` creates items with domain categories.
+- [ ] Inspect `/items/[id]` detail view displays specifications and system telemetry.
+- [ ] Check `/dashboard` displays live KPI cards and operational feed.
 
----
-
-## 6. When to Extend the Architecture
-
-Only add new models, database fields, indexes, or third-party packages if the problem statement explicitly requires them.
-
-*Examples of safe minimal extensions (if strictly required):*
-- Adding an optional field (e.g., `urgencyLevel` or `locationName`) to `HackathonItemSchema` in `backend/src/models/HackathonItem.ts` and `shared/src/types/domain.ts`.
-- Adding a custom calculated metric to `backend/src/services/analytics.service.ts`.
-
-*Do NOT add:*
-- New database engines (Redis, PostgreSQL, etc.)
-- WebSockets or real-time pub/sub infrastructure unless strictly essential
-- Complex state management libraries (Redux, Zustand)
-- Unverified third-party libraries that bloat bundles
+### Mobile Field Client (`frontend/`)
+- [ ] Verify `home.tsx` displays domain metrics and quick action cards.
+- [ ] Check active bottom tabs: `Home`, `Records`, `Create`, `AI Copilot`, `Alerts`.
+- [ ] Verify creating an item on Mobile persists to the shared backend.
 
 ---
 
-## 7. Dual-Platform Verification Checklist
+## 5. Polish Landing Page & AI Grounding (1:30 – 1:45)
 
-Run verification before starting the live demo:
-
-- [ ] **Web Build Check**: `npm run web:build` (in `web/` or root)
-- [ ] **Mobile Type Check**: `npx tsc --noEmit` (in `frontend/`)
-- [ ] **Backend Build**: `npm run build` (in `backend/`)
-- [ ] **Database Seed**: `npm run seed:reset` (in `backend/`)
-- [ ] **Web Auth Flow**: Login with `demo@app.com` / `Demo123!` on `http://localhost:3000`
-- [ ] **Web CRUD Flow**: Create item, test category filter, search, view detail, edit, delete
-- [ ] **Web AI Assistant**: Test `(app)/ai-assistant` and verify prompt generation works
-- [ ] **Mobile Demo Flow**: Verify mobile dashboard and item feed on Expo / Android emulator
-- [ ] **Cross-Platform Sync**: Create an item on Web, verify it instantly appears on Mobile after refresh
-- [ ] **Demo Walkthrough**: Perform a full 2-minute trial demo run-through
+- [ ] Check `http://localhost:3000` tells the problem statement story, not a starter pack description.
+- [ ] Verify OpenRouter AI prompt in `domainConfig.domain.aiSystemPrompt` generates domain-grounded summaries.
 
 ---
 
-## 8. Hackathon Time Allocation (3-Hour Model)
+## 6. Pre-Demo Verification & Walkthrough (1:45 – 2:00)
 
-```text
-[0:00 - 0:15] Problem understanding & Target Platform Decision (Web/Mobile/Both)
-[0:15 - 0:30] Foundation configuration (`shared/`, `appConfig.ts`, seed data)
-[0:30 - 1:45] Winning Feature implementation on chosen client(s)
-[1:45 - 2:15] AI prompt tuning, data cards, and polish (states, loaders, responsive)
-[2:15 - 2:40] Testing & build verification (`web:build`, seed checks)
-[2:40 - 3:00] 2-minute live demo rehearsal & backup plan verification
-```
+Run the verification battery:
+- [ ] **Web Lint Check**: `npm run lint` in `web/` (must pass with 0 errors).
+- [ ] **Mobile Type Check**: `npx tsc --noEmit` in `frontend/` (must pass with 0 errors).
+- [ ] **Database Integrity**: Re-run `npm run seed:reset` in `backend/` for fresh presentation data.
+- [ ] **2-Minute Demo Rehearsal**:
+  1. *Hook*: Landing page showing the problem statement value proposition.
+  2. *Action*: Log a new entity on the Mobile field app.
+  3. *Sync*: Refresh Web Command Center to show the record instantly appeared.
+  4. *Intelligence*: Click "AI Copilot Analysis" on the entity detail view for automated synthesis.

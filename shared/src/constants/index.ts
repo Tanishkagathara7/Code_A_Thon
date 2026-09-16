@@ -1,20 +1,14 @@
-export const DEFAULT_CATEGORIES = [
-  'Engineering',
-  'Design',
-  'Product',
-  'Marketing',
-  'General',
-] as const;
+export * from '../config/domain.config';
+import { domainConfig } from '../config/domain.config';
 
-export const ITEM_STATUSES = [
-  { key: 'pending', label: 'Pending', color: 'amber', bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
-  { key: 'in_progress', label: 'In Progress', color: 'blue', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
-  { key: 'completed', label: 'Completed', color: 'emerald', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
-] as const;
+export const DEFAULT_CATEGORIES = domainConfig.domain.categories;
+
+export const ITEM_STATUSES = domainConfig.domain.statuses;
 
 export const PRODUCT_BRAND = {
-  name: 'Pulse',
-  tagline: 'Real-Time Operational Intelligence & AI Workflow Platform',
-  entityName: 'Item',
-  entityPlural: 'Items',
+  name: domainConfig.brand.name,
+  tagline: domainConfig.brand.tagline,
+  entityName: domainConfig.domain.primaryEntityName,
+  entityPlural: domainConfig.domain.entityPluralName,
 } as const;
+

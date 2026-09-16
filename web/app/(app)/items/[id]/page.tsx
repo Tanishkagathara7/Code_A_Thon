@@ -61,7 +61,7 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
     if (!item) return;
     setUpdatingStatus(true);
     try {
-      const res = await itemsApi.updateItem(item.id, { status: newStatus });
+      const res = await itemsApi.updateItem(id, { status: newStatus });
       setItem(res.data);
       toast(`Status updated to ${newStatus}`, 'success');
     } catch (err: unknown) {
@@ -154,7 +154,7 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
 
         <div className="flex items-center gap-2">
           <Link
-            href={`/items/${item.id}/edit`}
+            href={`/items/${id}/edit`}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-700 shadow-sm"
           >
             <Edit className="w-3.5 h-3.5" />
@@ -275,7 +275,7 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
             </h3>
             <div className="flex justify-between py-1 border-b border-zinc-100">
               <span className="text-zinc-400">Record ID</span>
-              <span className="font-mono text-zinc-700">{item.id.slice(-8)}</span>
+              <span className="font-mono text-zinc-700">{(item.id || item._id || id).slice(-8)}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-zinc-100">
               <span className="text-zinc-400">Created</span>

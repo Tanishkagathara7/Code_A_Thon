@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Bell, Plus, Menu } from 'lucide-react';
 
+import { domainConfig } from '@/lib/domain.config';
+
 interface TopbarProps {
   unreadCount?: number;
   onMenuClick?: () => void;
@@ -14,13 +16,13 @@ export const Topbar: React.FC<TopbarProps> = ({ unreadCount = 0, onMenuClick }) 
   const pathname = usePathname();
 
   const getPageTitle = () => {
-    if (pathname.startsWith('/dashboard')) return 'Dashboard Analytics';
-    if (pathname.startsWith('/items/new')) return 'Create New Item';
-    if (pathname.startsWith('/items')) return 'Items Operations';
-    if (pathname.startsWith('/ai-assistant')) return 'AI Intelligence Assistant';
+    if (pathname.startsWith('/dashboard')) return `${domainConfig.brand.name} Command Center`;
+    if (pathname.startsWith('/items/new')) return `Log New ${domainConfig.domain.primaryEntityName}`;
+    if (pathname.startsWith('/items')) return `${domainConfig.domain.entityPluralName} Operations`;
+    if (pathname.startsWith('/ai-assistant')) return `${domainConfig.brand.name} AI Copilot`;
     if (pathname.startsWith('/files')) return 'Storage & Asset Manager';
     if (pathname.startsWith('/notifications')) return 'Notification Feed';
-    return 'Workspace';
+    return `${domainConfig.brand.name} Workspace`;
   };
 
   return (
@@ -47,7 +49,7 @@ export const Topbar: React.FC<TopbarProps> = ({ unreadCount = 0, onMenuClick }) 
           className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg btn-primary text-xs font-semibold"
         >
           <Plus className="w-3.5 h-3.5" />
-          <span>New Item</span>
+          <span>New {domainConfig.domain.primaryEntityName}</span>
         </Link>
 
         {/* Notification Icon */}

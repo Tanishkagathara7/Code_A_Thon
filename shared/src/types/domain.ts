@@ -6,6 +6,8 @@ export interface HackathonItem {
   description?: string;
   status: ItemStatus;
   category?: string;
+  priority?: 'low' | 'medium' | 'high' | 'urgent' | string;
+  attributes?: Record<string, any>;
   owner?: string;
   createdAt: string;
   updatedAt: string;

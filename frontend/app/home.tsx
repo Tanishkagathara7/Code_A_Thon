@@ -124,7 +124,7 @@ export default function HomeScreen() {
       window.addEventListener('focus', handleFocus);
       return () => window.removeEventListener('focus', handleFocus);
     } else {
-      sub = AppState.addEventListener('change', (state) => {
+      sub = AppState.addEventListener('change', (state: any) => {
         if (state === 'active') {
           fetchAnalytics();
           fetchUnreadCount();
@@ -273,31 +273,32 @@ export default function HomeScreen() {
       );
     }
 
-    // Coming Soon Blank Page for other tabs (Policies, Create, Benefits, Buy)
-    const tabTitles: Record<TabKey, string> = {
-      home: 'Home',
-      policies: 'Policies',
-      create: 'Create',
-      benefits: 'Benefits',
-      buy: 'Buy',
-    };
+    // Tab switching handler
+    if (activeTab === 'items') {
+      router.push('/items');
+      setActiveTab('home');
+      return null;
+    }
 
-    return (
-      <View style={styles.comingSoonContainer}>
-        <View style={styles.comingSoonCard}>
-          <LinearGradient
-            colors={['#8898DF', '#6D7FD5']}
-            style={styles.comingSoonBadge}
-          >
-            <Text style={styles.comingSoonBadgeText}>{tabTitles[activeTab].toUpperCase()}</Text>
-          </LinearGradient>
-          <Text style={styles.comingSoonTitle}>Coming Soon</Text>
-          <Text style={styles.comingSoonSubtitle}>
-            This feature is currently under development. Stay tuned for future updates!
-          </Text>
-        </View>
-      </View>
-    );
+    if (activeTab === 'notifications') {
+      router.push('/notifications');
+      setActiveTab('home');
+      return null;
+    }
+
+    if (activeTab === 'create') {
+      router.push('/items/create');
+      setActiveTab('home');
+      return null;
+    }
+
+    if (activeTab === 'ai') {
+      return (
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          <AISummarizerCard />
+        </ScrollView>
+      );
+    }
   };
 
   return (
@@ -342,7 +343,7 @@ export default function HomeScreen() {
       {/* Interactive Bottom Navbar matching the design with custom purple center button */}
       <InteractiveNavbar
         activeTab={activeTab}
-        onSelectTab={(tab) => {
+        onSelectTab={(tab: TabKey) => {
           if (tab === 'create') {
             router.push('/items/create');
           } else {

@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/context/AuthContext';
 import { useToast } from '@/lib/context/ToastContext';
 import { KineticHeadline } from '@/components/auth/KineticHeadline';
 import { PasswordStrengthMeter } from '@/components/auth/PasswordStrengthMeter';
+import { domainConfig } from '@/lib/domain.config';
 
 interface AuthPageProps {
   initialMode?: 'signin' | 'signup';
@@ -188,12 +189,12 @@ export function UnifiedAuthView({ initialMode = 'signin' }: AuthPageProps) {
           {/* Header */}
           <div className="space-y-1 mb-6">
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-950 transition-all duration-300">
-              {mode === 'signin' ? 'Sign in to account' : 'Create an account'}
+              {mode === 'signin' ? `Sign in to ${domainConfig.brand.name}` : `Join ${domainConfig.brand.name}`}
             </h2>
             <p className="text-xs sm:text-sm text-zinc-500">
               {mode === 'signin'
-                ? 'Enter credentials to access the synchronized web workspace.'
-                : 'Set up your developer credentials to enter the workspace.'}
+                ? `Enter credentials to access the ${domainConfig.brand.name} operations center.`
+                : `Set up your profile to enter the ${domainConfig.brand.name} workspace.`}
             </p>
           </div>
 

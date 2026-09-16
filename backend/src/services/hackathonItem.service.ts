@@ -4,15 +4,19 @@ import mongoose from 'mongoose';
 export interface CreateItemInput {
   title: string;
   description?: string;
-  status?: HackathonItemStatus;
+  status?: string;
   category?: string;
+  priority?: string;
+  attributes?: Record<string, any>;
 }
 
 export interface UpdateItemInput {
   title?: string;
   description?: string;
-  status?: HackathonItemStatus;
+  status?: string;
   category?: string;
+  priority?: string;
+  attributes?: Record<string, any>;
 }
 
 export interface GetItemsOptions {
@@ -50,6 +54,8 @@ export class HackathonItemService {
       description: input.description,
       status: input.status || 'pending',
       category: input.category,
+      priority: input.priority || 'medium',
+      attributes: input.attributes || {},
       owner: new mongoose.Types.ObjectId(userId),
     });
 
@@ -170,6 +176,8 @@ export class HackathonItemService {
     if (updateData.description !== undefined) updatePayload.description = updateData.description;
     if (updateData.status !== undefined) updatePayload.status = updateData.status;
     if (updateData.category !== undefined) updatePayload.category = updateData.category;
+    if (updateData.priority !== undefined) updatePayload.priority = updateData.priority;
+    if (updateData.attributes !== undefined) updatePayload.attributes = updateData.attributes;
 
     const item = await HackathonItem.findOneAndUpdate(
       {

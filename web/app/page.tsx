@@ -25,6 +25,7 @@ import { initHeroTypographyAnimation } from '@/lib/animations/heroTypography';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { SITE_CONFIG, getSiteUrl } from '@/lib/seo';
 import { InteractiveGridTiles } from '@/components/auth/InteractiveGridTiles';
+import { domainConfig } from '@/lib/domain.config';
 
 export default function MarketingPage() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -303,15 +304,15 @@ export default function MarketingPage() {
             {/* Value Proposition & CTAs (Centered, Balanced Rhythm) */}
             <div className="max-w-2xl mx-auto space-y-6 pt-1">
               <p className="hero-copy text-base sm:text-lg text-zinc-600 leading-relaxed font-normal text-center">
-                Authoritative central engine powering high-density desktop operations and native mobile execution. Zero schema drift, instant biometric tokens, and continuous cryptographic state verification.
+                {domainConfig.landing.hero.subheadline}
               </p>
 
               <div className="hero-cta flex flex-wrap items-center justify-center gap-3.5">
                 <Link
-                  href="/signup"
+                  href={domainConfig.landing.hero.ctaPrimary.href}
                   className="btn-primary px-7 py-3.5 text-xs font-semibold tracking-wide shadow-md shadow-zinc-950/10"
                 >
-                  <span>Launch Web Workspace</span>
+                  <span>{domainConfig.landing.hero.ctaPrimary.label}</span>
                   <ArrowRight className="w-4 h-4 ml-1.5" />
                 </Link>
                 <button
@@ -319,7 +320,7 @@ export default function MarketingPage() {
                   className="btn-secondary px-6 py-3.5 text-xs font-semibold cursor-pointer shadow-sm hover:shadow"
                   aria-label="View interactive product preview"
                 >
-                  <span>View Product</span>
+                  <span>{domainConfig.landing.hero.ctaSecondary.label}</span>
                   <ArrowUpRight className="w-4 h-4 ml-1.5 opacity-60" />
                 </button>
               </div>

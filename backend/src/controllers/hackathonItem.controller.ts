@@ -18,7 +18,7 @@ export class HackathonItemController {
         return res.status(401).json({ success: false, error: 'Unauthorized. User session missing.' });
       }
 
-      const { title, description, status, category } = req.body || {};
+      const { title, description, status, category, priority, attributes } = req.body || {};
 
       // Input Validation
       if (!title || typeof title !== 'string' || title.trim() === '') {
@@ -57,7 +57,7 @@ export class HackathonItemController {
       }
 
       const newItem = await HackathonItemService.create(
-        { title, description, status, category },
+        { title, description, status, category, priority, attributes },
         userId
       );
 
@@ -194,7 +194,7 @@ export class HackathonItemController {
       }
 
       const id = req.params.id as string;
-      const { title, description, status, category } = req.body || {};
+      const { title, description, status, category, priority, attributes } = req.body || {};
 
       // Input Validation on update
       if (title !== undefined) {
@@ -249,6 +249,8 @@ export class HackathonItemController {
         description,
         status,
         category,
+        priority,
+        attributes,
       });
 
       // Trigger non-blocking notification only if status transitioned to 'completed'

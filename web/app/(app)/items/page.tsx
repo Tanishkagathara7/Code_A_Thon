@@ -226,12 +226,13 @@ export default function ItemsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
-                {items.map((item) => {
+                {items.map((item, index) => {
+                  const itemId = item.id || item._id || `item-${index}`;
                   const badge = getStatusBadgeStyle(item.status);
                   return (
-                    <tr key={item.id} className="hover:bg-zinc-50/80 transition-colors group">
+                    <tr key={itemId} className="hover:bg-zinc-50/80 transition-colors group">
                       <td className="px-6 py-4">
-                        <Link href={`/items/${item.id}`} className="font-semibold text-zinc-900 hover:underline">
+                        <Link href={`/items/${itemId}`} className="font-semibold text-zinc-900 hover:underline">
                           {item.title}
                         </Link>
                         {item.description && (
@@ -258,21 +259,21 @@ export default function ItemsPage() {
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100">
                           <Link
-                            href={`/items/${item.id}`}
+                            href={`/items/${itemId}`}
                             className="p-1.5 text-zinc-400 hover:text-zinc-900 rounded-lg hover:bg-zinc-100"
                             title="View Details"
                           >
                             <ExternalLink className="w-4 h-4" />
                           </Link>
                           <Link
-                            href={`/items/${item.id}/edit`}
+                            href={`/items/${itemId}/edit`}
                             className="p-1.5 text-zinc-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50"
                             title="Edit Item"
                           >
                             <Edit className="w-4 h-4" />
                           </Link>
                           <button
-                            onClick={() => handleDelete(item.id)}
+                            onClick={() => handleDelete(itemId)}
                             className="p-1.5 text-zinc-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 cursor-pointer"
                             title="Delete Item"
                           >

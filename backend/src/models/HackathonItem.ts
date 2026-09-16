@@ -5,8 +5,10 @@ export type HackathonItemStatus = 'pending' | 'in_progress' | 'completed';
 export interface IHackathonItem extends Document {
   title: string;
   description?: string;
-  status: HackathonItemStatus;
+  status: string;
   category?: string;
+  priority?: string;
+  attributes?: Record<string, any>;
   owner: mongoose.Types.ObjectId;
   isDemo?: boolean;
   createdAt: Date;
@@ -28,16 +30,22 @@ const HackathonItemSchema: Schema = new Schema(
     },
     status: {
       type: String,
-      enum: {
-        values: ['pending', 'in_progress', 'completed'],
-        message: 'Status must be one of: pending, in_progress, completed',
-      },
       default: 'pending',
     },
     category: {
       type: String,
       trim: true,
       maxlength: [50, 'Category cannot exceed 50 characters'],
+    },
+    priority: {
+      type: String,
+      enum: ['low', 'medium', 'high', 'urgent'],
+      default: 'medium',
+    },
+    attributes: {
+      type: Map,
+      of: Schema.Types.Mixed,
+      default: {},
     },
     owner: {
       type: Schema.Types.ObjectId,

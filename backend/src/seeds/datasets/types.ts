@@ -6,6 +6,8 @@ export interface SeedItemTemplate {
   description: string;
   category: string;
   status: HackathonItemStatus;
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  attributes?: Record<string, any>;
   daysAgo: number;
 }
 

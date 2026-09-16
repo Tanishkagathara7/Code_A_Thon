@@ -27,6 +27,8 @@ export async function seedHackathonItems(
       description: template.description,
       category: template.category,
       status: template.status,
+      priority: template.priority || 'medium',
+      attributes: template.attributes || {},
       owner: ownerId,
       isDemo: true,
       createdAt,
@@ -40,6 +42,8 @@ export async function seedHackathonItems(
       existing.description = template.description;
       existing.category = template.category;
       existing.status = template.status;
+      existing.priority = template.priority || 'medium';
+      existing.attributes = template.attributes || {};
       existing.isDemo = true;
       existing.createdAt = createdAt;
       await existing.save();

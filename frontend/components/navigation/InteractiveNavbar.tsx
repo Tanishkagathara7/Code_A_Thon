@@ -22,7 +22,7 @@ import {
   NavPlusIcon,
 } from './NavIcons';
 
-export type TabKey = 'home' | 'policies' | 'create' | 'benefits' | 'buy';
+export type TabKey = 'home' | 'items' | 'create' | 'ai' | 'notifications';
 
 interface InteractiveNavbarProps {
   activeTab: TabKey;
@@ -107,73 +107,73 @@ export const InteractiveNavbar: React.FC<InteractiveNavbarProps> = ({
           {activeTab === 'home' && <View style={styles.activeIndicator} />}
         </TouchableOpacity>
 
-        {/* Tab 2: Policies */}
+        {/* Tab 2: Domain Items */}
         <TouchableOpacity
           activeOpacity={0.75}
-          onPress={() => onSelectTab('policies')}
+          onPress={() => onSelectTab('items')}
           style={styles.navItem}
         >
           <NavShieldIcon
             size={25}
-            color={activeTab === 'policies' ? '#6D7FD5' : '#8E94A5'}
-            focused={activeTab === 'policies'}
+            color={activeTab === 'items' ? '#6D7FD5' : '#8E94A5'}
+            focused={activeTab === 'items'}
           />
           <Text
             style={[
               styles.navLabel,
-              activeTab === 'policies' ? styles.navLabelActive : styles.navLabelInactive,
+              activeTab === 'items' ? styles.navLabelActive : styles.navLabelInactive,
             ]}
           >
-            Policies
+            Records
           </Text>
-          {activeTab === 'policies' && <View style={styles.activeIndicator} />}
+          {activeTab === 'items' && <View style={styles.activeIndicator} />}
         </TouchableOpacity>
 
         {/* Center Blank Spacer for the floating circle */}
         <View style={styles.centerSpacer} />
 
-        {/* Tab 3: Benefits */}
+        {/* Tab 3: AI Copilot */}
         <TouchableOpacity
           activeOpacity={0.75}
-          onPress={() => onSelectTab('benefits')}
+          onPress={() => onSelectTab('ai')}
           style={styles.navItem}
         >
           <NavBenefitsIcon
             size={25}
-            color={activeTab === 'benefits' ? '#6D7FD5' : '#8E94A5'}
-            focused={activeTab === 'benefits'}
+            color={activeTab === 'ai' ? '#6D7FD5' : '#8E94A5'}
+            focused={activeTab === 'ai'}
           />
           <Text
             style={[
               styles.navLabel,
-              activeTab === 'benefits' ? styles.navLabelActive : styles.navLabelInactive,
+              activeTab === 'ai' ? styles.navLabelActive : styles.navLabelInactive,
             ]}
           >
-            Benefits
+            AI Copilot
           </Text>
-          {activeTab === 'benefits' && <View style={styles.activeIndicator} />}
+          {activeTab === 'ai' && <View style={styles.activeIndicator} />}
         </TouchableOpacity>
 
-        {/* Tab 4: Buy */}
+        {/* Tab 4: Notifications */}
         <TouchableOpacity
           activeOpacity={0.75}
-          onPress={() => onSelectTab('buy')}
+          onPress={() => onSelectTab('notifications')}
           style={styles.navItem}
         >
           <NavBuyIcon
             size={25}
-            color={activeTab === 'buy' ? '#6D7FD5' : '#8E94A5'}
-            focused={activeTab === 'buy'}
+            color={activeTab === 'notifications' ? '#6D7FD5' : '#8E94A5'}
+            focused={activeTab === 'notifications'}
           />
           <Text
             style={[
               styles.navLabel,
-              activeTab === 'buy' ? styles.navLabelActive : styles.navLabelInactive,
+              activeTab === 'notifications' ? styles.navLabelActive : styles.navLabelInactive,
             ]}
           >
-            Buy
+            Alerts
           </Text>
-          {activeTab === 'buy' && <View style={styles.activeIndicator} />}
+          {activeTab === 'notifications' && <View style={styles.activeIndicator} />}
         </TouchableOpacity>
       </View>
     </View>

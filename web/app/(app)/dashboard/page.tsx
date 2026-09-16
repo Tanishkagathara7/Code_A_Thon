@@ -17,6 +17,7 @@ import { analyticsApi, itemsApi } from '@/lib/api/domain';
 import { AnalyticsOverviewData, HackathonItem } from '@/lib/types';
 import { getStatusBadgeStyle, formatDate } from '@/lib/utils';
 import { useAuth } from '@/lib/context/AuthContext';
+import { domainConfig } from '@/lib/domain.config';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -94,13 +95,13 @@ export default function DashboardPage() {
         <div className="relative z-10 space-y-2">
           <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-zinc-800 text-[11px] font-semibold text-indigo-400 border border-zinc-700">
             <Sparkles className="w-3 h-3" />
-            <span>Multi-Platform Operations Center</span>
+            <span>{domainConfig.brand.name} Command Center</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-            Welcome back, {user?.name || 'APP Operator'}
+            Welcome back, {user?.name || 'Operator'}
           </h1>
           <p className="text-zinc-400 text-sm max-w-xl">
-            Real-time synchronization active across mobile (React Native) and desktop (Next.js). View workflow metrics and intelligence below.
+            {domainConfig.brand.tagline} • Real-time telemetry synchronized across Mobile & Web.
           </p>
         </div>
 
@@ -118,7 +119,7 @@ export default function DashboardPage() {
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>Create Item</span>
+            <span>Log {domainConfig.domain.primaryEntityName}</span>
           </Link>
         </div>
 
@@ -140,7 +141,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Total Items</span>
+            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Total {domainConfig.domain.entityPluralName}</span>
             <div className="p-2 rounded-lg bg-zinc-100 text-zinc-700">
               <Layers className="w-4 h-4" />
             </div>
@@ -150,12 +151,12 @@ export default function DashboardPage() {
               {loading ? '—' : overview.total}
             </span>
           </div>
-          <div className="text-[11px] text-zinc-400">Total entities tracked across devices</div>
+          <div className="text-[11px] text-zinc-400">Total {domainConfig.domain.entityPluralName.toLowerCase()} tracked across devices</div>
         </div>
 
         <div className="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Completed</span>
+            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Resolved / Completed</span>
             <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
               <CheckCircle2 className="w-4 h-4" />
             </div>
@@ -165,12 +166,12 @@ export default function DashboardPage() {
               {loading ? '—' : overview.completed}
             </span>
           </div>
-          <div className="text-[11px] text-zinc-400">Successfully finalized tasks</div>
+          <div className="text-[11px] text-zinc-400">Successfully finalized records</div>
         </div>
 
         <div className="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">In Progress</span>
+            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Active / In-Flight</span>
             <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
               <Clock className="w-4 h-4" />
             </div>
@@ -185,7 +186,7 @@ export default function DashboardPage() {
 
         <div className="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Completion Rate</span>
+            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Resolution Rate</span>
             <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
               <TrendingUp className="w-4 h-4" />
             </div>
@@ -195,7 +196,7 @@ export default function DashboardPage() {
               {loading ? '—' : `${overview.completionRate}%`}
             </span>
           </div>
-          <div className="text-[11px] text-zinc-400">Overall throughput efficiency</div>
+          <div className="text-[11px] text-zinc-400">Overall operational throughput</div>
         </div>
       </div>
 
@@ -205,8 +206,8 @@ export default function DashboardPage() {
         <div className="lg:col-span-2 bg-white rounded-2xl border border-zinc-200/80 shadow-sm overflow-hidden flex flex-col">
           <div className="p-6 border-b border-zinc-100 flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold text-zinc-900 tracking-tight">Recent Entity Activity</h3>
-              <p className="text-xs text-zinc-500">Live feed of domain records registered on Mobile & Web</p>
+              <h3 className="text-base font-bold text-zinc-900 tracking-tight">Recent {domainConfig.domain.primaryEntityName} Activity</h3>
+              <p className="text-xs text-zinc-500">Live feed of {domainConfig.domain.entityPluralName.toLowerCase()} registered on Mobile & Web</p>
             </div>
             <Link
               href="/items"
@@ -243,10 +244,11 @@ export default function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
-                  {recentItems.map((item) => {
+                  {recentItems.map((item, index) => {
+                    const itemId = item.id || item._id || `item-${index}`;
                     const badge = getStatusBadgeStyle(item.status);
                     return (
-                      <tr key={item.id} className="hover:bg-zinc-50/70 transition-colors group">
+                      <tr key={itemId} className="hover:bg-zinc-50/70 transition-colors group">
                         <td className="px-6 py-4">
                           <div className="font-semibold text-zinc-900">{item.title}</div>
                           <div className="text-xs text-zinc-400">{item.category || 'General'}</div>
@@ -263,11 +265,11 @@ export default function DashboardPage() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           <Link
-                            href={`/items/${item.id}`}
-                            className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-zinc-900 group-hover:text-indigo-600"
+                            href={`/items/${itemId}`}
+                            className="inline-flex items-center text-xs font-semibold text-indigo-600 hover:text-indigo-800"
                           >
-                            <span>Inspect</span>
-                            <ArrowUpRight className="w-3.5 h-3.5" />
+                            View
+                            <ArrowUpRight className="w-3.5 h-3.5 ml-1" />
                           </Link>
                         </td>
                       </tr>

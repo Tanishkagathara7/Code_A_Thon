@@ -10,11 +10,14 @@ export interface User {
 export type ItemStatus = 'pending' | 'in_progress' | 'completed' | string;
 
 export interface HackathonItem {
-  id: string;
+  id?: string;
+  _id?: string;
   title: string;
   description?: string;
   status: ItemStatus;
   category?: string;
+  priority?: string;
+  attributes?: Record<string, unknown>;
   owner?: string;
   createdAt: string;
   updatedAt: string;

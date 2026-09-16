@@ -9,19 +9,39 @@ import {
   Sparkles,
   FolderOpen,
   Bell,
+  Activity,
+  Shield,
+  Users,
+  MapPin,
+  HeartPulse,
   LogOut,
   ChevronRight,
   User as UserIcon,
   X,
+  type LucideIcon,
 } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';
 import { cn } from '@/lib/utils';
+import { domainConfig } from '@/lib/domain.config';
 
 interface SidebarProps {
   unreadNotifications?: number;
   isOpen?: boolean;
   onClose?: () => void;
 }
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  LayoutDashboard,
+  Layers,
+  Sparkles,
+  FolderOpen,
+  Bell,
+  Activity,
+  Shield,
+  Users,
+  MapPin,
+  HeartPulse,
+};
 
 export const Sidebar: React.FC<SidebarProps> = ({
   unreadNotifications = 0,
@@ -31,18 +51,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
-  const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Items Hub', href: '/items', icon: Layers },
-    { name: 'AI Copilot', href: '/ai-assistant', icon: Sparkles },
-    { name: 'File Storage', href: '/files', icon: FolderOpen },
-    {
-      name: 'Notifications',
-      href: '/notifications',
-      icon: Bell,
-      badge: unreadNotifications > 0 ? unreadNotifications : null,
-    },
-  ];
+  const navigation = domainConfig.navigation.map((item) => ({
+    name: item.name,
+    href: item.href,
+    icon: ICON_MAP[item.iconName] || Layers,
+    badge: item.href === '/notifications' && unreadNotifications > 0 ? unreadNotifications : item.badge,
+  }));
 
   return (
     <>
@@ -67,12 +81,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="h-16 flex items-center justify-between px-6 border-b border-black/[0.06]">
             <Link href="/dashboard" onClick={onClose} className="flex items-center gap-3 group">
               <div className="w-8 h-8 rounded-xl bg-zinc-900 flex items-center justify-center font-bold text-white shadow-sm font-sans text-xs group-hover:scale-105 transition-transform">
-                A
+                {domainConfig.brand.shortName.charAt(0)}
               </div>
               <div>
-                <span className="font-bold text-base tracking-tight text-zinc-900">APP</span>
+                <span className="font-bold text-base tracking-tight text-zinc-900">{domainConfig.brand.name}</span>
                 <span className="ml-1.5 text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                  Workspace
+                  Command
                 </span>
               </div>
             </Link>

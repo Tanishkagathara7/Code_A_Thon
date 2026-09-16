@@ -17,10 +17,11 @@ This skill controls how Antigravity performs code reviews on changes made within
 
 When reviewing pull requests, diffs, or proposed code edits, Antigravity MUST evaluate changes against these 8 categories:
 
-### 1. Multi-Platform Architecture
-- Is existing functionality being reused rather than duplicated across clients?
-- Are shared interfaces imported from `shared/src/types/` rather than redefined locally?
-- Is speculative infrastructure being introduced without justification?
+### 1. Multi-Platform Architecture & Domain Fidelity
+- Does the implementation solve the actual problem statement rather than cosmetically relabeling generic starter kit templates?
+- Are `domain.config.ts` and `shared/` domain contracts used as the single source of truth across Web and Mobile?
+- Are core workflows implemented with dual-platform parity (Web Command Center + Mobile Field Client)?
+- Are shared interfaces and types imported properly without violating bundler boundaries?
 - Did Web modifications preserve mobile Metro bundler compatibility in `frontend/`?
 
 ### 2. Security & Secret Isolation
