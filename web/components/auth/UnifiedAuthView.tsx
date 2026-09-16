@@ -17,6 +17,10 @@ interface AuthPageProps {
 
 export function UnifiedAuthView({ initialMode = 'signin' }: AuthPageProps) {
   const [mode, setMode] = useState<'signin' | 'signup'>(initialMode);
+  const authConfig = domainConfig.productSpec?.authExperience;
+  const initialRole = authConfig?.availableRoles?.[0]?.id || 'coordinator';
+  const [selectedRole, setSelectedRole] = useState<string>(initialRole);
+  const [organization, setOrganization] = useState<string>('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -69,7 +73,10 @@ export function UnifiedAuthView({ initialMode = 'signin' }: AuthPageProps) {
         setIsSuccess(true);
         toast('Authenticated successfully', 'success');
       } else {
-        await signup(name, email, password);
+        await signup(name, email, password, {
+          role: selectedRole,
+          organization: organization || undefined,
+        });
         setIsSuccess(true);
         toast('Workspace created successfully!', 'success');
       }
@@ -208,26 +215,69 @@ export function UnifiedAuthView({ initialMode = 'signin' }: AuthPageProps) {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-3.5">
-            {/* Full Name field in Sign Up Mode */}
+            {/* Role & Org selection in Sign Up Mode */}
             {mode === 'signup' && (
-              <div className="space-y-1 animate-in fade-in slide-in-from-top-2 duration-300">
-                <label className="block text-xs font-semibold text-zinc-700">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
-                    <UserIcon className="w-4 h-4" />
+              <>
+                {authConfig?.requireRoleSelectionOnSignup && authConfig.availableRoles?.length > 0 && (
+                  <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <label className="block text-xs font-semibold text-zinc-700">
+                      Select Your Operational Role
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {authConfig.availableRoles.map((role: any) => {
+                        const isSelected = selectedRole === role.id;
+                        return (
+                          <button
+                            key={role.id}
+                            type="button"
+                            onClick={() => setSelectedRole(role.id)}
+                            className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                              isSelected
+                                ? 'bg-indigo-50/80 border-indigo-600 text-indigo-900 ring-2 ring-indigo-600/10'
+                                : 'bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50'
+                            }`}
+                          >
+                            <div className="text-xs font-bold">{role.name}</div>
+                            <div className="text-[10px] text-zinc-500 line-clamp-1 mt-0.5">{role.description}</div>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
+                )}
+
+                <div className="space-y-1 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <label className="block text-xs font-semibold text-zinc-700">
+                    Organization / Affiliation
+                  </label>
                   <input
                     type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Tanish Kathuria"
-                    required
-                    className="w-full pl-10 pr-4 py-2.5 bg-white rounded-xl border border-zinc-200 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all shadow-2xs"
+                    value={organization}
+                    onChange={(e) => setOrganization(e.target.value)}
+                    placeholder="e.g. City Response Command or Regional Ops"
+                    className="w-full px-3.5 py-2.5 bg-white rounded-xl border border-zinc-200 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all shadow-2xs"
                   />
                 </div>
-              </div>
+
+                <div className="space-y-1 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <label className="block text-xs font-semibold text-zinc-700">
+                    Full Name
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
+                      <UserIcon className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Jane Doe"
+                      required
+                      className="w-full pl-10 pr-4 py-2.5 bg-white rounded-xl border border-zinc-200 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all shadow-2xs"
+                    />
+                  </div>
+                </div>
+              </>
             )}
 
             {/* Email Address */}

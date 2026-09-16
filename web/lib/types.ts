@@ -2,6 +2,9 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  role?: string;
+  organization?: string;
+  domainProfile?: Record<string, any>;
   avatarUrl?: string;
   provider?: 'email' | 'google' | 'github';
   createdAt?: string;

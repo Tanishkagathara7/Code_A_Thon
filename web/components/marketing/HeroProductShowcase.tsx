@@ -17,6 +17,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { pauseLenis, resumeLenis } from '@/lib/animations/lenis';
+import { domainConfig } from '@/lib/domain.config';
 
 interface HeroProductShowcaseProps {
   isPreviewOpen: boolean;
@@ -183,7 +184,7 @@ export const HeroProductShowcase: React.FC<HeroProductShowcaseProps> = ({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-4">
               <div className="p-4 rounded-xl bg-white border border-black/[0.06] shadow-sm hover:border-black/[0.1] transition-all">
                 <div className="flex items-center justify-between text-xs font-semibold text-zinc-500">
-                  <span>Domain Items</span>
+                  <span>{domainConfig.domain.entityPluralName}</span>
                   <Layers className="w-4 h-4 text-blue-600" />
                 </div>
                 <div className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 mt-2">24</div>

@@ -21,6 +21,7 @@ import {
   NavBuyIcon,
   NavPlusIcon,
 } from './NavIcons';
+import { appConfig } from '../../config/appConfig';
 
 export type TabKey = 'home' | 'items' | 'create' | 'ai' | 'notifications';
 
@@ -124,7 +125,7 @@ export const InteractiveNavbar: React.FC<InteractiveNavbarProps> = ({
               activeTab === 'items' ? styles.navLabelActive : styles.navLabelInactive,
             ]}
           >
-            Records
+            {appConfig.entityPluralName || 'Records'}
           </Text>
           {activeTab === 'items' && <View style={styles.activeIndicator} />}
         </TouchableOpacity>

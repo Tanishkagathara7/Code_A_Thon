@@ -17,6 +17,7 @@ import { itemsApi, aiApi } from '@/lib/api/domain';
 import { HackathonItem } from '@/lib/types';
 import { getStatusBadgeStyle, formatDate } from '@/lib/utils';
 import { useToast } from '@/lib/context/ToastContext';
+import { domainConfig } from '@/lib/domain.config';
 
 export default function ItemDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -212,59 +213,33 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
 
         {/* Side Metadata & Quick Status Changer */}
         <div className="space-y-6">
-          {/* Quick Status Control */}
+          {/* Dynamic Workflow Status Controls */}
           <div className="bg-white p-6 rounded-2xl border border-zinc-200/80 shadow-sm space-y-4">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-              Update Entity Status
+              Workflow & Status Actions
             </h3>
             <div className="flex flex-col gap-2">
-              <button
-                onClick={() => handleStatusChange('pending')}
-                disabled={updatingStatus || item.status === 'pending'}
-                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
-                  item.status === 'pending'
-                    ? 'bg-amber-50 border-amber-300 text-amber-800'
-                    : 'bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
-                  <span>Mark Pending</span>
-                </div>
-                {item.status === 'pending' && <CheckCircle2 className="w-3.5 h-3.5 text-amber-700" />}
-              </button>
-
-              <button
-                onClick={() => handleStatusChange('in_progress')}
-                disabled={updatingStatus || item.status === 'in_progress'}
-                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
-                  item.status === 'in_progress'
-                    ? 'bg-indigo-50 border-indigo-300 text-indigo-800'
-                    : 'bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>Mark In Progress</span>
-                </div>
-                {item.status === 'in_progress' && <CheckCircle2 className="w-3.5 h-3.5 text-indigo-700" />}
-              </button>
-
-              <button
-                onClick={() => handleStatusChange('completed')}
-                disabled={updatingStatus || item.status === 'completed'}
-                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
-                  item.status === 'completed'
-                    ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
-                    : 'bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Mark Completed</span>
-                </div>
-                {item.status === 'completed' && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />}
-              </button>
+              {domainConfig.domain.statuses.map((statusOpt) => {
+                const isCurrent = item.status === statusOpt.key;
+                return (
+                  <button
+                    key={statusOpt.key}
+                    onClick={() => handleStatusChange(statusOpt.key)}
+                    disabled={updatingStatus || isCurrent}
+                    className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+                      isCurrent
+                        ? `${statusOpt.bg} ${statusOpt.text} font-bold ring-1 ring-inset ring-black/10`
+                        : 'bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>{isCurrent ? `Current: ${statusOpt.label}` : `Transition to ${statusOpt.label}`}</span>
+                    </div>
+                    {isCurrent && <CheckCircle2 className="w-3.5 h-3.5" />}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

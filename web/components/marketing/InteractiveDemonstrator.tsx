@@ -2,25 +2,29 @@
 
 import React, { useState } from 'react';
 import { Terminal, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { domainConfig } from '@/lib/domain.config';
 
 export const InteractiveDemonstrator: React.FC = () => {
   const [activeStep, setActiveStep] = useState<number>(0);
+
+  const entity = domainConfig.domain.primaryEntityName;
+  const category = domainConfig.domain.categories[0] || 'Operational';
 
   const steps = [
     {
       id: 0,
       phase: '01',
-      title: 'Desktop Operation Dispatch & Schema Validation',
-      client: 'NEXT.JS 14 CLIENT',
+      title: `${entity} Intake & Schema Validation`,
+      client: 'NEXT.JS CLIENT',
       accent: 'blue',
       badgeBg: 'bg-blue-50 text-blue-700 border-blue-200',
       description:
-        'Operations created on the Next.js desktop workspace validate Mongoose schemas and execute atomic mutations against MongoDB Atlas.',
+        `Domain ${entity.toLowerCase()} records created on the desktop workspace validate Mongoose schemas and execute atomic mutations against MongoDB Atlas.`,
       requestMethod: 'POST',
       requestPath: '/api/items',
       payload: `{
-  "title": "Production Deployment Gate",
-  "category": "Deployment",
+  "title": "Priority ${entity} Dispatch",
+  "category": "${category}",
   "priority": "high",
   "status": "in_progress"
 }`,
@@ -44,7 +48,7 @@ export const InteractiveDemonstrator: React.FC = () => {
       requestPath: '/api/ai/generate',
       payload: `{
   "model": "openrouter/auto",
-  "prompt": "Evaluate current items pipeline for cross-platform parity."
+  "prompt": "Evaluate current ${entity.toLowerCase()} pipeline for operational risk and dispatch priority."
 }`,
       responseStatus: 'HTTP/1.1 200 OK',
       responseDetail: 'Gateway: OpenRouter • Tokens Ingested: 284 • Status: Ready',

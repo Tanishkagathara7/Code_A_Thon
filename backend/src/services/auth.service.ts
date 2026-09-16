@@ -22,6 +22,9 @@ export interface EmailAuthPayload {
   password: string;
   name?: string;
   mode?: string;
+  role?: string;
+  organization?: string;
+  domainProfile?: Record<string, any>;
 }
 
 export interface ResetPasswordPayload {
@@ -30,12 +33,12 @@ export interface ResetPasswordPayload {
   newPassword: string;
 }
 
-export const generateToken = (userId: string, email: string): string => {
+export const generateToken = (userId: string, email: string, role?: string): string => {
   const JWT_SECRET = process.env.JWT_SECRET;
   if (!JWT_SECRET) {
     throw new Error('JWT_SECRET environment variable is missing on server.');
   }
-  return jwt.sign({ id: userId, email }, JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign({ id: userId, email, role: role || 'user' }, JWT_SECRET, { expiresIn: '7d' });
 };
 
 export class AuthService {
@@ -258,51 +261,44 @@ export class AuthService {
       const newUser = new User({
         email: normalizedEmail,
         name: name ? name.trim() : normalizedEmail.split('@')[0],
+        role: payload.role || 'user',
+        organization: payload.organization || undefined,
+        domainProfile: payload.domainProfile || {},
         provider: 'email',
         passwordHash: hashedPassword,
       });
       await newUser.save();
-      console.log(`👤 New user registered via email: ${newUser.email}`);
+      console.log(`👤 New user registered via email: ${newUser.email} (role: ${newUser.role})`);
 
       return {
         success: true,
-        token: generateToken((newUser._id as any).toString(), newUser.email),
+        token: generateToken((newUser._id as any).toString(), newUser.email, newUser.role),
         user: {
           id: newUser._id,
           email: newUser.email,
           name: newUser.name,
+          role: newUser.role,
+          organization: newUser.organization,
+          domainProfile: newUser.domainProfile,
           provider: newUser.provider,
           avatarUrl: newUser.avatarUrl,
+          createdAt: newUser.createdAt,
         },
       };
     } else {
       let user = await User.findOne({ email: normalizedEmail });
       // Mode: 'login' - User MUST be registered
       if (!user) {
-        const error: any = new Error('No account found with this email. Please sign up first.');
+        const error: any = new Error('No user found with this email. Please sign up first.');
         error.statusCode = 404;
         throw error;
       }
 
-      // Check password if set
+      // If user registered with email mode, they MUST have a passwordHash
       if (user.passwordHash) {
-        let isMatch = false;
-        try {
-          isMatch = await bcrypt.compare(password, user.passwordHash);
-        } catch (bcryptErr) {
-          isMatch = false;
-        }
-
-        // Dual-check for legacy plaintext passwords to auto-migrate them to bcrypt
-        if (!isMatch && user.passwordHash === password) {
-          isMatch = true;
-          user.passwordHash = await bcrypt.hash(password, 10);
-          await user.save();
-          console.log(`🔐 Auto-upgraded legacy plaintext password to bcrypt hash for user: ${user.email}`);
-        }
-
+        const isMatch = await bcrypt.compare(password, user.passwordHash);
         if (!isMatch) {
-          const error: any = new Error('Incorrect password. Please try again or reset your password.');
+          const error: any = new Error('Invalid email or password.');
           error.statusCode = 401;
           throw error;
         }
@@ -314,11 +310,14 @@ export class AuthService {
 
       return {
         success: true,
-        token: generateToken((user._id as any).toString(), user.email),
+        token: generateToken((user._id as any).toString(), user.email, user.role),
         user: {
           id: user._id,
           email: user.email,
           name: user.name,
+          role: user.role,
+          organization: user.organization,
+          domainProfile: user.domainProfile,
           provider: user.provider,
           avatarUrl: user.avatarUrl,
         },
@@ -469,6 +468,9 @@ export class AuthService {
         id: user._id,
         email: user.email,
         name: user.name,
+        role: user.role,
+        organization: user.organization,
+        domainProfile: user.domainProfile,
         provider: user.provider,
         avatarUrl: user.avatarUrl,
         createdAt: user.createdAt,

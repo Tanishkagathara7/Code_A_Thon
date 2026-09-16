@@ -6,6 +6,7 @@ export interface AuthenticatedRequest extends Request {
   user?: {
     id: string;
     email: string;
+    role?: string;
   };
 }
 
@@ -29,12 +30,28 @@ export const requireAuth = (req: AuthenticatedRequest, res: Response, next: Next
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: string; email: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: string; email: string; role?: string };
     req.user = decoded;
     next();
   } catch (err: any) {
     return res.status(401).json({ error: 'Invalid or expired access token.' });
   }
+};
+
+/**
+ * RBAC authorization guard: allows execution only if user's role is in the allowed list.
+ */
+export const requireRoles = (allowedRoles: string[]) => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    const userRole = req.user.role || 'user';
+    if (!allowedRoles.includes(userRole) && !allowedRoles.includes('*') && userRole !== 'admin') {
+      return res.status(403).json({ error: `Forbidden: role '${userRole}' is not authorized for this resource.` });
+    }
+    next();
+  };
 };
 
 // General API Rate Limiter (Max 100 requests per 15 mins per IP)

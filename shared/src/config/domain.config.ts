@@ -1,9 +1,13 @@
+import { CompleteProductSpec } from '../types/productSpec';
+import { activeProductSpec } from './activeProductSpec';
+
 export interface DomainNavigationItem {
   name: string;
   href: string;
-  iconName: 'LayoutDashboard' | 'Layers' | 'Sparkles' | 'FolderOpen' | 'Bell' | 'Activity' | 'Shield' | 'Users' | 'MapPin' | 'HeartPulse';
+  iconName: 'LayoutDashboard' | 'Layers' | 'Sparkles' | 'FolderOpen' | 'Bell' | 'Activity' | 'Shield' | 'Users' | 'MapPin' | 'HeartPulse' | string;
   badge?: string | number | null;
   description?: string;
+  allowedRoles?: string[];
 }
 
 export interface DomainStatusOption {
@@ -71,97 +75,109 @@ export interface DomainConfig {
       accentBg: string;
     }[];
   };
+  productSpec: CompleteProductSpec;
 }
 
-export const domainConfig: DomainConfig = {
-  brand: {
-    name: 'Pulse',
-    shortName: 'Pulse',
-    tagline: 'Multi-Platform Operational Intelligence & AI Workflow Platform',
-    description: 'High-density operational intelligence with real-time web & mobile synchronization.',
-    accentColor: '#4F46E5',
-    themeGradient: ['#1E274A', '#2D3A6B'],
-  },
-  domain: {
-    primaryEntityName: 'Incident',
-    entityPluralName: 'Incidents',
-    categories: ['Critical', 'High Priority', 'Logistics', 'Medical', 'General'],
+/**
+ * Derives the active DomainConfig dynamically from the active CompleteProductSpec.
+ */
+function deriveDomainConfig(spec: CompleteProductSpec): DomainConfig {
+  const primaryEntity = spec.entities.find((e) => e.isPrimary) || spec.entities[0] || {
+    name: 'Item',
+    pluralName: 'Items',
+    categories: ['General'],
     statuses: [
-      { key: 'pending', label: 'Triage / Pending', color: 'amber', bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
-      { key: 'in_progress', label: 'In Transit / Active', color: 'blue', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
-      { key: 'completed', label: 'Resolved / Done', color: 'emerald', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+      { key: 'pending', label: 'Pending', color: 'amber' as const, bg: 'bg-amber-50', text: 'text-amber-700' },
+      { key: 'in_progress', label: 'In Progress', color: 'blue' as const, bg: 'bg-blue-50', text: 'text-blue-700' },
+      { key: 'completed', label: 'Completed', color: 'emerald' as const, bg: 'bg-emerald-50', text: 'text-emerald-700' },
     ],
-    roles: ['Coordinator', 'Field Responder', 'Analyst', 'Admin'],
-    aiSystemPrompt: 'Act as a specialized operational intelligence copilot. Extract urgent actions, prioritize domain tasks, and synthesize cross-platform incident updates.',
-  },
-  navigation: [
-    { name: 'Dashboard', href: '/dashboard', iconName: 'LayoutDashboard', description: 'Real-time telemetry and operational metrics' },
-    { name: 'Incident Hub', href: '/items', iconName: 'Layers', description: 'Core domain records and status lifecycle' },
-    { name: 'AI Copilot', href: '/ai-assistant', iconName: 'Sparkles', description: 'Prompt generation and automated synthesis' },
-    { name: 'Files & Media', href: '/files', iconName: 'FolderOpen', description: 'Evidence files and attachments' },
-    { name: 'Notifications', href: '/notifications', iconName: 'Bell', description: 'Dispatch alerts and priority activity' },
-  ],
-  landing: {
-    hero: {
-      badge: 'Real-Time Multi-Platform Coordination',
-      headlineWords: [
-        { text: 'Precision', highlightBg: '#2563EB', textColor: '#FFFFFF' },
-        { text: 'Operations', highlightBg: '#EC4899', textColor: '#FFFFFF' },
-        { text: 'on' },
-        { text: 'Desktop,', highlightBg: '#10B981', textColor: '#FFFFFF' },
-        { text: 'Native' },
-        { text: 'Velocity', highlightBg: '#6366F1', textColor: '#FFFFFF' },
-        { text: 'on' },
-        { text: 'Mobile.' },
+  };
+
+  const heroWords = spec.landingPage.headlineHighlightWords.map((w) => ({
+    text: w.text,
+    highlightBg: w.bgHex,
+    textColor: w.colorHex,
+  }));
+
+  const capabilitySection = spec.landingPage.sections.find((s) => s.type === 'capability_matrix');
+  const features: DomainLandingFeature[] = capabilitySection?.content?.items?.map((item: any) => ({
+    title: item.title,
+    description: item.description,
+    category: item.category || 'Feature',
+    iconName: item.iconName || 'Activity',
+    badge: item.badge,
+  })) || [
+    {
+      title: 'Real-Time Sync',
+      description: 'Instant state synchronization between web command center and mobile field clients.',
+      category: 'Real-Time',
+      iconName: 'Activity',
+      badge: 'Zero Latency',
+    },
+  ];
+
+  const problemSection = spec.landingPage.sections.find((s) => s.type === 'problem_solution');
+  const faqSection = spec.landingPage.sections.find((s) => s.type === 'faq');
+
+  return {
+    brand: {
+      name: spec.meta.name,
+      shortName: spec.meta.shortName,
+      tagline: spec.meta.tagline,
+      description: spec.meta.description,
+      accentColor: spec.meta.accentColorHex,
+      themeGradient: spec.meta.themeGradient,
+    },
+    domain: {
+      primaryEntityName: primaryEntity.name,
+      entityPluralName: primaryEntity.pluralName,
+      categories: primaryEntity.categories || ['General'],
+      statuses: primaryEntity.statuses.map((s) => ({
+        key: s.key,
+        label: s.label,
+        color: s.color,
+        bg: s.bg,
+        text: s.text,
+        border: s.border,
+      })),
+      roles: spec.roles.map((r) => r.name),
+      aiSystemPrompt: spec.aiSystemPrompt,
+    },
+    navigation: spec.navigation.map((n) => ({
+      name: n.name,
+      href: n.href,
+      iconName: n.iconName as any,
+      description: n.description,
+      allowedRoles: n.allowedRoles,
+    })),
+    landing: {
+      hero: {
+        badge: spec.landingPage.badge,
+        headlineWords: heroWords,
+        subheadline: spec.landingPage.detailedSubheadline,
+        ctaPrimary: spec.landingPage.primaryCta,
+        ctaSecondary: spec.landingPage.secondaryCta,
+      },
+      features,
+      problemSolution: {
+        problem: problemSection?.content?.problem || spec.meta.problemSummary,
+        solution: problemSection?.content?.solution || spec.meta.objective,
+      },
+      faqs: faqSection?.content?.faqs || [],
+    },
+    dashboard: {
+      metrics: [
+        { key: 'total', label: `Total ${primaryEntity.pluralName}`, iconName: 'Layers', color: spec.meta.accentColorHex, accentBg: 'bg-indigo-50' },
+        { key: 'inProgress', label: 'Active / In-Flight', iconName: 'Activity', color: '#2563EB', accentBg: 'bg-blue-50' },
+        { key: 'pending', label: 'Pending Triage', iconName: 'Bell', color: '#D97706', accentBg: 'bg-amber-50' },
+        { key: 'completed', label: 'Resolved', iconName: 'Shield', color: '#059669', accentBg: 'bg-emerald-50' },
       ],
-      subheadline: 'Synchronize critical domain workflows instantly across desktop command centers and touch-first mobile devices.',
-      ctaPrimary: { label: 'Launch Workspace', href: '/login' },
-      ctaSecondary: { label: 'Explore Features', href: '#features' },
     },
-    features: [
-      {
-        title: 'Instant Triage & Dispatch',
-        description: 'Categorize, prioritize, and route high-impact domain items in sub-second cycles.',
-        category: 'Workflows',
-        iconName: 'Activity',
-        badge: 'Zero Latency',
-      },
-      {
-        title: 'Bi-Directional Mobile Sync',
-        description: 'Field responders receive real-time updates and push logs seamlessly via native Expo client.',
-        category: 'Mobility',
-        iconName: 'HeartPulse',
-        badge: 'Dual-Platform',
-      },
-      {
-        title: 'OpenRouter AI Copilot',
-        description: 'Automate situation summaries, classify urgencies, and synthesize action plans on demand.',
-        category: 'Intelligence',
-        iconName: 'Sparkles',
-        badge: 'LLM Powered',
-      },
-    ],
-    problemSolution: {
-      problem: 'Fragmented operations across slow web dashboards and disconnected mobile tools lead to critical delays.',
-      solution: 'A unified single-source-of-truth platform connecting desktop decision-makers with mobile responders in real time.',
-    },
-    faqs: [
-      {
-        question: 'How do Web and Mobile remain synchronized?',
-        answer: 'Both platforms consume the same REST backend and database. Status transitions and records created on Mobile reflect instantly on Web upon refresh or polling.',
-      },
-      {
-        question: 'How do I pivot this to another problem domain?',
-        answer: 'Simply edit `shared/src/config/domain.config.ts`. All navigation, titles, statuses, categories, and landing page copy adapt automatically across both platforms.',
-      },
-    ],
-  },
-  dashboard: {
-    metrics: [
-      { key: 'total', label: 'Total Records', iconName: 'Layers', color: '#4F46E5', accentBg: 'bg-indigo-50' },
-      { key: 'inProgress', label: 'Active / In-Flight', iconName: 'Activity', color: '#2563EB', accentBg: 'bg-blue-50' },
-      { key: 'pending', label: 'Pending Triage', iconName: 'Bell', color: '#D97706', accentBg: 'bg-amber-50' },
-      { key: 'completed', label: 'Resolved', iconName: 'Shield', color: '#059669', accentBg: 'bg-emerald-50' },
-    ],
-  },
-};
+    productSpec: spec,
+  };
+}
+
+export const domainConfig: DomainConfig = deriveDomainConfig(activeProductSpec);
+
+export { activeProductSpec };
+export default domainConfig;

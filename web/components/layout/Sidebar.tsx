@@ -51,12 +51,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
-  const navigation = domainConfig.navigation.map((item) => ({
-    name: item.name,
-    href: item.href,
-    icon: ICON_MAP[item.iconName] || Layers,
-    badge: item.href === '/notifications' && unreadNotifications > 0 ? unreadNotifications : item.badge,
-  }));
+  const userRole = user?.role || 'user';
+  const navigation = domainConfig.navigation
+    .filter((item) => {
+      if (!item.allowedRoles || item.allowedRoles.length === 0) return true;
+      if (item.allowedRoles.includes('*') || userRole === 'admin') return true;
+      return item.allowedRoles.includes(userRole);
+    })
+    .map((item) => ({
+      name: item.name,
+      href: item.href,
+      icon: ICON_MAP[item.iconName] || Layers,
+      badge: item.href === '/notifications' && unreadNotifications > 0 ? unreadNotifications : item.badge,
+    }));
 
   return (
     <>
@@ -150,8 +157,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {user?.name ? user.name.slice(0, 2).toUpperCase() : <UserIcon className="w-4 h-4 text-zinc-500" />}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-zinc-900 truncate">{user?.name || 'Workspace Operator'}</p>
-            <p className="text-[11px] text-zinc-400 truncate">{user?.email || 'operator@workspace.app'}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-xs font-semibold text-zinc-900 truncate">{user?.name || 'Workspace Operator'}</p>
+              {user?.role && (
+                <span className="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  {user.role}
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-zinc-400 truncate">{user?.organization ? `${user.organization} • ` : ''}{user?.email || 'operator@workspace.app'}</p>
           </div>
         </div>
 

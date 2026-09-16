@@ -27,12 +27,20 @@ export const authApi = {
     return res;
   },
 
-  async signup(name: string, email: string, pass: string): Promise<AuthResponse> {
+  async signup(
+    name: string,
+    email: string,
+    pass: string,
+    extra?: { role?: string; organization?: string; domainProfile?: Record<string, any> }
+  ): Promise<AuthResponse> {
     const res = await apiClient.post<AuthResponse>('/auth/email', {
       name,
       email,
       password: pass,
       mode: 'signup',
+      role: extra?.role,
+      organization: extra?.organization,
+      domainProfile: extra?.domainProfile,
     });
     if (res.success && res.token) {
       setStoredSession(res.token, res.user);

@@ -88,6 +88,13 @@ export default function DashboardPage() {
     completionRate: 0,
   };
 
+  const userRole = user?.role || 'user';
+  const roleDashboard = domainConfig.productSpec?.roleDashboards?.find((rd: any) => rd.roleId === userRole) ||
+    domainConfig.productSpec?.roleDashboards?.[0];
+  const primaryActionLabel = roleDashboard?.primaryAction?.label || `Log ${domainConfig.domain.primaryEntityName}`;
+  const primaryActionHref = roleDashboard?.primaryAction?.href || '/items/new';
+  const welcomeSubtext = roleDashboard?.welcomeMessage || `${domainConfig.brand.tagline} • Real-time telemetry synchronized across Mobile & Web.`;
+
   return (
     <div className="space-y-8">
       {/* Welcome Banner */}
@@ -95,13 +102,13 @@ export default function DashboardPage() {
         <div className="relative z-10 space-y-2">
           <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-zinc-800 text-[11px] font-semibold text-indigo-400 border border-zinc-700">
             <Sparkles className="w-3 h-3" />
-            <span>{domainConfig.brand.name} Command Center</span>
+            <span>{domainConfig.brand.name} Command Center • <span className="uppercase text-emerald-400 font-bold">{userRole}</span></span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
             Welcome back, {user?.name || 'Operator'}
           </h1>
           <p className="text-zinc-400 text-sm max-w-xl">
-            {domainConfig.brand.tagline} • Real-time telemetry synchronized across Mobile & Web.
+            {welcomeSubtext}
           </p>
         </div>
 
@@ -115,11 +122,11 @@ export default function DashboardPage() {
             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
           </button>
           <Link
-            href="/items/new"
+            href={primaryActionHref}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>Log {domainConfig.domain.primaryEntityName}</span>
+            <span>{primaryActionLabel}</span>
           </Link>
         </div>
 

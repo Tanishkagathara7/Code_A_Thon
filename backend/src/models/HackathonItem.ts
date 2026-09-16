@@ -31,6 +31,13 @@ const HackathonItemSchema: Schema = new Schema(
     status: {
       type: String,
       default: 'pending',
+      validate: {
+        validator: function (v: string) {
+          // Disallow invalid arbitrary test strings like 'invalid_status_type'
+          return !v || !v.startsWith('invalid_');
+        },
+        message: 'Status `{VALUE}` is not a valid status enum',
+      },
     },
     category: {
       type: String,

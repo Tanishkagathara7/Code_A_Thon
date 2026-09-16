@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
+import { domainConfig } from '@/lib/domain.config';
 
 export const MarketingNav: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -28,11 +29,11 @@ export const MarketingNav: React.FC = () => {
         {/* Brand identity: Sleek, high-precision */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-zinc-900 to-zinc-800 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-zinc-950/20 group-hover:scale-105 transition-transform">
-            A
+            {domainConfig.brand.shortName.charAt(0)}
           </div>
           <div className="flex items-center gap-2">
             <span className="font-bold tracking-tight text-zinc-900 text-base">
-              APP
+              {domainConfig.brand.name}
             </span>
           </div>
         </Link>
