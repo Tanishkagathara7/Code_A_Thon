@@ -28,11 +28,12 @@ export const AuthOrbitalBackground: React.FC = () => {
         <BackgroundMotion>
           {/* =========================================================================
               TOP-RIGHT CANVAS FRAMING:
-              - Sits above/behind the right card with ample spacing
+              - Sits neatly in the top-right viewport corner
+              - Plenty of clearance from the login card
               - Clean orbital arc with dual tone endpoints
               - Floating iridescent sphere with ambient float
              ========================================================================= */}
-          <div className="hidden lg:block absolute top-24 right-4 xl:right-16 pointer-events-none">
+          <div className="hidden xl:block absolute top-12 right-2 pointer-events-none">
             <div className="relative w-[480px] h-[480px]">
               {/* Sweeping Orbital Arc SVG */}
               <svg
@@ -73,15 +74,15 @@ export const AuthOrbitalBackground: React.FC = () => {
                 {/* Node endpoints */}
                 <circle cx="60" cy="240" r="3.5" fill="#38BDF8" />
                 <circle cx="420" cy="240" r="4" fill="#F472B6" />
-                <circle cx="420" cy="240" r="8" fill="none" stroke="#F472B6" strokeWidth="0.8" opacity="0.4" />
 
-                {/* Subtle radial measurement ticks along upper half */}
-                {[15, 45, 75, 105, 135, 165].map((deg) => {
+                {/* Measurement tangent ticks along arc */}
+                {[200, 220, 240, 260, 280, 300, 320, 340].map((deg) => {
                   const rad = (deg * Math.PI) / 180;
-                  const x1 = 240 + 180 * Math.cos(rad);
-                  const y1 = 240 - 180 * Math.sin(rad);
-                  const x2 = 240 + 188 * Math.cos(rad);
-                  const y2 = 240 - 188 * Math.sin(rad);
+                  const round = (v: number) => Math.round(v * 100) / 100;
+                  const x1 = round(240 + 180 * Math.cos(rad));
+                  const y1 = round(240 - 180 * Math.sin(rad));
+                  const x2 = round(240 + 188 * Math.cos(rad));
+                  const y2 = round(240 - 188 * Math.sin(rad));
                   return (
                     <line
                       key={deg}
@@ -105,9 +106,9 @@ export const AuthOrbitalBackground: React.FC = () => {
                 />
               </div>
 
-              {/* Crystal-clear pill badge: Fully readable text with frosted backdrop */}
-              <div className="absolute top-[320px] right-2 xl:right-8">
-                <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-black/[0.08] shadow-xs">
+              {/* Crystal-clear pill badge: Fully readable text positioned above the card zone */}
+              <div className="absolute top-10 right-4">
+                <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-black/[0.08] shadow-xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse" />
                   <span className="font-serif italic text-zinc-700 text-xs tracking-wide">
                     Zero sync drift verified.
@@ -120,7 +121,7 @@ export const AuthOrbitalBackground: React.FC = () => {
               </div>
 
               {/* Discrete vertical architectural coordinates tag */}
-              <div className="hidden xl:block absolute top-20 right-0">
+              <div className="hidden 2xl:block absolute top-28 right-0">
                 <div
                   className="text-[10px] font-mono font-semibold tracking-[0.25em] text-zinc-400/80 uppercase"
                   style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
