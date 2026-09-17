@@ -86,7 +86,7 @@ export const InteractiveDemonstrator: React.FC = () => {
   const current = steps[activeStep];
 
   return (
-    <div className="w-full space-y-6 select-none">
+    <div className="workflow-container w-full space-y-6 select-none">
       {/* Step Selector Tabs */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {steps.map((step, idx) => {
@@ -95,10 +95,10 @@ export const InteractiveDemonstrator: React.FC = () => {
             <button
               key={step.id}
               onClick={() => setActiveStep(idx)}
-              className={`p-4 rounded-xl text-left transition-all border ${
+              className={`p-4 rounded-xl text-left transition-all duration-200 border cursor-pointer ${
                 isActive
                   ? 'bg-white border-blue-500/40 shadow-lg shadow-blue-500/[0.04] ring-1 ring-blue-500/20'
-                  : 'bg-white/70 hover:bg-white border-black/[0.06] hover:border-black/[0.12] shadow-sm'
+                  : 'bg-white/70 hover:bg-white border-black/[0.06] hover:border-black/[0.12] shadow-sm hover:-translate-y-0.5'
               }`}
             >
               <div className="flex items-center justify-between mb-2">
@@ -142,7 +142,7 @@ export const InteractiveDemonstrator: React.FC = () => {
 
           <div className="flex items-center gap-3 font-mono text-xs">
             {current.systemMetrics.map((m, i) => (
-              <div key={i} className="p-2.5 rounded-lg bg-zinc-50 border border-zinc-200/80">
+              <div key={i} className="p-2.5 rounded-lg bg-zinc-50 border border-zinc-200/80 shadow-xs">
                 <div className="text-[10px] text-zinc-400 uppercase font-semibold">{m.label}</div>
                 <div className="text-zinc-900 font-bold mt-0.5">{m.value}</div>
               </div>
@@ -153,36 +153,36 @@ export const InteractiveDemonstrator: React.FC = () => {
         {/* Request & Response Split Display */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {/* Request Stream */}
-          <div className="rounded-xl bg-zinc-950 text-white p-4 font-mono text-xs space-y-3 shadow-sm border border-zinc-800">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-2 text-[11px]">
-              <span className="text-zinc-400 flex items-center gap-1.5 font-semibold">
-                <Terminal className="w-3.5 h-3.5 text-blue-400" />
+          <div className="rounded-xl bg-zinc-50/80 text-zinc-900 p-4 font-mono text-xs space-y-3 shadow-xs border border-zinc-200/80">
+            <div className="flex items-center justify-between border-b border-zinc-200/80 pb-2 text-[11px]">
+              <span className="text-zinc-600 flex items-center gap-1.5 font-semibold">
+                <Terminal className="w-3.5 h-3.5 text-blue-600" />
                 OUTBOUND DISPATCH
               </span>
-              <span className="text-blue-400 font-bold">
+              <span className="text-blue-600 font-bold">
                 {current.requestMethod} {current.requestPath}
               </span>
             </div>
-            <pre className="text-zinc-300 overflow-x-auto p-2 bg-zinc-900/60 rounded-lg text-[11px] leading-relaxed">
+            <pre className="text-zinc-800 overflow-x-auto p-2.5 bg-white rounded-lg text-[11px] leading-relaxed border border-zinc-200/60 shadow-2xs">
               {current.payload}
             </pre>
           </div>
 
           {/* Response Stream */}
-          <div className="rounded-xl bg-zinc-950 text-white p-4 font-mono text-xs space-y-3 shadow-sm border border-zinc-800">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-2 text-[11px]">
-              <span className="text-zinc-400 flex items-center gap-1.5 font-semibold">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="rounded-xl bg-zinc-50/80 text-zinc-900 p-4 font-mono text-xs space-y-3 shadow-xs border border-zinc-200/80">
+            <div className="flex items-center justify-between border-b border-zinc-200/80 pb-2 text-[11px]">
+              <span className="text-zinc-600 flex items-center gap-1.5 font-semibold">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                 CONFIRMED RECEIPT
               </span>
-              <span className="text-emerald-400 font-bold">
+              <span className="text-emerald-600 font-bold">
                 {current.responseStatus}
               </span>
             </div>
-            <div className="space-y-2 p-2 bg-zinc-900/60 rounded-lg">
-              <div className="text-zinc-400 text-[11px]">{current.responseDetail}</div>
-              <div className="text-emerald-400 text-[11px] flex items-center gap-1.5 font-semibold">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Cryptographic Handshake Verified
+            <div className="space-y-2 p-2.5 bg-white rounded-lg border border-zinc-200/60 shadow-2xs">
+              <div className="text-zinc-600 text-[11px]">{current.responseDetail}</div>
+              <div className="text-emerald-700 text-[11px] flex items-center gap-1.5 font-semibold">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Cryptographic Handshake Verified
               </div>
             </div>
           </div>

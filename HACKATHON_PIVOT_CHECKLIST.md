@@ -50,6 +50,7 @@ Execute Web and Mobile in parallel:
 - [ ] Check `/items/new` creates items with domain categories.
 - [ ] Inspect `/items/[id]` detail view displays specifications and system telemetry.
 - [ ] Check `/dashboard` displays live KPI cards and operational feed.
+- [ ] **Synchronize Markdown Specifications**: Whenever the dashboard layout, data models, or hero showcase mockups are updated, immediately update the relevant markdown files (`hackathon/02_PRODUCT_SPEC.md`, `hackathon/03_UX_PLAN.md`, `hackathon/05_DATA_MODEL.md`, `hackathon/13_CHANGE_LOG.md`, and `PROJECT_ARCHITECTURE.md`).
 
 ### Mobile Field Client (`frontend/`)
 - [ ] Verify `home.tsx` displays domain metrics and quick action cards.

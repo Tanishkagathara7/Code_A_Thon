@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/lib/context/AuthContext';
 import { ToastProvider } from '@/lib/context/ToastContext';
+import { LoadingProvider } from '@/lib/context/LoadingContext';
 import { SITE_CONFIG, getSiteUrl } from '@/lib/seo';
 
 const inter = Inter({
@@ -78,7 +79,9 @@ export default function RootLayout({
       <body className="bg-[#FAFAF7] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white min-h-screen">
         <AuthProvider>
           <ToastProvider>
-            {children}
+            <LoadingProvider>
+              {children}
+            </LoadingProvider>
           </ToastProvider>
         </AuthProvider>
       </body>

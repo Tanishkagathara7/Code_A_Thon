@@ -94,6 +94,7 @@ export const initHeroTypographyAnimation = (
   const masterTl = gsap.timeline({
     repeat: -1,
     repeatDelay: 0.8,
+    delay: 0.6, // Allow headline entrance reveal to land gracefully before kinetic cycle begins
     defaults: { ease: 'power2.out' },
   });
 

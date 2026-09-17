@@ -54,6 +54,27 @@ export const resumeLenis = () => {
   }
 };
 
+export const scrollTo = (
+  target: string | HTMLElement | number,
+  options?: { offset?: number; immediate?: boolean; duration?: number }
+) => {
+  if (typeof window === 'undefined') return;
+
+  if (lenisInstance) {
+    lenisInstance.scrollTo(target, options);
+  } else {
+    if (typeof target === 'number') {
+      window.scrollTo({ top: target, behavior: options?.immediate ? 'auto' : 'smooth' });
+    } else {
+      const el = typeof target === 'string' ? document.querySelector(target) : target;
+      if (el) {
+        const top = el.getBoundingClientRect().top + window.scrollY + (options?.offset || 0);
+        window.scrollTo({ top, behavior: options?.immediate ? 'auto' : 'smooth' });
+      }
+    }
+  }
+};
+
 export const destroyLenis = () => {
   if (lenisInstance) {
     lenisInstance.destroy();

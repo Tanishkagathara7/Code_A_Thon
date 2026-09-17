@@ -52,31 +52,41 @@ export const FAQAccordion: React.FC = () => {
         return (
           <div
             key={faq.id}
-            className={`bento-card overflow-hidden transition-all duration-200 ${
-              isOpen ? 'border-blue-500/30 shadow-md' : 'hover:border-black/[0.12]'
+            className={`faq-accordion-item bento-card overflow-hidden transition-all duration-300 ${
+              isOpen ? 'border-blue-500/40 shadow-md ring-1 ring-blue-500/10' : 'hover:border-black/[0.14]'
             }`}
           >
             <button
               onClick={() => setOpenIndex(isOpen ? null : index)}
-              className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 font-semibold text-zinc-900 cursor-pointer"
+              aria-expanded={isOpen}
+              className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 font-semibold text-zinc-900 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl"
             >
               <span className="text-base sm:text-lg tracking-tight">
                 {faq.question}
               </span>
               <span
-                className={`p-1.5 rounded-lg border border-black/[0.06] bg-zinc-50 transition-transform duration-200 ${
-                  isOpen ? 'rotate-180 bg-blue-50 text-blue-600 border-blue-200' : 'text-zinc-500'
+                className={`p-2 rounded-lg border border-black/[0.06] transition-transform duration-300 ${
+                  isOpen
+                    ? 'rotate-180 bg-blue-50 text-blue-600 border-blue-200 shadow-xs'
+                    : 'bg-zinc-50 text-zinc-500'
                 }`}
               >
                 <ChevronDown className="w-4 h-4" />
               </span>
             </button>
 
-            {isOpen && (
-              <div className="px-5 sm:px-6 pb-6 pt-0 text-sm text-zinc-600 leading-relaxed border-t border-black/[0.04]">
-                <div className="pt-4">{faq.answer}</div>
+            {/* Smooth CSS Grid Height Transition without layout jumps */}
+            <div
+              className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${
+                isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+              }`}
+            >
+              <div className="overflow-hidden">
+                <div className="px-5 sm:px-6 pb-6 pt-0 text-sm text-zinc-600 leading-relaxed border-t border-black/[0.04]">
+                  <div className="pt-4">{faq.answer}</div>
+                </div>
               </div>
-            )}
+            </div>
           </div>
         );
       })}

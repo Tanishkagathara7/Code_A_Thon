@@ -63,7 +63,7 @@ export const ArchitectureDiagram: React.FC = () => {
 
   return (
     <div className="w-full space-y-8 select-none">
-      <div className="max-w-2xl space-y-2">
+      <div className="topology-header max-w-2xl space-y-2">
         <div className="text-xs font-mono font-bold tracking-wider text-zinc-500 uppercase">
           {'// 08. TOPOLOGY & DATA BUS'}
         </div>
@@ -75,6 +75,8 @@ export const ArchitectureDiagram: React.FC = () => {
         </p>
       </div>
 
+
+
       {/* Interactive Topology Bento Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {Object.values(nodes).map((node) => {
@@ -83,17 +85,21 @@ export const ArchitectureDiagram: React.FC = () => {
             <button
               key={node.id}
               onClick={() => setSelectedNode(node.id)}
-              className={`p-5 rounded-2xl text-left transition-all border relative overflow-hidden ${
+              className={`topology-node-btn p-5 rounded-2xl text-left transition-all duration-200 border relative overflow-hidden cursor-pointer ${
                 isSelected
                   ? 'bg-white border-blue-500/50 shadow-lg shadow-blue-500/[0.06] ring-2 ring-blue-500/20'
-                  : 'bg-white/80 hover:bg-white border-black/[0.06] hover:border-black/[0.12] shadow-sm'
+                  : 'bg-white/80 hover:bg-white border-black/[0.06] hover:border-black/[0.14] shadow-sm hover:-translate-y-0.5'
               }`}
             >
               <div className="flex items-center justify-between mb-3">
                 <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${node.badgeColor}`}>
                   {node.badge}
                 </span>
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    isSelected ? 'bg-blue-600 animate-pulse' : 'bg-emerald-500'
+                  }`}
+                />
               </div>
 
               <div className="font-bold text-zinc-900 text-base leading-snug">
@@ -109,7 +115,7 @@ export const ArchitectureDiagram: React.FC = () => {
       </div>
 
       {/* Detailed Spec Sheet */}
-      <div className="bento-card p-6 sm:p-8 space-y-6">
+      <div className="topology-detail-card bento-card p-6 sm:p-8 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/[0.06] pb-4">
           <div>
             <div className="flex items-center gap-2">

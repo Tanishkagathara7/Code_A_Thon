@@ -1,412 +1,306 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
-import Link from 'next/link';
-import gsap from 'gsap';
+import React, { useRef } from 'react';
 import {
   Layers,
-  CheckCircle2,
-  Clock,
   TrendingUp,
-  ArrowUpRight,
-  Smartphone,
-  X,
-  ExternalLink,
   Activity,
   ShieldCheck,
   Zap,
 } from 'lucide-react';
-import { pauseLenis, resumeLenis } from '@/lib/animations/lenis';
-import { domainConfig } from '@/lib/domain.config';
 
-interface HeroProductShowcaseProps {
-  isPreviewOpen: boolean;
-  onOpenPreview: () => void;
-  onClosePreview: () => void;
-}
-
-export const HeroProductShowcase: React.FC<HeroProductShowcaseProps> = ({
-  isPreviewOpen,
-  onOpenPreview,
-  onClosePreview,
-}) => {
-  const modalBackdropRef = useRef<HTMLDivElement>(null);
-  const modalWindowRef = useRef<HTMLDivElement>(null);
+export const HeroProductShowcase: React.FC = () => {
   const stageRef = useRef<HTMLDivElement>(null);
-
-  // Synchronize Lenis and Body Scroll Lock when preview modal opens/closes
-  useEffect(() => {
-    if (isPreviewOpen) {
-      pauseLenis();
-      document.body.style.overflow = 'hidden';
-
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-          onClosePreview();
-        }
-      };
-      window.addEventListener('keydown', handleKeyDown);
-
-      // GSAP animate preview opening
-      if (modalBackdropRef.current && modalWindowRef.current) {
-        const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (isReduced) {
-          gsap.set(modalBackdropRef.current, { opacity: 1 });
-          gsap.set(modalWindowRef.current, { opacity: 1, scale: 1, y: 0 });
-        } else {
-          gsap.fromTo(
-            modalBackdropRef.current,
-            { opacity: 0 },
-            { opacity: 1, duration: 0.3, ease: 'power2.out' }
-          );
-          gsap.fromTo(
-            modalWindowRef.current,
-            { scale: 0.94, y: 24, opacity: 0 },
-            { scale: 1, y: 0, opacity: 1, duration: 0.4, ease: 'power3.out' }
-          );
-        }
-      }
-
-      return () => {
-        window.removeEventListener('keydown', handleKeyDown);
-        resumeLenis();
-        document.body.style.overflow = '';
-      };
-    } else {
-      resumeLenis();
-      document.body.style.overflow = '';
-    }
-  }, [isPreviewOpen, onClosePreview]);
-
-  const handleClose = () => {
-    if (modalBackdropRef.current && modalWindowRef.current) {
-      const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (isReduced) {
-        onClosePreview();
-      } else {
-        gsap.to(modalWindowRef.current, {
-          scale: 0.96,
-          y: 12,
-          opacity: 0,
-          duration: 0.2,
-          ease: 'power2.in',
-        });
-        gsap.to(modalBackdropRef.current, {
-          opacity: 0,
-          duration: 0.2,
-          ease: 'power2.in',
-          onComplete: () => {
-            onClosePreview();
-          },
-        });
-      }
-    } else {
-      onClosePreview();
-    }
-  };
 
   return (
     <>
       {/* ========================================================
-          HERO MAIN STAGE: CINEMATIC BENTO PRODUCT COMPOSITION
+          HERO MAIN STAGE: 3D ISOMETRIC TABLET MOCKUP WITH STYLUS
          ======================================================== */}
-      <div className="w-full relative mt-10 select-none">
-        {/* Floating telemetry pills */}
-        <div className="flex items-center justify-between px-2 mb-3 text-xs font-medium text-zinc-500">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-            <span className="font-semibold text-zinc-800">Operational Workspace Engine</span>
-            <span className="text-zinc-400">•</span>
-            <span className="font-mono text-[11px] text-zinc-400">REST v1.4.0</span>
-          </div>
-          <div className="hidden sm:flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-mono text-[11px] font-medium border border-emerald-200">
-              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-              ATLAS CLOUD SYNCED
-            </span>
-            <span className="inline-flex items-center gap-1 text-[11px] font-mono text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-md">
-              <Zap className="w-3 h-3 text-amber-500" /> 32ms RTT
-            </span>
-          </div>
-        </div>
-
-        {/* Premium Window Frame */}
-        <div
-          ref={stageRef}
-          onClick={onOpenPreview}
-          className="group relative cursor-pointer rounded-2xl bg-white border border-black/[0.08] shadow-[0_1px_3px_rgba(0,0,0,0.05),0_20px_48px_-12px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06),0_28px_64px_-12px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300 overflow-hidden"
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              onOpenPreview();
-            }
-          }}
-          aria-label="Click to inspect full-page web operations workspace preview"
-        >
-          {/* Subtle top glare highlight */}
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent pointer-events-none z-20" />
-
-          {/* Floating Hover Indicator */}
-          <div className="absolute top-14 right-6 z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-200 translate-y-1 group-hover:translate-y-0">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full glass-panel text-zinc-900 text-xs font-semibold shadow-lg shadow-black/5 border border-black/10">
-              <span>Inspect Live Stage</span>
-              <ArrowUpRight className="w-3.5 h-3.5 text-blue-600" />
-            </span>
-          </div>
-
-          {/* Realistic Window Titlebar */}
-          <div className="h-11 bg-zinc-50/80 border-b border-black/[0.06] px-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E]/50 inline-block" />
-              <span className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]/50 inline-block" />
-              <span className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29]/50 inline-block" />
-              <div className="ml-3 hidden sm:flex items-center gap-2 px-3 py-1 rounded-md bg-white/80 border border-black/[0.05] text-[11px] font-medium text-zinc-600">
-                <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                <span>app.workspace.internal/operations</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2.5 text-xs text-zinc-500">
-              <span className="hidden md:inline-block font-mono text-[11px] px-2 py-0.5 rounded bg-zinc-100 border border-zinc-200/80">
-                PORT 3000
-              </span>
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                ACTIVE
-              </span>
-            </div>
-          </div>
-
-          {/* Product Interior View */}
-          <div className="p-6 sm:p-8 bg-gradient-to-b from-white to-zinc-50/50 space-y-6 text-left">
-            {/* Bento Metric Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-4">
-              <div className="p-4 rounded-xl bg-white border border-black/[0.06] shadow-sm hover:border-black/[0.1] transition-all">
-                <div className="flex items-center justify-between text-xs font-semibold text-zinc-500">
-                  <span>{domainConfig.domain.entityPluralName}</span>
-                  <Layers className="w-4 h-4 text-blue-600" />
-                </div>
-                <div className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 mt-2">24</div>
-                <div className="text-[11px] text-zinc-500 mt-1 flex items-center gap-1 font-mono">
-                  <span className="text-emerald-600 font-semibold">↑ 100%</span> synchronized
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl bg-white border border-black/[0.06] shadow-sm hover:border-black/[0.1] transition-all">
-                <div className="flex items-center justify-between text-xs font-semibold text-zinc-500">
-                  <span>Completed</span>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                </div>
-                <div className="text-2xl sm:text-3xl font-bold tracking-tight text-emerald-600 mt-2">18</div>
-                <div className="text-[11px] text-zinc-500 mt-1 font-mono">
-                  Production ready
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl bg-white border border-black/[0.06] shadow-sm hover:border-black/[0.1] transition-all">
-                <div className="flex items-center justify-between text-xs font-semibold text-zinc-500">
-                  <span>In Flight</span>
-                  <Clock className="w-4 h-4 text-blue-600" />
-                </div>
-                <div className="text-2xl sm:text-3xl font-bold tracking-tight text-blue-600 mt-2">6</div>
-                <div className="text-[11px] text-zinc-500 mt-1 font-mono">
-                  Active mutations
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl bg-white border border-black/[0.06] shadow-sm hover:border-black/[0.1] transition-all">
-                <div className="flex items-center justify-between text-xs font-semibold text-zinc-500">
-                  <span>Parity Rate</span>
-                  <TrendingUp className="w-4 h-4 text-amber-600" />
-                </div>
-                <div className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 mt-2">75%</div>
-                <div className="text-[11px] text-amber-600 font-semibold mt-1 font-mono">
-                  Bi-directional
-                </div>
-              </div>
+      <div className="w-full relative py-2 sm:py-6 select-none">
+        {/* 3D Perspective Stage Container */}
+        <div className="tablet-perspective-stage relative max-w-5xl mx-auto py-8 px-2 sm:px-6">
+          {/* Playful background decorative shapes matching reference image */}
+          <div className="absolute -top-10 -left-12 w-64 h-64 bg-pink-200/40 rounded-full blur-2xl pointer-events-none -z-10" />
+          <div className="absolute -bottom-8 left-1/4 w-80 h-32 bg-emerald-300/30 rounded-full blur-2xl pointer-events-none -z-10" />
+          <div className="absolute top-1/4 -right-10 w-72 h-72 bg-blue-200/40 rounded-full blur-2xl pointer-events-none -z-10" />
+          
+          {/* 3D Isometric Tablet Body */}
+          <div
+            ref={stageRef}
+            className="tablet-3d-body relative rounded-[2.5rem] bg-[#1E242B] p-3 sm:p-4 border-2 border-zinc-700/60 shadow-2xl transition-transform duration-300 overflow-hidden"
+          >
+            {/* Tablet Camera Pinhole & Sensor */}
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-30 pointer-events-none">
+              <span className="w-2 h-2 rounded-full bg-zinc-900 border border-zinc-700/80" />
+              <span className="w-1 h-1 rounded-full bg-blue-900/60" />
             </div>
 
-            {/* Asymmetric Bento Body: Table + Live Companion Mobile Mock */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              {/* Operations Pipeline Table */}
-              <div className="lg:col-span-8 rounded-xl bg-white border border-black/[0.06] shadow-sm overflow-hidden">
-                <div className="bg-zinc-50 px-5 py-3 border-b border-black/[0.06] flex items-center justify-between text-xs font-semibold text-zinc-700">
-                  <div className="flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-blue-600" />
-                    <span>Real-Time Operations Pipeline</span>
+            {/* Glossy Screen Glare overlay */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.04] via-transparent to-white/[0.08] pointer-events-none z-20 rounded-[2rem]" />
+
+            {/* Inner Tablet Screen Container */}
+            <div className="relative rounded-[2rem] bg-white overflow-hidden shadow-inner flex flex-col min-h-[460px] text-zinc-800">
+              
+              {/* Tablet Top Navigation Bar */}
+              <div className="h-14 bg-white border-b border-zinc-200/80 px-4 sm:px-6 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1.5 text-zinc-900 font-extrabold tracking-tight text-lg">
+                    <span className="text-[#1E242B] font-black">Tech</span>
+                    <span className="text-zinc-500 font-semibold text-sm">matrix</span>
                   </div>
-                  <span className="font-mono text-[11px] text-zinc-500">SORT: PRIORITY // DESC</span>
+                  <button className="text-cyan-500 hover:text-cyan-600 p-1 cursor-pointer" aria-label="Menu">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                  </button>
                 </div>
-                <div className="divide-y divide-black/[0.05] text-xs">
-                  <div className="p-4 flex items-center justify-between hover:bg-zinc-50/60 transition-colors">
-                    <div>
-                      <div className="font-semibold text-zinc-900 text-sm">
-                        Cross-Platform State Verification
-                      </div>
-                      <div className="text-zinc-500 text-[11px] mt-0.5">
-                        Category: Engineering • JWT Bearer Auth Handshake
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        COMPLETED
-                      </span>
-                    </div>
-                  </div>
 
-                  <div className="p-4 flex items-center justify-between hover:bg-zinc-50/60 transition-colors">
-                    <div>
-                      <div className="font-semibold text-zinc-900 text-sm">
-                        Expo Router v57 Bundle Optimization
-                      </div>
-                      <div className="text-zinc-500 text-[11px] mt-0.5">
-                        Category: Mobile • Native Gesture & Biometrics
-                      </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 pl-2 pr-3 py-1 rounded-full bg-cyan-50/60 border border-cyan-100 text-xs font-semibold text-cyan-800">
+                    <div className="w-6 h-6 rounded-full bg-cyan-500 text-white flex items-center justify-center font-bold text-[11px] shadow-sm">
+                      TM
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-                        IN PROGRESS
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="p-4 flex items-center justify-between hover:bg-zinc-50/60 transition-colors">
-                    <div>
-                      <div className="font-semibold text-zinc-900 text-sm">
-                        OpenRouter LLM Entity Summarization
-                      </div>
-                      <div className="text-zinc-500 text-[11px] mt-0.5">
-                        Category: AI Engine • Automated Action Plans
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-violet-50 text-violet-700 border border-violet-200">
-                        SYNTHESIZED
-                      </span>
-                    </div>
+                    <span className="hidden sm:inline font-medium">tripMatrix</span>
                   </div>
                 </div>
               </div>
 
-              {/* Native Mobile Companion Bento Card */}
-              <div className="lg:col-span-4 rounded-xl bg-zinc-950 text-white p-5 space-y-4 shadow-md border border-zinc-800">
-                <div className="flex items-center justify-between border-b border-zinc-800 pb-3 text-xs">
-                  <div className="flex items-center gap-2 font-semibold">
-                    <Smartphone className="w-4 h-4 text-emerald-400" />
-                    <span>Mobile Companion Client</span>
-                  </div>
-                  <span className="font-mono text-[10px] text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">
-                    EXPO SDK 57
-                  </span>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="p-3 rounded-lg bg-zinc-900/80 border border-zinc-800 text-xs space-y-1">
-                    <div className="text-zinc-400 text-[11px]">Hardware Biometrics</div>
-                    <div className="text-emerald-400 font-semibold flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5" /> FaceID / Fingerprint Ready
+              {/* Tablet Two-Column Layout (Sidebar + Main Data Tables) */}
+              <div className="flex flex-1 overflow-hidden">
+                
+                {/* Left Mini Sidebar */}
+                <div className="w-40 sm:w-48 bg-zinc-50/70 border-r border-zinc-200/80 p-3 sm:p-4 flex flex-col justify-between hidden sm:flex">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-cyan-50 text-cyan-700 font-semibold text-xs border border-cyan-200/60 shadow-xs">
+                      <Layers className="w-4 h-4 text-cyan-600" />
+                      <span>Dashboard</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-zinc-600 hover:bg-zinc-100 text-xs font-medium transition-colors">
+                      <Activity className="w-4 h-4 text-zinc-400" />
+                      <span>Inquiry</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-zinc-600 hover:bg-zinc-100 text-xs font-medium transition-colors">
+                      <TrendingUp className="w-4 h-4 text-zinc-400" />
+                      <span>Tracking</span>
+                    </div>
+                    <div className="flex items-center justify-between px-3 py-2 rounded-lg text-zinc-600 hover:bg-zinc-100 text-xs font-medium transition-colors">
+                      <div className="flex items-center gap-2.5">
+                        <ShieldCheck className="w-4 h-4 text-zinc-400" />
+                        <span>Manage</span>
+                      </div>
+                      <span className="text-[10px] text-zinc-400 font-mono">›</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-zinc-600 hover:bg-zinc-100 text-xs font-medium transition-colors">
+                      <Zap className="w-4 h-4 text-zinc-400" />
+                      <span>Setting</span>
                     </div>
                   </div>
 
-                  <div className="p-3 rounded-lg bg-zinc-900/80 border border-zinc-800 text-xs space-y-1">
-                    <div className="text-zinc-400 text-[11px]">Cache Invalidation</div>
-                    <div className="font-mono text-zinc-200 text-[11px]">
-                      Triggered in &lt; 35ms via Express Core
+                  <div className="p-2.5 rounded-lg bg-white border border-zinc-200/80 text-[10px] text-zinc-500">
+                    <div className="font-semibold text-zinc-800">Status</div>
+                    <div className="flex items-center gap-1.5 text-emerald-600 font-medium mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Live Inquiries Active
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-2">
-                  <Link
-                    href="/login"
-                    onClick={(e) => e.stopPropagation()}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-md shadow-blue-600/20 transition-colors"
-                  >
-                    <span>Open Live Operations</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </Link>
+                {/* Main Content Area */}
+                <div className="flex-1 p-4 sm:p-6 space-y-6 overflow-x-auto bg-white">
+                  
+                  {/* Dashboard Page Title */}
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-bold tracking-tight text-zinc-900">Dashboard</h3>
+                    <span className="font-mono text-[11px] text-zinc-500 bg-zinc-100 px-2.5 py-1 rounded-md">
+                      16-07-2026
+                    </span>
+                  </div>
+
+                  {/* Section 1: New Inquiry Table */}
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <h4 className="font-bold text-zinc-800 text-sm">New Inquiry</h4>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] text-zinc-500 pb-1">
+                      <div className="flex items-center gap-1.5">
+                        <span>Show</span>
+                        <span className="px-1.5 py-0.5 border border-zinc-200 rounded bg-zinc-50 font-medium">10</span>
+                        <span>entries</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span>Search:</span>
+                        <input
+                          type="text"
+                          readOnly
+                          placeholder=""
+                          className="w-24 sm:w-32 px-2 py-0.5 border border-zinc-200 rounded bg-zinc-50 text-[11px]"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Styled Table 1 */}
+                    <div className="rounded-lg border border-zinc-200 overflow-hidden shadow-xs">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-[11px]">
+                          <thead className="bg-zinc-50 border-b border-zinc-200 text-zinc-600 font-semibold uppercase tracking-wider text-[10px]">
+                            <tr>
+                              <th className="px-3 py-2">Inquiry No</th>
+                              <th className="px-3 py-2">Customer</th>
+                              <th className="px-3 py-2">Destination</th>
+                              <th className="px-3 py-2">Travel Date</th>
+                              <th className="px-3 py-2">Persons</th>
+                              <th className="px-3 py-2">Rooms</th>
+                              <th className="px-3 py-2">Handled By</th>
+                              <th className="px-3 py-2">Created Date</th>
+                              <th className="px-3 py-2">Status</th>
+                              <th className="px-3 py-2 text-center">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-zinc-100 text-zinc-700">
+                            <tr className="hover:bg-zinc-50/60 transition-colors">
+                              <td className="px-3 py-2.5 font-medium text-zinc-900">INQ001</td>
+                              <td className="px-3 py-2.5">Mr. Alice</td>
+                              <td className="px-3 py-2.5">Thailand</td>
+                              <td className="px-3 py-2.5 font-mono">01-08-2026</td>
+                              <td className="px-3 py-2.5 text-center">1</td>
+                              <td className="px-3 py-2.5 text-center">1</td>
+                              <td className="px-3 py-2.5">Mr. John</td>
+                              <td className="px-3 py-2.5 font-mono text-[10px] text-zinc-500">16-07-2026 05:03 PM</td>
+                              <td className="px-3 py-2.5">
+                                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+                                  New
+                                </span>
+                              </td>
+                              <td className="px-3 py-2.5">
+                                <div className="flex items-center justify-center gap-1.5">
+                                  <button className="p-1 rounded bg-cyan-500 text-white hover:bg-cyan-600 shadow-xs cursor-pointer" title="Edit">
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                  </button>
+                                  <button className="p-1 rounded bg-rose-500 text-white hover:bg-rose-600 shadow-xs cursor-pointer" title="Delete">
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Table Pagination footer */}
+                      <div className="bg-zinc-50/70 px-3 py-2 border-t border-zinc-200 flex items-center justify-between text-[10px] text-zinc-500">
+                        <span>Showing 1 to 1 of 1 entries</span>
+                        <div className="flex items-center gap-1">
+                          <button className="px-2 py-0.5 rounded border border-zinc-200 bg-white text-zinc-600 cursor-pointer">Previous</button>
+                          <button className="px-2 py-0.5 rounded bg-cyan-500 text-white font-semibold cursor-pointer">1</button>
+                          <button className="px-2 py-0.5 rounded border border-zinc-200 bg-white text-zinc-600 cursor-pointer">Next</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 2: Today's Follow-up Table */}
+                  <div className="space-y-2.5 pt-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <h4 className="font-bold text-zinc-800 text-sm">Today&apos;s Follow-up</h4>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] text-zinc-500 pb-1">
+                      <div className="flex items-center gap-1.5">
+                        <span>Show</span>
+                        <span className="px-1.5 py-0.5 border border-zinc-200 rounded bg-zinc-50 font-medium">10</span>
+                        <span>entries</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span>Search:</span>
+                        <input
+                          type="text"
+                          readOnly
+                          placeholder=""
+                          className="w-24 sm:w-32 px-2 py-0.5 border border-zinc-200 rounded bg-zinc-50 text-[11px]"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Styled Table 2 */}
+                    <div className="rounded-lg border border-zinc-200 overflow-hidden shadow-xs">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-[11px]">
+                          <thead className="bg-zinc-50 border-b border-zinc-200 text-zinc-600 font-semibold uppercase tracking-wider text-[10px]">
+                            <tr>
+                              <th className="px-3 py-2">Inquiry No</th>
+                              <th className="px-3 py-2">Customer</th>
+                              <th className="px-3 py-2">Destination</th>
+                              <th className="px-3 py-2">Travel Date</th>
+                              <th className="px-3 py-2">Followup Type</th>
+                              <th className="px-3 py-2">Followup Date</th>
+                              <th className="px-3 py-2">Followup Remark</th>
+                              <th className="px-3 py-2">Status</th>
+                              <th className="px-3 py-2 text-center">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-zinc-100 text-zinc-700">
+                            <tr className="hover:bg-zinc-50/60 transition-colors">
+                              <td className="px-3 py-2.5 font-medium text-zinc-900">INQ002</td>
+                              <td className="px-3 py-2.5">Mr. Mike</td>
+                              <td className="px-3 py-2.5">Thailand</td>
+                              <td className="px-3 py-2.5 font-mono">10-08-2026</td>
+                              <td className="px-3 py-2.5">Email</td>
+                              <td className="px-3 py-2.5 font-mono text-[10px] text-zinc-500">16-07-2026 05:03 PM</td>
+                              <td className="px-3 py-2.5 text-zinc-600">reminder sent</td>
+                              <td className="px-3 py-2.5">
+                                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                                  In Progress
+                                </span>
+                              </td>
+                              <td className="px-3 py-2.5">
+                                <div className="flex items-center justify-center gap-1.5">
+                                  <button className="p-1 rounded bg-cyan-500 text-white hover:bg-cyan-600 shadow-xs cursor-pointer" title="Edit">
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                  </button>
+                                  <button className="p-1 rounded bg-rose-500 text-white hover:bg-rose-600 shadow-xs cursor-pointer" title="Delete">
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Table Pagination footer */}
+                      <div className="bg-zinc-50/70 px-3 py-2 border-t border-zinc-200 flex items-center justify-between text-[10px] text-zinc-500">
+                        <span>Showing 1 to 1 of 1 entries</span>
+                        <div className="flex items-center gap-1">
+                          <button className="px-2 py-0.5 rounded border border-zinc-200 bg-white text-zinc-600 cursor-pointer">Previous</button>
+                          <button className="px-2 py-0.5 rounded bg-cyan-500 text-white font-semibold cursor-pointer">1</button>
+                          <button className="px-2 py-0.5 rounded border border-zinc-200 bg-white text-zinc-600 cursor-pointer">Next</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 3: Tomorrow's Follow-up Table preview header */}
+                  <div className="pt-2">
+                    <h4 className="font-bold text-zinc-800 text-sm">Tomorrow&apos;s Follow-up</h4>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* ========================================================
-          FULL-PAGE INTERACTIVE PREVIEW MODAL
-         ======================================================== */}
-      {isPreviewOpen && (
-        <div
-          ref={modalBackdropRef}
-          onClick={handleClose}
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div
-            ref={modalWindowRef}
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-5xl bg-white rounded-2xl border border-black/10 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
-          >
-            <div className="h-12 bg-zinc-50 border-b border-black/[0.06] px-5 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="font-semibold text-zinc-900 text-sm">Interactive Product Workspace</span>
-                <span className="text-[11px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                  LIVE SIMULATION
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/dashboard"
-                  className="btn-primary px-3 py-1.5 text-xs font-semibold"
-                >
-                  <span>Go to App</span>
-                  <ExternalLink className="w-3.5 h-3.5 ml-1" />
-                </Link>
-                <button
-                  onClick={handleClose}
-                  className="p-1.5 rounded-lg hover:bg-zinc-200 text-zinc-500 hover:text-zinc-900 transition-colors"
-                  aria-label="Close modal"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            <div className="p-6 sm:p-8 overflow-y-auto space-y-6 text-left">
-              <div className="space-y-2">
-                <h3 className="text-xl font-bold text-zinc-900">Synchronized High-Density Dashboard</h3>
-                <p className="text-sm text-zinc-600 max-w-2xl">
-                  Inspect domain items, execute instant status updates, and orchestrate automated AI workflows directly across desktop and mobile clients.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
-                <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200">
-                  <div className="text-zinc-500">API Endpoint</div>
-                  <div className="font-bold text-zinc-900 mt-1">GET /api/analytics/overview</div>
-                </div>
-                <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200">
-                  <div className="text-zinc-500">State Architecture</div>
-                  <div className="font-bold text-zinc-900 mt-1">Context + SecureStore</div>
-                </div>
-                <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200">
-                  <div className="text-zinc-500">AI Gateway</div>
-                  <div className="font-bold text-zinc-900 mt-1">OpenRouter / auto</div>
-                </div>
-              </div>
-
-              <div className="p-5 rounded-xl bg-zinc-950 text-white font-mono text-xs space-y-2">
-                <div className="text-zinc-400">{'// System verification output'}</div>
-                <div className="text-emerald-400">✓ Cryptographic token integrity confirmed</div>
-                <div className="text-blue-400">✓ React 19 hydration completed without drift</div>
-                <div className="text-zinc-300">✓ Native bridge established with Expo SDK 57</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 };

@@ -10,6 +10,7 @@ import { useToast } from '@/lib/context/ToastContext';
 import { KineticHeadline } from '@/components/auth/KineticHeadline';
 import { PasswordStrengthMeter } from '@/components/auth/PasswordStrengthMeter';
 import { domainConfig } from '@/lib/domain.config';
+import { TiltCard } from '@/components/ui/TiltCard';
 
 interface AuthPageProps {
   initialMode?: 'signin' | 'signup';
@@ -128,19 +129,29 @@ export function UnifiedAuthView({ initialMode = 'signin' }: AuthPageProps) {
           subheading="One shared Express backend, cryptographically secure JWT authentication, and zero latency across React Native Expo and Next.js 14 workspaces."
         />
 
-        {/* Seamless Background-less Code-A-Thon Logo Presentation */}
+        {/* Seamless Background-less Code-A-Thon Logo Presentation with 360 load flip & cursor tilt */}
         <div className="relative pt-2 pb-2">
-          {/* Transparent / Background-less container */}
-          <div className="relative aspect-[2083/755] w-full max-w-xl flex items-center justify-start">
-            <Image
-              src="/code.png"
-              alt="Code-A-Thon"
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 650px"
-              className="object-contain object-left filter drop-shadow-[0_10px_25px_rgba(0,0,0,0.06)] hover:scale-[1.02] transition-transform duration-300"
-            />
-          </div>
+          <TiltCard
+            key={mode}
+            flipOnLoad={true}
+            loadFlipDurationMs={1300}
+            enableScrollFlip={false}
+            maxTilt={12}
+            perspective={1200}
+            glare={false}
+            className="w-full max-w-xl"
+          >
+            <div className="relative aspect-[2083/755] w-full flex items-center justify-start cursor-pointer">
+              <Image
+                src="/code.png"
+                alt="Code-A-Thon"
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 650px"
+                className="object-contain object-left filter drop-shadow-[0_10px_25px_rgba(0,0,0,0.06)] hover:scale-[1.02] transition-transform duration-300"
+              />
+            </div>
+          </TiltCard>
         </div>
       </div>
 
@@ -215,50 +226,9 @@ export function UnifiedAuthView({ initialMode = 'signin' }: AuthPageProps) {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-3.5">
-            {/* Role & Org selection in Sign Up Mode */}
+            {/* Full Name in Sign Up Mode */}
             {mode === 'signup' && (
               <>
-                {authConfig?.requireRoleSelectionOnSignup && authConfig.availableRoles?.length > 0 && (
-                  <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <label className="block text-xs font-semibold text-zinc-700">
-                      Select Your Operational Role
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {authConfig.availableRoles.map((role: any) => {
-                        const isSelected = selectedRole === role.id;
-                        return (
-                          <button
-                            key={role.id}
-                            type="button"
-                            onClick={() => setSelectedRole(role.id)}
-                            className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
-                              isSelected
-                                ? 'bg-indigo-50/80 border-indigo-600 text-indigo-900 ring-2 ring-indigo-600/10'
-                                : 'bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50'
-                            }`}
-                          >
-                            <div className="text-xs font-bold">{role.name}</div>
-                            <div className="text-[10px] text-zinc-500 line-clamp-1 mt-0.5">{role.description}</div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                <div className="space-y-1 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <label className="block text-xs font-semibold text-zinc-700">
-                    Organization / Affiliation
-                  </label>
-                  <input
-                    type="text"
-                    value={organization}
-                    onChange={(e) => setOrganization(e.target.value)}
-                    placeholder="e.g. City Response Command or Regional Ops"
-                    className="w-full px-3.5 py-2.5 bg-white rounded-xl border border-zinc-200 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all shadow-2xs"
-                  />
-                </div>
-
                 <div className="space-y-1 animate-in fade-in slide-in-from-top-2 duration-300">
                   <label className="block text-xs font-semibold text-zinc-700">
                     Full Name

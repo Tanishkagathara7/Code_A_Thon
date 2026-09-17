@@ -5,11 +5,13 @@ import React, { useEffect, useRef } from 'react';
 interface InteractiveGridTilesProps {
   tileSize?: number;
   className?: string;
+  fixed?: boolean;
 }
 
 export const InteractiveGridTiles: React.FC<InteractiveGridTilesProps> = ({
   tileSize = 40,
   className = '',
+  fixed = false,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -34,8 +36,8 @@ export const InteractiveGridTiles: React.FC<InteractiveGridTilesProps> = ({
 
     const updateDimensions = () => {
       if (!canvas) return;
-      width = canvas.width = canvas.offsetWidth || window.innerWidth;
-      height = canvas.height = canvas.offsetHeight || window.innerHeight;
+      width = canvas.width = fixed ? window.innerWidth : (canvas.offsetWidth || window.innerWidth);
+      height = canvas.height = fixed ? window.innerHeight : (canvas.offsetHeight || window.innerHeight);
     };
 
     updateDimensions();
@@ -46,9 +48,14 @@ export const InteractiveGridTiles: React.FC<InteractiveGridTilesProps> = ({
 
     const handleMouseMove = (e: MouseEvent) => {
       if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
-      mouse.targetX = e.clientX - rect.left;
-      mouse.targetY = e.clientY - rect.top;
+      if (fixed) {
+        mouse.targetX = e.clientX;
+        mouse.targetY = e.clientY;
+      } else {
+        const rect = canvas.getBoundingClientRect();
+        mouse.targetX = e.clientX - rect.left;
+        mouse.targetY = e.clientY - rect.top;
+      }
     };
 
     const handleMouseLeave = () => {
@@ -172,12 +179,12 @@ export const InteractiveGridTiles: React.FC<InteractiveGridTilesProps> = ({
       document.removeEventListener('mouseleave', handleMouseLeave);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [tileSize]);
+  }, [tileSize, fixed]);
 
   return (
     <canvas
       ref={canvasRef}
-      className={`absolute inset-0 pointer-events-none ${className}`}
+      className={`${fixed ? 'fixed' : 'absolute'} inset-0 pointer-events-none ${className}`}
     />
   );
 };

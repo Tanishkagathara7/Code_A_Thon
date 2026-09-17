@@ -2,12 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
 import { domainConfig } from '@/lib/domain.config';
+import { scrollTo } from '@/lib/animations/lenis';
 
 export const MarketingNav: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,6 +20,28 @@ export const MarketingNav: React.FC = () => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const navItems = [
+    { href: '/#product', hash: '#product', label: 'Product' },
+    { href: '/#platform', hash: '#platform', label: 'Two Clients' },
+    { href: '/#workflow', hash: '#workflow', label: 'Workflow' },
+    { href: '/#architecture', hash: '#architecture', label: 'Architecture' },
+    { href: '/#heritage', hash: '#heritage', label: 'Heritage' },
+    { href: '/#faq', hash: '#faq', label: 'FAQ' },
+  ];
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, hash: string, href: string) => {
+    if (pathname === '/') {
+      e.preventDefault();
+      const targetEl = document.querySelector(hash);
+      if (targetEl) {
+        scrollTo(targetEl as HTMLElement, { offset: -80 });
+        window.history.pushState(null, '', hash);
+      } else {
+        router.push(href);
+      }
+    }
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-4 sm:px-6 py-4 flex justify-center">
@@ -38,53 +64,34 @@ export const MarketingNav: React.FC = () => {
           </div>
         </Link>
 
-        {/* Desktop Links */}
+        {/* Desktop Links with Animated Hover Pill */}
         <nav className="hidden md:flex items-center gap-1 text-xs font-medium text-zinc-600">
-          <a
-            href="#product"
-            className="px-3.5 py-1.5 rounded-lg hover:text-zinc-900 hover:bg-zinc-100/70 transition-all"
-          >
-            Product
-          </a>
-          <a
-            href="#platform"
-            className="px-3.5 py-1.5 rounded-lg hover:text-zinc-900 hover:bg-zinc-100/70 transition-all"
-          >
-            Two Clients
-          </a>
-          <a
-            href="#workflow"
-            className="px-3.5 py-1.5 rounded-lg hover:text-zinc-900 hover:bg-zinc-100/70 transition-all"
-          >
-            Workflow
-          </a>
-          <a
-            href="#architecture"
-            className="px-3.5 py-1.5 rounded-lg hover:text-zinc-900 hover:bg-zinc-100/70 transition-all"
-          >
-            Architecture
-          </a>
-          <a
-            href="#heritage"
-            className="px-3.5 py-1.5 rounded-lg hover:text-zinc-900 hover:bg-zinc-100/70 transition-all"
-          >
-            Heritage
-          </a>
-          <a
-            href="#faq"
-            className="px-3.5 py-1.5 rounded-lg hover:text-zinc-900 hover:bg-zinc-100/70 transition-all"
-          >
-            FAQ
-          </a>
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={(e) => handleNavClick(e, item.hash, item.href)}
+              className="relative px-3.5 py-1.5 rounded-full text-zinc-600 hover:text-zinc-950 transition-colors duration-200 group overflow-hidden"
+            >
+              {/* Subtle animated background fill on hover */}
+              <span className="absolute inset-0 bg-zinc-900/[0.06] rounded-full scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-200 ease-out pointer-events-none" />
+              {/* Bottom active indicator dot/line */}
+              <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 bg-blue-600 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-out pointer-events-none" />
+              <span className="relative z-10 transition-transform duration-150 group-hover:-translate-y-[0.5px] inline-block font-medium">
+                {item.label}
+              </span>
+            </Link>
+          ))}
         </nav>
 
         {/* Action CTAs */}
         <div className="hidden sm:flex items-center gap-2.5">
           <Link
             href="/login"
-            className="text-xs font-semibold text-zinc-700 hover:text-zinc-950 px-3.5 py-2 rounded-lg hover:bg-zinc-100/70 transition-all"
+            className="relative px-3.5 py-2 text-xs font-semibold text-zinc-700 hover:text-zinc-950 rounded-full transition-colors duration-200 group overflow-hidden"
           >
-            Sign in
+            <span className="absolute inset-0 bg-zinc-900/[0.06] rounded-full scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-200 ease-out pointer-events-none" />
+            <span className="relative z-10 font-semibold">{domainConfig.brand.shortName ? 'Sign in' : 'Login'}</span>
           </Link>
           <Link
             href="/signup"
@@ -109,48 +116,19 @@ export const MarketingNav: React.FC = () => {
       {mobileMenuOpen && (
         <div className="md:hidden fixed inset-x-4 top-20 bg-white/95 backdrop-blur-xl rounded-2xl p-5 flex flex-col gap-3 z-50 border border-zinc-200/90 shadow-2xl shadow-zinc-950/15">
           <nav className="flex flex-col gap-1 text-sm font-medium text-zinc-800">
-            <a
-              href="#product"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-2.5 px-3 rounded-xl hover:bg-zinc-100 hover:text-zinc-950 transition-colors font-semibold"
-            >
-              Product
-            </a>
-            <a
-              href="#platform"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-2.5 px-3 rounded-lg hover:bg-zinc-100/70 hover:text-zinc-950 transition-colors"
-            >
-              Two Clients
-            </a>
-            <a
-              href="#workflow"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-2.5 px-3 rounded-lg hover:bg-zinc-100/70 hover:text-zinc-950 transition-colors"
-            >
-              Workflow
-            </a>
-            <a
-              href="#architecture"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-2.5 px-3 rounded-lg hover:bg-zinc-100/70 hover:text-zinc-950 transition-colors"
-            >
-              Architecture
-            </a>
-            <a
-              href="#heritage"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-2.5 px-3 rounded-lg hover:bg-zinc-100/70 hover:text-zinc-950 transition-colors"
-            >
-              Heritage
-            </a>
-            <a
-              href="#faq"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-2.5 px-3 rounded-lg hover:bg-zinc-100/70 hover:text-zinc-950 transition-colors"
-            >
-              FAQ
-            </a>
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={(e) => {
+                  setMobileMenuOpen(false);
+                  handleNavClick(e, item.hash, item.href);
+                }}
+                className="py-2.5 px-3 rounded-xl hover:bg-zinc-100 hover:text-zinc-950 transition-colors font-semibold"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
           <div className="pt-3 border-t border-black/[0.06] flex flex-col gap-2.5">
             <Link

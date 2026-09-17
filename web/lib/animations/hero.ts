@@ -1,79 +1,85 @@
 'use client';
 
 import gsap from 'gsap';
+import { MOTION, isReducedMotion } from './motionSystem';
 
+/**
+ * createHeroEntranceTimeline
+ * Establishes a cohesive editorial entrance for navigation, headline lines, copy, buttons, and tablet stage.
+ */
 export const createHeroEntranceTimeline = (container: HTMLElement | null) => {
-  if (!container) return null;
-
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    return null;
-  }
+  if (!container || typeof window === 'undefined') return null;
+  if (isReducedMotion()) return null;
 
   const ctx = gsap.context(() => {
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.7 } });
+    const tl = gsap.timeline({
+      defaults: { ease: MOTION.ease.smooth, duration: MOTION.duration.standard },
+    });
 
-    // Eyebrow badge entrance (if present)
-    if (container.querySelector('.hero-eyebrow')) {
+    // 1. Eyebrow badge entrance
+    const eyebrow = container.querySelector('.hero-eyebrow');
+    if (eyebrow) {
       tl.fromTo(
-        '.hero-eyebrow',
+        eyebrow,
         { y: -12, opacity: 0, scale: 0.96 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.5 }
+        { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: MOTION.ease.snappy }
       );
     }
 
-    // Headline reveal line by line
+    // 2. Headline masked line-by-line reveal
     tl.fromTo(
       '.hero-headline-1',
-      { y: 24, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6 },
-      '-=0.2'
+      { y: 32, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.75 },
+      eyebrow ? '-=0.2' : '0'
     );
 
     tl.fromTo(
       '.hero-headline-2',
-      { y: 24, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6 },
-      '-=0.35'
+      { y: 32, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.75 },
+      '-=0.55'
     );
 
     tl.fromTo(
       '.hero-headline-3',
-      { y: 24, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6 },
-      '-=0.35'
+      { y: 32, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.75 },
+      '-=0.55'
     );
 
-    // Supporting copy reveals
+    // 3. Supporting editorial copy
     tl.fromTo(
       '.hero-copy',
       { y: 16, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.5 },
-      '-=0.3'
+      { y: 0, opacity: 1, duration: 0.6 },
+      '-=0.45'
     );
 
-    // CTA buttons reveal
+    // 4. CTA wrapper — animate the container (opacity:0 inline style is on .hero-cta div)
     tl.fromTo(
       '.hero-cta',
-      { y: 14, opacity: 0 },
-      { y: 0, opacity: 1, stagger: 0.08, duration: 0.45 },
-      '-=0.25'
+      { y: 16, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.5,
+        ease: MOTION.ease.smooth,
+      },
+      '-=0.35'
     );
 
-    // Technical verification strip appears (if present)
-    if (container.querySelector('.hero-metadata')) {
-      tl.fromTo(
-        '.hero-metadata',
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.4 },
-        '-=0.2'
-      );
-    }
-
-    // Product visual enters smoothly with realistic elevation
+    // 5. Tablet mockup elevation into the stage
     tl.fromTo(
       '.hero-product-stage',
-      { y: 36, opacity: 0, scale: 0.98 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.85, ease: 'power2.out' },
+      { y: 40, opacity: 0, scale: 0.97 },
+      {
+        y: 0,
+        opacity: 1,
+        scale: 1,
+        duration: 0.9,
+        ease: MOTION.ease.smooth,
+      },
       '-=0.3'
     );
   }, container);

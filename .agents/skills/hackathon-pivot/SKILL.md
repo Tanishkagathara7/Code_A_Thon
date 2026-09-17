@@ -170,3 +170,4 @@ Before declaring the pivot complete:
 2. **Never Break Metro Bundling**: Do not alter `frontend/babel.config.js`, `frontend/metro.config.js`, or native packages unless explicitly mandated.
 3. **No Speculative Architecture**: Do not install PostgreSQL, Redis, GraphQL, or complex state managers. Use the existing, battle-tested REST + Mongo + Context stack.
 4. **Preserve Reusable Infrastructure**: Keep JWT auth, rate limiters, Multer upload pipes, and OpenRouter AI adapters untouched—only adapt the domain schemas, configs, and UI views.
+5. **Continuous Markdown Specification Synchronization**: Whenever the website dashboard, showcase mockups, or domain entities/attributes change, you MUST synchronously update all affected documentation in `hackathon/` (`02_PRODUCT_SPEC.md`, `03_UX_PLAN.md`, `05_DATA_MODEL.md`, `13_CHANGE_LOG.md`) and `PROJECT_ARCHITECTURE.md` to guarantee zero drift between UI code and reference specifications.
