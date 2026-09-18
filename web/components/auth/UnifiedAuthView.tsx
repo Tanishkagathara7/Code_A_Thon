@@ -156,7 +156,7 @@ export function UnifiedAuthView({ initialMode = 'signin' }: AuthPageProps) {
       </div>
 
       {/* RIGHT AUTH CARD (5 cols) */}
-      <div className="lg:col-span-5 w-full flex justify-center lg:justify-end">
+      <div className="lg:col-span-5 w-full flex justify-center lg:justify-end relative z-20">
         <div className="w-full max-w-md bg-white rounded-2xl border border-black/[0.08] p-7 sm:p-9 shadow-[0_16px_40px_-8px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] relative">
           {/* Animated top indicator bar with smooth expansion and laser glow */}
           <div className="absolute top-0 inset-x-8 h-[2px] overflow-hidden rounded-full">

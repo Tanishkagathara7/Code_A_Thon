@@ -6,8 +6,8 @@ import { domainConfig } from '@/lib/domain.config';
 
 export const MarketingFooter: React.FC<{ className?: string }> = ({ className = '' }) => {
   return (
-    <footer className={`bg-zinc-50 py-12 px-4 sm:px-6 text-zinc-700 text-xs font-medium border-t border-black/[0.06] relative z-20 ${className}`}>
-      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+    <footer className={`bg-zinc-50 py-6 sm:py-8 px-4 sm:px-6 text-zinc-700 text-xs font-medium border-t border-black/[0.06] relative z-20 ${className}`}>
+      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-7 h-7 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-bold text-xs shadow-xs">
             {domainConfig.brand.shortName ? domainConfig.brand.shortName.charAt(0) : 'A'}

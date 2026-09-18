@@ -724,8 +724,8 @@ export default function MarketingPage() {
         {/* ========================================================
             10. FINAL CTA: CINEMATIC BENTO FINALE
            ======================================================== */}
-        <section className="section-cta py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] relative overflow-hidden">
-          <div className="max-w-4xl mx-auto text-left relative z-10 space-y-8">
+        <section className="section-cta pt-14 sm:pt-16 pb-8 sm:pb-10 px-4 sm:px-6 border-b border-black/[0.06] relative overflow-hidden">
+          <div className="max-w-4xl mx-auto text-left relative z-10 space-y-6">
             <div className="cta-badge inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-50 text-blue-700 border border-blue-200/80 rounded-full text-xs font-semibold shadow-sm">
               <Sparkles className="w-3.5 h-3.5" />
               <span>DEPLOYMENT READY</span>

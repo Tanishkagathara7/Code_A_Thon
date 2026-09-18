@@ -27,18 +27,18 @@ export const AuthOrbitalBackground: React.FC = () => {
       >
         <BackgroundMotion>
           {/* =========================================================================
+          {/* =========================================================================
               TOP-RIGHT CANVAS FRAMING:
-              - Sits neatly in the top-right viewport corner
-              - Plenty of clearance from the login card
-              - Clean orbital arc with dual tone endpoints
-              - Floating iridescent sphere with ambient float
+              - Positioned elegantly in the upper-right ambient space
+              - Z-index 0 behind all content
+              - Generous clearance from the card and top navigation bar
              ========================================================================= */}
-          <div className="hidden xl:block absolute top-12 right-2 pointer-events-none">
-            <div className="relative w-[480px] h-[480px]">
+          <div className="hidden lg:block absolute top-4 right-0 lg:right-6 pointer-events-none opacity-85">
+            <div className="relative w-[520px] h-[520px]">
               {/* Sweeping Orbital Arc SVG */}
               <svg
-                width="480"
-                height="480"
+                width="520"
+                height="520"
                 viewBox="0 0 480 480"
                 className="overflow-visible"
               >
@@ -97,31 +97,31 @@ export const AuthOrbitalBackground: React.FC = () => {
                 })}
               </svg>
 
-              {/* Floating Iridescent Multi-Tone Sphere positioned at peak of the trajectory */}
-              <div className="absolute top-4 left-[195px]">
+              {/* Floating Iridescent Multi-Tone Sphere positioned safely in ambient canvas */}
+              <div className="absolute top-8 right-24">
                 <FloatingSphere
-                  size={92}
+                  size={84}
                   gradientId="sphere-cyan-pink"
                   className="editorial-float"
                 />
               </div>
 
-              {/* Crystal-clear pill badge: Fully readable text positioned above the card zone */}
-              <div className="absolute top-10 right-4">
-                <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-black/[0.08] shadow-xs">
+              {/* Crystal-clear pill badge: Fully readable text positioned in the far top right ambient canvas */}
+              <div className="hidden 2xl:block absolute top-14 right-10">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-black/[0.08] shadow-xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse" />
                   <span className="font-serif italic text-zinc-700 text-xs tracking-wide">
                     Zero sync drift verified.
                   </span>
                   <span className="text-[9px] font-mono uppercase tracking-wider text-zinc-400 border-l border-zinc-200 pl-2">
-                    CROSS-SURFACE TELEMETRY
+                    TELEMETRY
                   </span>
                   <ArrowUpRight className="w-3 h-3 text-zinc-400" />
                 </div>
               </div>
 
               {/* Discrete vertical architectural coordinates tag */}
-              <div className="hidden 2xl:block absolute top-28 right-0">
+              <div className="hidden 2xl:block absolute top-32 right-4">
                 <div
                   className="text-[10px] font-mono font-semibold tracking-[0.25em] text-zinc-400/80 uppercase"
                   style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
