@@ -57,7 +57,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onExitComplete }) 
           const v = Math.round(obj.val);
           counterValRef.current = v;
           if (numberRef.current) {
-            numberRef.current.textContent = String(v).padStart(2, '0');
+            numberRef.current.textContent = `${v}%`;
           }
         },
       },
@@ -122,13 +122,13 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onExitComplete }) 
             const v = Math.round(obj.val);
             counterValRef.current = v;
             if (numberRef.current) {
-              numberRef.current.textContent = String(v).padStart(2, '0');
+              numberRef.current.textContent = `${v}%`;
             }
           },
         }
       );
 
-      // 2. Hold at 100 — lets the eye register completion
+      // 2. Hold at 100% — lets the eye register completion
       tl.to({}, { duration: 0.14 });
 
       // 3. Upward wipe — reveals the landing page beneath
@@ -179,7 +179,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onExitComplete }) 
             opacity: 0,
           }}
         >
-          00
+          0%
         </span>
       </div>
 

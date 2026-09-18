@@ -78,36 +78,57 @@ export const ArchitectureDiagram: React.FC = () => {
 
 
       {/* Interactive Topology Bento Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div role="tablist" aria-label="Architecture Nodes" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {Object.values(nodes).map((node) => {
           const isSelected = selectedNode === node.id;
           return (
             <button
               key={node.id}
+              role="tab"
+              aria-selected={isSelected}
               onClick={() => setSelectedNode(node.id)}
-              className={`topology-node-btn p-5 rounded-2xl text-left transition-all duration-200 border relative overflow-hidden cursor-pointer ${
+              className={`topology-node-btn p-5 rounded-2xl text-left transition-all duration-200 border relative overflow-hidden cursor-pointer group flex flex-col justify-between min-h-[145px] ${
                 isSelected
-                  ? 'bg-white border-blue-500/50 shadow-lg shadow-blue-500/[0.06] ring-2 ring-blue-500/20'
-                  : 'bg-white/80 hover:bg-white border-black/[0.06] hover:border-black/[0.14] shadow-sm hover:-translate-y-0.5'
+                  ? 'bg-white border-blue-600 shadow-lg shadow-blue-500/[0.12] ring-2 ring-blue-500/25'
+                  : 'bg-white/80 hover:bg-white border-black/[0.06] hover:border-black/[0.16] shadow-sm hover:-translate-y-0.5'
               }`}
             >
-              <div className="flex items-center justify-between mb-3">
-                <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${node.badgeColor}`}>
-                  {node.badge}
+              {isSelected && (
+                <span className="absolute top-0 left-0 right-0 h-1 bg-blue-600" />
+              )}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${node.badgeColor}`}>
+                    {node.badge}
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    {isSelected ? (
+                      <span className="text-[10px] font-bold font-mono text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                        Selected
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-mono text-zinc-400 group-hover:text-zinc-600">
+                        Select &rarr;
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="font-bold text-zinc-900 text-base leading-snug">
+                  {node.name}
+                </div>
+
+                <div className="text-[11px] font-mono text-zinc-500 mt-1">
+                  {node.role}
+                </div>
+              </div>
+
+              <div className="pt-2.5 mt-2 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-400">
+                <span>Click to view specs</span>
+                <span className={`transition-transform duration-200 ${isSelected ? 'text-blue-600 translate-x-0.5' : 'group-hover:translate-x-0.5'}`}>
+                  &rarr;
                 </span>
-                <span
-                  className={`w-2 h-2 rounded-full ${
-                    isSelected ? 'bg-blue-600 animate-pulse' : 'bg-emerald-500'
-                  }`}
-                />
-              </div>
-
-              <div className="font-bold text-zinc-900 text-base leading-snug">
-                {node.name}
-              </div>
-
-              <div className="text-[11px] font-mono text-zinc-500 mt-1">
-                {node.role}
               </div>
             </button>
           );

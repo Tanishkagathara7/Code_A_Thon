@@ -88,34 +88,51 @@ export const InteractiveDemonstrator: React.FC = () => {
   return (
     <div className="workflow-container w-full space-y-6 select-none">
       {/* Step Selector Tabs */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div role="tablist" aria-label="Workflow Phases" className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
         {steps.map((step, idx) => {
           const isActive = activeStep === idx;
           return (
             <button
               key={step.id}
+              role="tab"
+              id={`workflow-tab-${step.id}`}
+              aria-selected={isActive}
+              aria-controls={`workflow-panel-${step.id}`}
+              tabIndex={isActive ? 0 : -1}
               onClick={() => setActiveStep(idx)}
-              className={`p-4 rounded-xl text-left transition-all duration-200 border cursor-pointer ${
+              className={`p-5 rounded-xl text-left transition-all duration-200 border cursor-pointer flex flex-col justify-between min-h-[140px] relative overflow-hidden ${
                 isActive
-                  ? 'bg-white border-blue-500/40 shadow-lg shadow-blue-500/[0.04] ring-1 ring-blue-500/20'
-                  : 'bg-white/70 hover:bg-white border-black/[0.06] hover:border-black/[0.12] shadow-sm hover:-translate-y-0.5'
+                  ? 'bg-white border-blue-600 shadow-lg shadow-blue-500/[0.12] ring-2 ring-blue-500/25'
+                  : 'bg-white/80 hover:bg-white border-black/[0.08] hover:border-black/[0.16] shadow-xs hover:-translate-y-0.5'
               }`}
             >
-              <div className="flex items-center justify-between mb-2">
+              {/* High-contrast top accent bar for active tab */}
+              {isActive && (
+                <span className="absolute top-0 left-0 right-0 h-1 bg-blue-600" />
+              )}
+              <div className="flex items-center justify-between w-full mb-3">
                 <span
-                  className={`text-xs font-mono font-bold px-2 py-0.5 rounded-md border ${
+                  className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded-md border ${
                     isActive ? step.badgeBg : 'bg-zinc-100 text-zinc-600 border-zinc-200'
                   }`}
                 >
                   PHASE {step.phase}
                 </span>
-                <span className="text-[11px] font-mono text-zinc-400">0{idx + 1}/03</span>
+                <span className="text-xs font-mono text-zinc-400">0{idx + 1}/03</span>
               </div>
-              <div className="text-sm font-semibold text-zinc-900 leading-snug">
+              <div className="text-sm font-semibold text-zinc-900 leading-snug my-auto">
                 {step.title}
               </div>
-              <div className="text-[11px] font-medium text-zinc-500 mt-1">
-                {step.client}
+              <div className="flex items-center justify-between w-full pt-3 mt-2 border-t border-zinc-100 text-xs font-medium text-zinc-500">
+                <span>{step.client}</span>
+                {isActive ? (
+                  <span className="text-blue-600 font-bold text-[11px] flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                    Active
+                  </span>
+                ) : (
+                  <span className="text-zinc-400 text-[11px]">Inspect &rarr;</span>
+                )}
               </div>
             </button>
           );
@@ -123,7 +140,12 @@ export const InteractiveDemonstrator: React.FC = () => {
       </div>
 
       {/* Main Execution Stage */}
-      <div className="bento-card p-6 sm:p-8 space-y-6">
+      <div
+        role="tabpanel"
+        id={`workflow-panel-${current.id}`}
+        aria-labelledby={`workflow-tab-${current.id}`}
+        className="bento-card p-6 sm:p-8 space-y-6"
+      >
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-black/[0.06] pb-5">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
@@ -154,7 +176,7 @@ export const InteractiveDemonstrator: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {/* Request Stream */}
           <div className="rounded-xl bg-zinc-50/80 text-zinc-900 p-4 font-mono text-xs space-y-3 shadow-xs border border-zinc-200/80">
-            <div className="flex items-center justify-between border-b border-zinc-200/80 pb-2 text-[11px]">
+            <div className="flex items-center justify-between border-b border-zinc-200/80 pb-2 text-xs">
               <span className="text-zinc-600 flex items-center gap-1.5 font-semibold">
                 <Terminal className="w-3.5 h-3.5 text-blue-600" />
                 OUTBOUND DISPATCH
@@ -163,25 +185,25 @@ export const InteractiveDemonstrator: React.FC = () => {
                 {current.requestMethod} {current.requestPath}
               </span>
             </div>
-            <pre className="text-zinc-800 overflow-x-auto p-2.5 bg-white rounded-lg text-[11px] leading-relaxed border border-zinc-200/60 shadow-2xs">
+            <pre className="text-zinc-800 overflow-x-auto p-2.5 bg-white rounded-lg text-xs leading-relaxed border border-zinc-200/60 shadow-2xs">
               {current.payload}
             </pre>
           </div>
 
           {/* Response Stream */}
           <div className="rounded-xl bg-zinc-50/80 text-zinc-900 p-4 font-mono text-xs space-y-3 shadow-xs border border-zinc-200/80">
-            <div className="flex items-center justify-between border-b border-zinc-200/80 pb-2 text-[11px]">
+            <div className="flex items-center justify-between border-b border-zinc-200/80 pb-2 text-xs">
               <span className="text-zinc-600 flex items-center gap-1.5 font-semibold">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                 CONFIRMED RECEIPT
               </span>
-              <span className="text-emerald-600 font-bold">
+              <span className="text-emerald-700 font-bold text-xs font-mono">
                 {current.responseStatus}
               </span>
             </div>
             <div className="space-y-2 p-2.5 bg-white rounded-lg border border-zinc-200/60 shadow-2xs">
-              <div className="text-zinc-600 text-[11px]">{current.responseDetail}</div>
-              <div className="text-emerald-700 text-[11px] flex items-center gap-1.5 font-semibold">
+              <div className="text-zinc-600 text-xs">{current.responseDetail}</div>
+              <div className="text-emerald-700 text-xs flex items-center gap-1.5 font-semibold">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Cryptographic Handshake Verified
               </div>
             </div>

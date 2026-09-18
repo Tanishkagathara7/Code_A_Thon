@@ -200,10 +200,10 @@ export default function MarketingPage() {
 
           <div className="max-w-5xl mx-auto relative z-10 space-y-8 hero-text-container text-center flex flex-col items-center">
             {/* Editorial Display Headline — Unified Color with Kinetic Multi-Color Animated Transitions */}
-            <div className="hero-headline-wrapper space-y-2 sm:space-y-4 max-w-5xl cursor-default select-none mx-auto py-2">
-              <h1 className="text-5xl sm:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[1.08] sm:leading-[1.06] text-center text-[#1E1B4B]">
+            <div className="hero-headline-wrapper space-y-1.5 sm:space-y-3 max-w-4xl lg:max-w-5xl cursor-default select-none mx-auto py-1">
+              <h1 className="text-5xl sm:text-7xl lg:text-[5.25rem] xl:text-[5.75rem] font-extrabold tracking-tight leading-[1.10] sm:leading-[1.07] text-center text-[#1E1B4B]">
                 {/* Line 1: Precision Operations */}
-                <div className="hero-headline-1 flex flex-wrap items-center justify-center gap-2 sm:gap-3.5 opacity-0">
+                <div className="hero-headline-1 flex flex-wrap items-center justify-center gap-2 sm:gap-3 opacity-0">
                   {/* Precision */}
                   <span
                     className="hero-anim-word relative inline-block px-1.5 sm:px-2 py-0.5 rounded-xl sm:rounded-2xl"
@@ -238,7 +238,7 @@ export default function MarketingPage() {
                 </div>
 
                 {/* Line 2: on Desktop */}
-                <div className="hero-headline-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3.5 mt-0.5 sm:mt-1 opacity-0">
+                <div className="hero-headline-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 mt-0.5 opacity-0">
                   <span
                     className="hero-anim-word relative inline-block px-1.5 sm:px-2 py-0.5 rounded-xl sm:rounded-2xl"
                     data-word="on-1"
@@ -271,7 +271,7 @@ export default function MarketingPage() {
                 </div>
 
                 {/* Line 3: Native Velocity on Mobile. */}
-                <div className="hero-headline-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3.5 mt-0.5 sm:mt-1 opacity-0">
+                <div className="hero-headline-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3 mt-0.5 opacity-0">
                   <span
                     className="hero-anim-word relative inline-block px-1.5 sm:px-2 py-0.5 rounded-xl sm:rounded-2xl"
                     data-word="native"
@@ -348,10 +348,10 @@ export default function MarketingPage() {
               <div className="hero-cta flex flex-wrap items-center justify-center gap-3.5" style={{ opacity: 0 }}>
                 <Link
                   href={domainConfig.landing.hero.ctaPrimary.href}
-                  className="btn-primary px-7 py-3.5 text-xs font-semibold tracking-wide shadow-md shadow-zinc-950/10"
+                  className="btn-primary px-7 py-3.5 text-xs font-semibold tracking-wide shadow-md shadow-zinc-950/10 inline-flex items-center"
                 >
                   <span>{domainConfig.landing.hero.ctaPrimary.label}</span>
-                  <ArrowRight className="w-4 h-4 ml-1.5" />
+                  <ArrowUpRight className="w-4 h-4 ml-1.5 opacity-80" />
                 </Link>
                 <Link
                   href="#product"
@@ -363,7 +363,7 @@ export default function MarketingPage() {
                       window.history.pushState(null, '', '#product');
                     }
                   }}
-                  className="btn-secondary px-6 py-3.5 text-xs font-semibold cursor-pointer shadow-sm hover:shadow inline-flex items-center"
+                  className="btn-secondary px-6 py-3.5 text-xs font-semibold cursor-pointer shadow-sm hover:shadow inline-flex items-center border border-zinc-300/90 bg-white/95 hover:bg-zinc-50"
                   aria-label="Explore platform features"
                 >
                   <span>{domainConfig.landing.hero.ctaSecondary.label}</span>
@@ -377,7 +377,7 @@ export default function MarketingPage() {
         {/* ========================================================
             01.5 PRODUCT STAGE SHOWCASE (DEDICATED SECTION)
            ======================================================== */}
-        <section id="product" className="product-stage-section relative pt-12 sm:pt-16 pb-20 sm:pb-28 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
+        <section id="product" className="product-stage-section relative pt-6 sm:pt-10 pb-8 sm:pb-12 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
           <div className="max-w-5xl mx-auto relative z-10">
             <div className="hero-product-stage">
               <HeroProductShowcase />
@@ -388,8 +388,8 @@ export default function MarketingPage() {
         {/* ========================================================
             02. EDITORIAL STATEMENT: CINEMATIC CONTRAST
            ======================================================== */}
-        <section className="section-philosophy py-24 sm:py-32 px-4 sm:px-6 border-b border-black/[0.06]">
-          <div className="max-w-5xl mx-auto space-y-6">
+        <section className="section-philosophy py-10 sm:py-14 px-4 sm:px-6 border-b border-black/[0.06]">
+          <div className="max-w-5xl mx-auto space-y-5">
             <div className="philosophy-eyebrow font-mono text-xs font-semibold uppercase tracking-wider text-blue-600">
               {'// 02. ARCHITECTURAL PHILOSOPHY'}
             </div>
@@ -413,14 +413,14 @@ export default function MarketingPage() {
         {/* ========================================================
             03. PRODUCT EXPERIENCE: BENTO GRID CLIENT PARITY
            ======================================================== */}
-        <section id="platform" className="section-parity py-24 sm:py-32 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
+        <section id="platform" className="section-parity py-12 sm:py-16 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
           <div className="max-w-6xl mx-auto space-y-12">
             <div className="parity-header max-w-3xl space-y-2">
               <div className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500">
                 {'// 03. CLIENT PURPOSE & PARITY'}
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
-                TWO DEDICATED CLIENTS. ONE CORE API.
+                Two Dedicated Clients. One Core API.
               </h2>
             </div>
 
@@ -490,14 +490,14 @@ export default function MarketingPage() {
         {/* ========================================================
             04. SYNCHRONIZATION CORRIDOR: CINEMATIC DEPTH
            ======================================================== */}
-        <section id="sync" className="sync-section py-24 sm:py-32 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
+        <section id="sync" className="sync-section py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
           <div className="max-w-6xl mx-auto space-y-12">
             <div className="sync-header text-left max-w-3xl space-y-2">
               <div className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500">
                 {'// 04. SYNCHRONIZATION CORRIDOR'}
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
-                ONE BACKEND. TWO CLIENTS. ZERO DRIFT.
+                One Backend. Two Clients. Zero Drift.
               </h2>
               <p className="text-sm text-zinc-600 leading-relaxed">
                 Watch desktop state changes synchronize with mobile native clients in under 35ms through atomic Mongoose mutations.
@@ -510,7 +510,7 @@ export default function MarketingPage() {
               <div className="sync-desktop-card md:col-span-7 bento-card p-6 space-y-4 bg-white/85 backdrop-blur-md transition-all duration-300 hover:shadow-lg">
                 <div className="flex items-center justify-between border-b border-black/[0.06] pb-3 text-xs font-semibold text-zinc-800">
                   <span>CLIENT A: DESKTOP DISPATCH</span>
-                  <span className="font-mono text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-200">Port 3000</span>
+                  <span className="font-mono text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-200">Port 3000</span>
                 </div>
                 <div className="space-y-2 font-mono text-xs text-zinc-900 bg-zinc-50/80 p-4 rounded-xl border border-black/[0.06]">
                   <div className="text-zinc-500">{'// Dispatching item state change'}</div>
@@ -523,7 +523,7 @@ export default function MarketingPage() {
               <div className="sync-mobile-card md:col-span-5 bento-card p-6 space-y-4 bg-white/85 backdrop-blur-md transition-all duration-300 hover:shadow-lg">
                 <div className="flex items-center justify-between border-b border-black/[0.06] pb-3 text-xs font-semibold text-zinc-800">
                   <span>CLIENT B: MOBILE SYNC</span>
-                  <span className="font-mono text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200">Expo 57</span>
+                  <span className="font-mono text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200">Expo 57</span>
                 </div>
                 <div className="space-y-2 font-mono text-xs text-zinc-900 bg-zinc-50/80 p-4 rounded-xl border border-black/[0.06]">
                   <div className="text-zinc-500">{'// Revalidated via cache invalidation'}</div>
@@ -538,14 +538,14 @@ export default function MarketingPage() {
         {/* ========================================================
             05. OPERATIONAL WORKFLOW: INTERACTIVE BENTO DEMO
            ======================================================== */}
-        <section id="workflow" className="section-workflow relative z-10 py-24 sm:py-32 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
+        <section id="workflow" className="section-workflow relative z-10 py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
           <div className="max-w-6xl mx-auto space-y-8 relative z-10">
             <div className="workflow-header max-w-2xl space-y-2">
               <div className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500">
                 {'// 05. INTERACTIVE WORKFLOW'}
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
-                END-TO-END EXECUTION WITH REAL PAYLOADS
+                End-to-End Execution with Real Payloads
               </h2>
             </div>
 
@@ -556,27 +556,30 @@ export default function MarketingPage() {
         {/* ========================================================
             06. REAL ASSET: CODE-A-THON HERITAGE
            ======================================================== */}
-        <section id="heritage" className="codeathon-section py-24 sm:py-32 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
+        <section id="heritage" className="codeathon-section py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
           <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            <div className="codeathon-copy-col lg:col-span-5 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-amber-50 text-amber-800 border border-amber-200/80 rounded-full text-xs font-semibold shadow-sm">
+            <div className="codeathon-copy-col lg:col-span-5 space-y-6 flex flex-col justify-center">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-amber-50 text-amber-800 border border-amber-200/80 rounded-full text-xs font-semibold shadow-sm w-fit">
                 <Code2 className="w-4 h-4 text-amber-600" />
                 <span>CODE-A-THON HERITAGE</span>
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 leading-tight">
-                BORN UNDER HACKATHON PRESSURE.
+                Born Under Hackathon Pressure.
               </h2>
               <p className="text-sm sm:text-base text-zinc-600 leading-relaxed">
                 APP was conceived and built to solve a concrete engineering challenge: how to architect a production-ready, cross-platform system at breakneck speed without introducing architectural drift or sacrificing mobile security.
               </p>
-              <div className="space-y-3 font-mono text-xs font-semibold text-zinc-800">
+              <p className="text-xs sm:text-sm text-zinc-500 leading-relaxed">
+                Engineered with strict API contracts, end-to-end type safety, atomic state synchronization, and biometric persistence built into the core baseline from day one.
+              </p>
+              <div className="space-y-3 font-mono text-xs font-semibold text-zinc-800 pt-1">
                 <div className="p-3.5 rounded-xl bg-white/80 backdrop-blur-sm border border-black/[0.06] flex items-center justify-between">
                   <span>ARCHITECTURAL PARITY</span>
-                  <span className="bg-zinc-900 text-white px-2.5 py-0.5 rounded text-[11px]">100% VERIFIED</span>
+                  <span className="bg-zinc-900 text-white px-2.5 py-0.5 rounded text-xs">100% VERIFIED</span>
                 </div>
                 <div className="p-3.5 rounded-xl bg-white/80 backdrop-blur-sm border border-black/[0.06] flex items-center justify-between">
                   <span>MOBILE RUNTIME</span>
-                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[11px]">EXPO 57 SAFE</span>
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-xs">EXPO 57 SAFE</span>
                 </div>
               </div>
             </div>
@@ -600,7 +603,7 @@ export default function MarketingPage() {
                       <span className="w-2 h-2 rounded-full bg-blue-600" />
                       Official Architecture Artifact
                     </span>
-                    <span className="text-zinc-500 font-mono text-[11px]">Next.js + Expo Shared Core</span>
+                    <span className="text-zinc-500 font-mono text-xs">Next.js + Expo Shared Core</span>
                   </div>
                 </div>
               </TiltCard>
@@ -611,8 +614,8 @@ export default function MarketingPage() {
         {/* ========================================================
             07. REAL ASSET: TANISH (CREATOR & ARCHITECT)
            ======================================================== */}
-        <section className="tanish-section py-24 sm:py-32 px-4 sm:px-6 border-b border-black/[0.06]">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <section className="tanish-section py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06]">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             {/* Real Tanish portrait in sleek frame */}
             <div className="lg:col-span-5 relative order-2 lg:order-1 flex justify-center">
               <TiltCard maxTilt={18} perspective={1000} className="max-w-xs w-full">
@@ -641,19 +644,19 @@ export default function MarketingPage() {
                 {'// 07. ENGINEERING CONTEXT'}
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 leading-tight">
-                ENGINEERED WITH DISCIPLINE.{' '}
-                <Highlight variant="green">DELIVERED FOR SPEED.</Highlight>
+                Engineered with Discipline.{' '}
+                <Highlight variant="green">Delivered for Speed.</Highlight>
               </h2>
               <p className="text-base text-zinc-600 leading-relaxed italic font-normal">
                 &ldquo;A great cross-platform product is not a single codebase stretched across two form factors. It is an authoritative backend and shared data contract powering two unapologetically native client experiences.&rdquo;
               </p>
               <div className="flex items-center gap-4 pt-2 text-xs font-medium">
                 <div className="p-3.5 rounded-xl bg-white/85 border border-black/[0.06] shadow-sm backdrop-blur-sm">
-                  <span className="text-zinc-400 block text-[10px] font-mono">REPOSITORY</span>
+                  <span className="text-zinc-400 block text-xs font-mono">REPOSITORY</span>
                   <span className="text-zinc-900 font-semibold">Tanishkagathara7</span>
                 </div>
                 <div className="p-3.5 rounded-xl bg-white/85 border border-black/[0.06] shadow-sm backdrop-blur-sm">
-                  <span className="text-zinc-400 block text-[10px] font-mono">APPLICATION</span>
+                  <span className="text-zinc-400 block text-xs font-mono">APPLICATION</span>
                   <span className="text-zinc-900 font-semibold">APP Multi-Platform Core</span>
                 </div>
               </div>
@@ -664,7 +667,7 @@ export default function MarketingPage() {
         {/* ========================================================
             08. TECHNICAL ARCHITECTURE: TOPOLOGY BENTO
            ======================================================== */}
-        <section id="architecture" className="section-topology relative z-10 py-24 sm:py-32 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
+        <section id="architecture" className="section-topology relative z-10 py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
           <div className="max-w-6xl mx-auto space-y-8 relative z-10">
             <ArchitectureDiagram />
           </div>
@@ -673,14 +676,14 @@ export default function MarketingPage() {
         {/* ========================================================
             09. FAQ SECTION: BENTO ACCORDION
            ======================================================== */}
-        <section id="faq" className="section-faq py-24 sm:py-32 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
+        <section id="faq" className="section-faq py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
           <div className="max-w-4xl mx-auto space-y-10">
             <div className="faq-header text-left space-y-2">
               <div className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500">
                 {'// 09. FREQUENTLY ASKED QUESTIONS'}
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
-                TECHNICAL FAQ
+                Technical FAQ
               </h2>
             </div>
 
@@ -691,19 +694,19 @@ export default function MarketingPage() {
         {/* ========================================================
             10. FINAL CTA: CINEMATIC BENTO FINALE
            ======================================================== */}
-        <section className="section-cta py-24 sm:py-32 px-4 sm:px-6 border-b border-black/[0.06] relative overflow-hidden">
+        <section className="section-cta py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] relative overflow-hidden">
           <div className="max-w-4xl mx-auto text-left relative z-10 space-y-8">
             <div className="cta-badge inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-50 text-blue-700 border border-blue-200/80 rounded-full text-xs font-semibold shadow-sm">
               <Sparkles className="w-3.5 h-3.5" />
               <span>DEPLOYMENT READY</span>
             </div>
 
-            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-zinc-950 leading-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-950 leading-tight">
               <span className="cta-headline-line block overflow-hidden">
-                BUILT ONCE.
+                Built once.
               </span>
               <span className="cta-headline-line block overflow-hidden mt-1">
-                DESIGNED FOR <Highlight variant="blue">EVERYWHERE.</Highlight>
+                Designed for <Highlight variant="blue">everywhere.</Highlight>
               </span>
             </h2>
 
@@ -714,16 +717,17 @@ export default function MarketingPage() {
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <Link
                 href="/signup"
-                className="cta-button btn-primary px-8 py-4 text-xs font-semibold tracking-wide shadow-md shadow-zinc-950/10 hover:shadow-lg transition-all"
+                className="cta-button btn-primary px-8 py-4 text-xs font-semibold tracking-wide shadow-md shadow-zinc-950/10 hover:shadow-lg transition-all inline-flex items-center"
               >
                 <span>Get Started Now</span>
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
               <Link
                 href="/login"
-                className="cta-button btn-secondary px-8 py-4 text-xs font-semibold shadow-xs hover:shadow transition-all"
+                className="cta-button btn-secondary px-8 py-4 text-xs font-semibold shadow-xs hover:shadow transition-all inline-flex items-center"
               >
-                <span>Sign in to Account</span>
+                <span>Sign In</span>
+                <ArrowUpRight className="w-4 h-4 ml-1.5 opacity-60" />
               </Link>
             </div>
           </div>

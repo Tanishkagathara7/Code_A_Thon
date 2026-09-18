@@ -25,7 +25,7 @@ export const SectionBackgroundDecorations: React.FC = () => {
           SECTION 02 & 03: PHILOSOPHY & CLIENT PARITY (1400px - 3000px)
          ========================================================================= */}
       {/* Left: Pale mint organic shape with nested precision linework */}
-      <div className="absolute top-[1480px] -left-36 lg:-left-24 xl:-left-12">
+      <div className="absolute top-[1360px] -left-36 lg:-left-24 xl:-left-12">
         <OrganicBlob
           width={480}
           height={480}
@@ -38,7 +38,7 @@ export const SectionBackgroundDecorations: React.FC = () => {
       </div>
 
       {/* Left Philosophy Linework: Clean mathematical arc */}
-      <div className="hidden md:block absolute top-[1560px] left-4 lg:left-12 xl:left-24">
+      <div className="hidden md:block absolute top-[1440px] left-4 lg:left-12 xl:left-24">
         <PrecisionArc
           width={340}
           height={340}
@@ -57,7 +57,7 @@ export const SectionBackgroundDecorations: React.FC = () => {
       </div>
 
       {/* Left Crosshair Cluster */}
-      <div className="hidden lg:flex flex-col gap-6 absolute top-[1780px] left-12 xl:left-24">
+      <div className="hidden lg:flex flex-col gap-6 absolute top-[1660px] left-12 xl:left-24">
         <TechnicalCrosshair size={12} color="#2563EB" />
         <TechnicalConnectingLine length={90} vertical color="rgba(37, 99, 235, 0.25)" withArrow />
         <TechnicalCrosshair size={10} color="#059669" />
@@ -253,7 +253,7 @@ export const SectionBackgroundDecorations: React.FC = () => {
       <div className="hidden xl:block absolute top-[5920px] right-14">
         <EditorialAnnotation
           text="Build. Learn. Ship. Repeat."
-          subtext="CONTINUOUS REFINEMENT"
+          subtext="Continuous refinement"
           rotation="-rotate-6"
         />
       </div>
@@ -333,7 +333,7 @@ export const SectionBackgroundDecorations: React.FC = () => {
       <div className="hidden xl:block absolute top-[7620px] right-16">
         <EditorialAnnotation
           text="Good Questions. Better Builders."
-          subtext="DEVELOPER ACCESSIBILITY"
+          subtext="Developer accessibility"
           rotation="rotate-6"
         />
       </div>

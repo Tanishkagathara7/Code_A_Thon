@@ -17,9 +17,9 @@ export const HeroProductShowcase: React.FC = () => {
       {/* ========================================================
           HERO MAIN STAGE: 3D ISOMETRIC TABLET MOCKUP WITH STYLUS
          ======================================================== */}
-      <div className="w-full relative py-2 sm:py-6 select-none">
+      <div className="w-full relative py-0 select-none">
         {/* 3D Perspective Stage Container */}
-        <div className="tablet-perspective-stage relative max-w-5xl mx-auto py-8 px-2 sm:px-6">
+        <div className="tablet-perspective-stage relative max-w-5xl mx-auto pt-2 pb-4 px-2 sm:px-6">
           {/* Playful background decorative shapes matching reference image */}
           <div className="absolute -top-10 -left-12 w-64 h-64 bg-pink-200/40 rounded-full blur-2xl pointer-events-none -z-10" />
           <div className="absolute -bottom-8 left-1/4 w-80 h-32 bg-emerald-300/30 rounded-full blur-2xl pointer-events-none -z-10" />
@@ -89,7 +89,7 @@ export const HeroProductShowcase: React.FC = () => {
                         <ShieldCheck className="w-4 h-4 text-zinc-400" />
                         <span>Manage</span>
                       </div>
-                      <span className="text-[10px] text-zinc-400 font-mono">›</span>
+                      <span className="text-xs text-zinc-400 font-mono">›</span>
                     </div>
                     <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-zinc-600 hover:bg-zinc-100 text-xs font-medium transition-colors">
                       <Zap className="w-4 h-4 text-zinc-400" />
@@ -97,7 +97,7 @@ export const HeroProductShowcase: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="p-2.5 rounded-lg bg-white border border-zinc-200/80 text-[10px] text-zinc-500">
+                  <div className="p-2.5 rounded-lg bg-white border border-zinc-200/80 text-xs text-zinc-500">
                     <div className="font-semibold text-zinc-800">Status</div>
                     <div className="flex items-center gap-1.5 text-emerald-600 font-medium mt-0.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -107,193 +107,94 @@ export const HeroProductShowcase: React.FC = () => {
                 </div>
 
                 {/* Main Content Area */}
-                <div className="flex-1 p-4 sm:p-6 space-y-6 overflow-x-auto bg-white">
+                <div className="flex-1 p-5 sm:p-6 space-y-6 overflow-x-auto bg-white">
                   
-                  {/* Dashboard Page Title */}
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-bold tracking-tight text-zinc-900">Dashboard</h3>
-                    <span className="font-mono text-[11px] text-zinc-500 bg-zinc-100 px-2.5 py-1 rounded-md">
-                      16-07-2026
-                    </span>
+                  {/* Dashboard Header Bar (Using div with presentation semantics to not disrupt page H1->H2 outline) */}
+                  <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
+                    <div>
+                      <div className="text-base font-bold tracking-tight text-zinc-900" role="presentation">
+                        Operational Dashboard
+                      </div>
+                      <div className="text-xs text-zinc-500 font-medium">Real-Time Inquiry Telemetry</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs text-zinc-600 bg-zinc-100 px-3 py-1 rounded-md tabular-nums">
+                        16-07-2026 05:03 pm
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Section 1: New Inquiry Table */}
-                  <div className="space-y-2.5">
-                    <div className="flex items-center justify-between text-xs">
-                      <h4 className="font-bold text-zinc-800 text-sm">New Inquiry</h4>
+                  {/* Summary Metric Cards (Spacious & High Readability) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                    <div className="p-3.5 rounded-xl bg-cyan-50/60 border border-cyan-200/70">
+                      <div className="text-xs text-cyan-800 font-semibold">Active Inquiries</div>
+                      <div className="text-xl font-bold text-cyan-950 mt-1">24 Received</div>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200/70">
+                      <div className="text-xs text-emerald-800 font-semibold">Sync Status</div>
+                      <div className="text-xl font-bold text-emerald-950 mt-1">100% In Sync</div>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-violet-50/60 border border-violet-200/70">
+                      <div className="text-xs text-violet-800 font-semibold">Avg Response</div>
+                      <div className="text-xl font-bold text-violet-950 mt-1">&lt; 38ms</div>
+                    </div>
+                  </div>
+
+                  {/* Focused Table Preview */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="font-semibold text-zinc-800 text-sm">Recent Live Inquiries</div>
+                      <span className="text-xs text-zinc-500">Showing 2 of 24 records</span>
                     </div>
 
-                    <div className="flex items-center justify-between text-[11px] text-zinc-500 pb-1">
-                      <div className="flex items-center gap-1.5">
-                        <span>Show</span>
-                        <span className="px-1.5 py-0.5 border border-zinc-200 rounded bg-zinc-50 font-medium">10</span>
-                        <span>entries</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <span>Search:</span>
-                        <input
-                          type="text"
-                          readOnly
-                          placeholder=""
-                          className="w-24 sm:w-32 px-2 py-0.5 border border-zinc-200 rounded bg-zinc-50 text-[11px]"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Styled Table 1 */}
-                    <div className="rounded-lg border border-zinc-200 overflow-hidden shadow-xs">
+                    <div className="rounded-xl border border-zinc-200 overflow-hidden shadow-xs">
                       <div className="overflow-x-auto">
-                        <table className="w-full text-left text-[11px]">
-                          <thead className="bg-zinc-50 border-b border-zinc-200 text-zinc-600 font-semibold uppercase tracking-wider text-[10px]">
+                        <table className="w-full text-left text-xs" aria-label="Recent Inquiries Preview">
+                          <thead className="bg-zinc-50 border-b border-zinc-200 text-zinc-600 font-semibold">
                             <tr>
-                              <th className="px-3 py-2">Inquiry No</th>
-                              <th className="px-3 py-2">Customer</th>
-                              <th className="px-3 py-2">Destination</th>
-                              <th className="px-3 py-2">Travel Date</th>
-                              <th className="px-3 py-2">Persons</th>
-                              <th className="px-3 py-2">Rooms</th>
-                              <th className="px-3 py-2">Handled By</th>
-                              <th className="px-3 py-2">Created Date</th>
-                              <th className="px-3 py-2">Status</th>
-                              <th className="px-3 py-2 text-center">Action</th>
+                              <th className="px-4 py-3">Inquiry ID</th>
+                              <th className="px-4 py-3">Customer</th>
+                              <th className="px-4 py-3">Destination</th>
+                              <th className="px-4 py-3">Handled By</th>
+                              <th className="px-4 py-3">Timestamp</th>
+                              <th className="px-4 py-3">Status</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-zinc-100 text-zinc-700">
                             <tr className="hover:bg-zinc-50/60 transition-colors">
-                              <td className="px-3 py-2.5 font-medium text-zinc-900">INQ001</td>
-                              <td className="px-3 py-2.5">Mr. Alice</td>
-                              <td className="px-3 py-2.5">Thailand</td>
-                              <td className="px-3 py-2.5 font-mono">01-08-2026</td>
-                              <td className="px-3 py-2.5 text-center">1</td>
-                              <td className="px-3 py-2.5 text-center">1</td>
-                              <td className="px-3 py-2.5">Mr. John</td>
-                              <td className="px-3 py-2.5 font-mono text-[10px] text-zinc-500">16-07-2026 05:03 PM</td>
-                              <td className="px-3 py-2.5">
-                                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+                              <td className="px-4 py-3 font-mono font-medium text-zinc-900">INQ-001</td>
+                              <td className="px-4 py-3 font-medium text-zinc-800">Mr. Alice</td>
+                              <td className="px-4 py-3">Thailand</td>
+                              <td className="px-4 py-3">Mr. John</td>
+                              <td className="px-4 py-3 font-mono text-xs tabular-nums text-zinc-600">
+                                16-07-2026 05:03 pm
+                              </td>
+                              <td className="px-4 py-3">
+                                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
                                   <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
                                   New
                                 </span>
                               </td>
-                              <td className="px-3 py-2.5">
-                                <div className="flex items-center justify-center gap-1.5">
-                                  <button className="p-1 rounded bg-cyan-500 text-white hover:bg-cyan-600 shadow-xs cursor-pointer" title="Edit">
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                    </svg>
-                                  </button>
-                                  <button className="p-1 rounded bg-rose-500 text-white hover:bg-rose-600 shadow-xs cursor-pointer" title="Delete">
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                  </button>
-                                </div>
-                              </td>
                             </tr>
-                          </tbody>
-                        </table>
-                      </div>
-
-                      {/* Table Pagination footer */}
-                      <div className="bg-zinc-50/70 px-3 py-2 border-t border-zinc-200 flex items-center justify-between text-[10px] text-zinc-500">
-                        <span>Showing 1 to 1 of 1 entries</span>
-                        <div className="flex items-center gap-1">
-                          <button className="px-2 py-0.5 rounded border border-zinc-200 bg-white text-zinc-600 cursor-pointer">Previous</button>
-                          <button className="px-2 py-0.5 rounded bg-cyan-500 text-white font-semibold cursor-pointer">1</button>
-                          <button className="px-2 py-0.5 rounded border border-zinc-200 bg-white text-zinc-600 cursor-pointer">Next</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Section 2: Today's Follow-up Table */}
-                  <div className="space-y-2.5 pt-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <h4 className="font-bold text-zinc-800 text-sm">Today&apos;s Follow-up</h4>
-                    </div>
-
-                    <div className="flex items-center justify-between text-[11px] text-zinc-500 pb-1">
-                      <div className="flex items-center gap-1.5">
-                        <span>Show</span>
-                        <span className="px-1.5 py-0.5 border border-zinc-200 rounded bg-zinc-50 font-medium">10</span>
-                        <span>entries</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <span>Search:</span>
-                        <input
-                          type="text"
-                          readOnly
-                          placeholder=""
-                          className="w-24 sm:w-32 px-2 py-0.5 border border-zinc-200 rounded bg-zinc-50 text-[11px]"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Styled Table 2 */}
-                    <div className="rounded-lg border border-zinc-200 overflow-hidden shadow-xs">
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-left text-[11px]">
-                          <thead className="bg-zinc-50 border-b border-zinc-200 text-zinc-600 font-semibold uppercase tracking-wider text-[10px]">
-                            <tr>
-                              <th className="px-3 py-2">Inquiry No</th>
-                              <th className="px-3 py-2">Customer</th>
-                              <th className="px-3 py-2">Destination</th>
-                              <th className="px-3 py-2">Travel Date</th>
-                              <th className="px-3 py-2">Followup Type</th>
-                              <th className="px-3 py-2">Followup Date</th>
-                              <th className="px-3 py-2">Followup Remark</th>
-                              <th className="px-3 py-2">Status</th>
-                              <th className="px-3 py-2 text-center">Action</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-zinc-100 text-zinc-700">
                             <tr className="hover:bg-zinc-50/60 transition-colors">
-                              <td className="px-3 py-2.5 font-medium text-zinc-900">INQ002</td>
-                              <td className="px-3 py-2.5">Mr. Mike</td>
-                              <td className="px-3 py-2.5">Thailand</td>
-                              <td className="px-3 py-2.5 font-mono">10-08-2026</td>
-                              <td className="px-3 py-2.5">Email</td>
-                              <td className="px-3 py-2.5 font-mono text-[10px] text-zinc-500">16-07-2026 05:03 PM</td>
-                              <td className="px-3 py-2.5 text-zinc-600">reminder sent</td>
-                              <td className="px-3 py-2.5">
-                                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                              <td className="px-4 py-3 font-mono font-medium text-zinc-900">INQ-002</td>
+                              <td className="px-4 py-3 font-medium text-zinc-800">Mr. Mike</td>
+                              <td className="px-4 py-3">Thailand</td>
+                              <td className="px-4 py-3">Mr. John</td>
+                              <td className="px-4 py-3 font-mono text-xs tabular-nums text-zinc-600">
+                                16-07-2026 05:03 pm
+                              </td>
+                              <td className="px-4 py-3">
+                                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
                                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                                   In Progress
                                 </span>
                               </td>
-                              <td className="px-3 py-2.5">
-                                <div className="flex items-center justify-center gap-1.5">
-                                  <button className="p-1 rounded bg-cyan-500 text-white hover:bg-cyan-600 shadow-xs cursor-pointer" title="Edit">
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                    </svg>
-                                  </button>
-                                  <button className="p-1 rounded bg-rose-500 text-white hover:bg-rose-600 shadow-xs cursor-pointer" title="Delete">
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                  </button>
-                                </div>
-                              </td>
                             </tr>
                           </tbody>
                         </table>
                       </div>
-
-                      {/* Table Pagination footer */}
-                      <div className="bg-zinc-50/70 px-3 py-2 border-t border-zinc-200 flex items-center justify-between text-[10px] text-zinc-500">
-                        <span>Showing 1 to 1 of 1 entries</span>
-                        <div className="flex items-center gap-1">
-                          <button className="px-2 py-0.5 rounded border border-zinc-200 bg-white text-zinc-600 cursor-pointer">Previous</button>
-                          <button className="px-2 py-0.5 rounded bg-cyan-500 text-white font-semibold cursor-pointer">1</button>
-                          <button className="px-2 py-0.5 rounded border border-zinc-200 bg-white text-zinc-600 cursor-pointer">Next</button>
-                        </div>
-                      </div>
                     </div>
-                  </div>
-
-                  {/* Section 3: Tomorrow's Follow-up Table preview header */}
-                  <div className="pt-2">
-                    <h4 className="font-bold text-zinc-800 text-sm">Tomorrow&apos;s Follow-up</h4>
                   </div>
                 </div>
               </div>

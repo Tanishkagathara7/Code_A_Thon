@@ -91,7 +91,7 @@ export const MarketingNav: React.FC = () => {
             className="relative px-3.5 py-2 text-xs font-semibold text-zinc-700 hover:text-zinc-950 rounded-full transition-colors duration-200 group overflow-hidden"
           >
             <span className="absolute inset-0 bg-zinc-900/[0.06] rounded-full scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-200 ease-out pointer-events-none" />
-            <span className="relative z-10 font-semibold">{domainConfig.brand.shortName ? 'Sign in' : 'Login'}</span>
+            <span className="relative z-10 font-semibold">Sign In</span>
           </Link>
           <Link
             href="/signup"

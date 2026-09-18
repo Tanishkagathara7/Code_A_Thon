@@ -21,7 +21,7 @@ export const EditorialAnnotation: React.FC<{
         {withArrow && <ArrowUpRight className="w-3.5 h-3.5 text-zinc-400" />}
       </div>
       {subtext && (
-        <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">
+        <span className="text-xs font-mono font-medium tracking-wide text-zinc-500">
           {subtext}
         </span>
       )}
@@ -36,7 +36,7 @@ export const TechnicalTag: React.FC<{
 }> = ({ label, className = '', vertical = false }) => {
   return (
     <div
-      className={`pointer-events-none select-none text-[11px] font-mono font-semibold tracking-wider text-zinc-600 dark:text-zinc-300 uppercase ${
+      className={`pointer-events-none select-none text-xs font-mono font-semibold tracking-wider text-zinc-600 dark:text-zinc-300 uppercase ${
         vertical ? 'writing-vertical tracking-[0.25em]' : ''
       } ${className}`}
       style={vertical ? { writingMode: 'vertical-rl', textOrientation: 'mixed' } : undefined}

@@ -102,7 +102,7 @@ export const HeroOrbitalSystem: React.FC = () => {
       <div className="hidden lg:block absolute top-[430px] right-8 xl:right-20">
         <EditorialAnnotation
           text="Zero sync drift verified."
-          subtext="CROSS-SURFACE TELEMETRY"
+          subtext="Cross-Surface Telemetry"
           rotation="-rotate-2"
           withArrow
         />
@@ -114,7 +114,7 @@ export const HeroOrbitalSystem: React.FC = () => {
       <div className="hidden xl:block absolute top-[720px] left-10">
         <EditorialAnnotation
           text="Same power. Every screen."
-          subtext="DESKTOP & MOBILE PARITY"
+          subtext="Desktop & Mobile Parity"
           rotation="rotate-3"
         />
       </div>
