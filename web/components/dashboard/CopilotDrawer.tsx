@@ -1,0 +1,202 @@
+'use client';
+
+import React, { useState } from 'react';
+import {
+  Sparkles,
+  Send,
+  Loader2,
+  Copy,
+  Check,
+  FileText,
+  Search,
+  MessageSquare,
+} from 'lucide-react';
+import { aiApi } from '@/lib/api/domain';
+import { useToast } from '@/lib/context/ToastContext';
+
+interface CopilotDrawerProps {
+  totalIncidents?: number;
+  activeIncidents?: number;
+  resolvedIncidents?: number;
+  recentTitles?: string[];
+}
+
+export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
+  totalIncidents = 24,
+  activeIncidents = 6,
+  resolvedIncidents = 18,
+  recentTitles = [],
+}) => {
+  const [prompt, setPrompt] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [response, setResponse] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
+
+  const runCopilot = async (customPrompt: string) => {
+    setLoading(true);
+    setResponse(null);
+    try {
+      const res = await aiApi.generate({
+        prompt: customPrompt,
+        system:
+          'You are Pulse AI Copilot, an operational incident commander assistant. Provide concise, high-impact bulleted summaries and clear operational directives.',
+      });
+      if (res.data?.text) {
+        setResponse(res.data.text);
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Copilot request failed';
+      toast(msg, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!prompt.trim()) return;
+    runCopilot(prompt.trim());
+    setPrompt('');
+  };
+
+  const handleCopy = () => {
+    if (!response) return;
+    navigator.clipboard.writeText(response);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="bg-[#11152F] rounded-2xl p-6 text-white shadow-md flex flex-col justify-between relative overflow-hidden h-full">
+      {/* Subtle faint grid overlay only */}
+      <div
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, #FFFFFF 1px, transparent 1px),
+            linear-gradient(to bottom, #FFFFFF 1px, transparent 1px)
+          `,
+          backgroundSize: '24px 24px',
+        }}
+      />
+
+      <div className="space-y-4 relative z-10">
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-[#A78BFA]">
+            <Sparkles className="w-4 h-4 text-[#A78BFA]" />
+          </div>
+          <div className="flex items-center gap-2">
+            <h3 className="text-base font-bold text-white tracking-tight">Pulse AI Copilot</h3>
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#10B981]/20 border border-[#10B981]/30 text-[10px] font-medium text-[#34D399]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+              Online
+            </span>
+          </div>
+        </div>
+
+        {/* Subtitle */}
+        <p className="text-xs text-zinc-300">
+          Turn incident data into clear operational actions.
+        </p>
+
+        {/* Action Buttons */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+          <button
+            type="button"
+            onClick={() =>
+              runCopilot(
+                `Summarize all active incident data: ${totalIncidents} total incidents, ${activeIncidents} active/in-flight, ${resolvedIncidents} resolved. Recent events: ${recentTitles.join(', ') || 'API latency spike, Login failure on mobile, Sync error'}. Provide brief action points.`
+              )
+            }
+            disabled={loading}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-zinc-200 transition-colors text-left cursor-pointer"
+          >
+            <FileText className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+            <span className="truncate">Summarize incidents</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              runCopilot(
+                `Find recurring issues and failure patterns among recent incidents: ${recentTitles.join(', ') || 'API latency spike, Login failure on mobile, Sync error'}. Recommend preventative containment.`
+              )
+            }
+            disabled={loading}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-zinc-200 transition-colors text-left cursor-pointer"
+          >
+            <Search className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+            <span className="truncate">Find recurring issues</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              runCopilot(
+                `Draft an executive operational status update for stakeholders regarding current active incidents (${activeIncidents} in-flight out of ${totalIncidents} total).`
+              )
+            }
+            disabled={loading}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-zinc-200 transition-colors text-left cursor-pointer"
+          >
+            <MessageSquare className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+            <span className="truncate">Draft status update</span>
+          </button>
+        </div>
+
+        {/* Output area when generated */}
+        {loading && (
+          <div className="p-4 rounded-xl bg-black/40 border border-white/10 text-xs text-zinc-300 flex items-center justify-center gap-2 font-mono">
+            <Loader2 className="w-4 h-4 animate-spin text-[#A78BFA]" />
+            <span>Analyzing operational streams...</span>
+          </div>
+        )}
+
+        {response && !loading && (
+          <div className="p-3.5 rounded-xl bg-black/40 border border-white/10 text-xs text-zinc-200 space-y-2">
+            <div className="flex items-center justify-between border-b border-white/10 pb-1.5 text-[11px] text-zinc-400">
+              <span className="font-semibold text-[#A78BFA]">Copilot Response</span>
+              <button
+                onClick={handleCopy}
+                className="flex items-center gap-1 hover:text-white transition-colors"
+              >
+                {copied ? <Check className="w-3 h-3 text-[#10B981]" /> : <Copy className="w-3 h-3" />}
+                <span>{copied ? 'Copied' : 'Copy'}</span>
+              </button>
+            </div>
+            <div className="max-h-36 overflow-y-auto pr-1 whitespace-pre-wrap leading-relaxed">
+              {response}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* White Input Field with Purple Arrow Button */}
+      <form onSubmit={handleSubmit} className="pt-4 relative z-10 flex items-center gap-2">
+        <div className="relative flex-1">
+          <input
+            type="text"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            placeholder="Ask Pulse AI anything..."
+            className="w-full bg-white text-[#101226] placeholder:text-[#68728A] px-4 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#5B45F5] font-sans"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading || !prompt.trim()}
+          className="w-9 h-9 rounded-xl bg-[#5B45F5] hover:bg-[#4834df] text-white flex items-center justify-center transition-all disabled:opacity-40 cursor-pointer shrink-0"
+        >
+          {loading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Send className="w-4 h-4" />
+          )}
+        </button>
+      </form>
+    </div>
+  );
+};

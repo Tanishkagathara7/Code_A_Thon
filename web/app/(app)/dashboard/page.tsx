@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import {
   TrendingUp,
@@ -12,12 +12,26 @@ import {
   Layers,
   ArrowRight,
   RefreshCw,
+  AlertTriangle,
+  ShieldCheck,
+  Zap,
+  Radio,
+  Filter,
+  Flame,
+  Check,
 } from 'lucide-react';
 import { analyticsApi, itemsApi } from '@/lib/api/domain';
 import { AnalyticsOverviewData, HackathonItem } from '@/lib/types';
-import { getStatusBadgeStyle, formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 import { useAuth } from '@/lib/context/AuthContext';
-import { domainConfig } from '@/lib/domain.config';
+import { domainConfig, RoleDashboardSpec } from '@/lib/domain.config';
+import { OperationalMetricCard } from '@/components/dashboard/OperationalMetricCard';
+import { IncidentTrendChart } from '@/components/dashboard/IncidentTrendChart';
+import { ServiceHealthSection } from '@/components/dashboard/ServiceHealthSection';
+import { CopilotDrawer } from '@/components/dashboard/CopilotDrawer';
+import { CategoryBreakdownCard } from '@/components/dashboard/CategoryBreakdownCard';
+
+type FilterTab = 'all' | 'urgent' | 'active' | 'completed';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -26,6 +40,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [feedFilter, setFeedFilter] = useState<FilterTab>('all');
 
   const loadData = async (isRefresh = false) => {
     if (isRefresh) {
@@ -36,7 +51,7 @@ export default function DashboardPage() {
     try {
       const [analyticsRes, itemsRes] = await Promise.all([
         analyticsApi.getOverview(),
-        itemsApi.getItems({ limit: 5, sort: 'createdAt_desc' }),
+        itemsApi.getItems({ limit: 12, sort: 'createdAt_desc' }),
       ]);
       setAnalytics(analyticsRes);
       setRecentItems(itemsRes.data || []);
@@ -55,7 +70,7 @@ export default function DashboardPage() {
       try {
         const [analyticsRes, itemsRes] = await Promise.all([
           analyticsApi.getOverview(),
-          itemsApi.getItems({ limit: 5, sort: 'createdAt_desc' }),
+          itemsApi.getItems({ limit: 12, sort: 'createdAt_desc' }),
         ]);
         if (active) {
           setAnalytics(analyticsRes);
@@ -89,257 +104,372 @@ export default function DashboardPage() {
   };
 
   const userRole = user?.role || 'user';
-  const roleDashboard = domainConfig.productSpec?.roleDashboards?.find((rd: any) => rd.roleId === userRole) ||
-    domainConfig.productSpec?.roleDashboards?.[0];
+  const roleDashboard = domainConfig.productSpec?.roleDashboards?.find(
+    (rd: RoleDashboardSpec) => rd.roleId === userRole
+  ) || domainConfig.productSpec?.roleDashboards?.[0];
+
   const primaryActionLabel = roleDashboard?.primaryAction?.label || `Log ${domainConfig.domain.primaryEntityName}`;
   const primaryActionHref = roleDashboard?.primaryAction?.href || '/items/new';
-  const welcomeSubtext = roleDashboard?.welcomeMessage || `${domainConfig.brand.tagline} • Real-time telemetry synchronized across Mobile & Web.`;
+
+  // Filtered feed for actionable operational UX
+  const filteredFeed = useMemo(() => {
+    if (feedFilter === 'urgent') {
+      return recentItems.filter(
+        (item) => item.priority === 'urgent' || item.priority === 'high'
+      );
+    }
+    if (feedFilter === 'active') {
+      return recentItems.filter(
+        (item) => item.status === 'in_progress' || item.status === 'pending'
+      );
+    }
+    if (feedFilter === 'completed') {
+      return recentItems.filter((item) => item.status === 'completed');
+    }
+    return recentItems;
+  }, [recentItems, feedFilter]);
+
+  // Extract recent incident titles for Copilot context
+  const recentIncidentTitles = recentItems.map((item) => item.title);
 
   return (
-    <div className="space-y-8">
-      {/* Welcome Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-zinc-950 text-white p-6 sm:p-8 rounded-2xl relative overflow-hidden shadow-xl shadow-zinc-950/10">
-        <div className="relative z-10 space-y-2">
-          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-zinc-800 text-[11px] font-semibold text-indigo-400 border border-zinc-700">
-            <Sparkles className="w-3 h-3" />
-            <span>{domainConfig.brand.name} Command Center • <span className="uppercase text-emerald-400 font-bold">{userRole}</span></span>
+    <div className="space-y-8 pb-16">
+      {/* ========================================================
+          1. OPERATIONAL COMMAND CENTER HERO
+         ======================================================== */}
+      <div className="bg-white rounded-2xl border border-[#E6E9F0] p-6 sm:p-8 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative overflow-hidden">
+        {/* Left Side: Brand Badges, Title, Subtitle, and Action Buttons */}
+        <div className="space-y-3 max-w-2xl">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#101226] text-white text-[11px] font-bold">
+              <span className="w-2 h-2 rounded-full bg-[#16B981]" />
+              <span>PULSE DISPATCH MESH</span>
+            </div>
+
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EDE9FE] text-[11px] font-bold text-[#5B45F5]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#5B45F5]" />
+              <span>Role: <strong className="uppercase">{userRole}</strong></span>
+            </div>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-            Welcome back, {user?.name || 'Operator'}
+
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-[#101226]">
+            Operational Command Center
           </h1>
-          <p className="text-zinc-400 text-sm max-w-xl">
-            {welcomeSubtext}
+
+          <p className="text-xs sm:text-sm text-[#68728A] leading-relaxed">
+            Monitor incidents across web and mobile, analyze telemetry in real time, and coordinate faster with AI-powered intelligence.
           </p>
+
+          <div className="pt-2 flex flex-wrap items-center gap-3">
+            <Link
+              href="/items"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-[#E6E9F0] hover:bg-[#F8F9FC] text-[#101226] text-xs font-bold transition-all shadow-xs"
+            >
+              <Layers className="w-3.5 h-3.5 text-[#68728A]" />
+              <span>Incident Ledger</span>
+            </Link>
+
+            <Link
+              href="/items/new"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#5B45F5] hover:bg-[#4834df] text-white text-xs font-bold transition-all shadow-xs shadow-[#5B45F5]/25"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Log Incident</span>
+            </Link>
+          </div>
         </div>
 
-        <div className="relative z-10 flex items-center gap-3">
-          <button
-            onClick={() => loadData(true)}
-            disabled={refreshing}
-            className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all cursor-pointer"
-            title="Refresh Data"
-          >
-            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-          </button>
-          <Link
-            href={primaryActionHref}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>{primaryActionLabel}</span>
-          </Link>
-        </div>
+        {/* Right Side: Operational Context Block & Lifecycle Stepper */}
+        <div className="flex items-center gap-8 lg:border-l lg:border-[#E6E9F0] lg:pl-8">
+          <div className="space-y-1 text-right sm:text-left">
+            <div className="text-xs font-medium text-[#68728A]">
+              {new Date().toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+            </div>
+            <div className="text-sm font-black text-[#101226]">
+              {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+            </div>
+            <p className="text-xs text-[#68728A] pt-2 max-w-[180px] leading-snug">
+              Keep systems reliable. Turn signals into action.
+            </p>
+          </div>
 
-        {/* Decorative dynamic glows */}
-        <div className="absolute -right-20 -top-20 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -left-20 -bottom-20 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="hidden sm:flex flex-col space-y-1.5 text-[9px] font-bold tracking-widest text-[#94A3B8] uppercase pl-4 border-l border-[#E6E9F0]">
+            <span className="text-[#101226]">OBSERVE</span>
+            <span>INVESTIGATE</span>
+            <span>RESOLVE</span>
+            <span>IMPROVE</span>
+          </div>
+        </div>
       </div>
 
       {error && (
-        <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-sm flex items-center justify-between">
-          <span>{error}</span>
-          <button onClick={() => loadData()} className="underline font-semibold ml-4">
-            Retry
+        <div className="p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl text-xs flex items-center justify-between shadow-xs">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+            <span>{error}</span>
+          </div>
+          <button
+            onClick={() => loadData()}
+            className="underline font-bold cursor-pointer hover:text-rose-950 ml-4 shrink-0"
+          >
+            Retry Telemetry Probe
           </button>
         </div>
       )}
 
-      {/* KPI Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Total {domainConfig.domain.entityPluralName}</span>
-            <div className="p-2 rounded-lg bg-zinc-100 text-zinc-700">
-              <Layers className="w-4 h-4" />
-            </div>
-          </div>
-          <div>
-            <span className="text-3xl font-extrabold tracking-tight text-zinc-900">
-              {loading ? '—' : overview.total}
-            </span>
-          </div>
-          <div className="text-[11px] text-zinc-400">Total {domainConfig.domain.entityPluralName.toLowerCase()} tracked across devices</div>
+      {/* ========================================================
+          2. FOUR OPERATIONAL KPI CARDS
+         ======================================================== */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <OperationalMetricCard
+          label="TOTAL INCIDENTS"
+          value={loading ? '—' : overview.total}
+          subtext="Across web & mobile devices"
+          icon={Layers}
+          variant="total"
+          trend={overview.total > 0 ? '↑ 12%' : undefined}
+        />
+
+        <OperationalMetricCard
+          label="ACTIVE / IN-FLIGHT"
+          value={loading ? '—' : overview.inProgress}
+          subtext="Currently being handled"
+          icon={Clock}
+          variant="active"
+          trend={overview.inProgress > 0 ? '↑ 8%' : undefined}
+        />
+
+        <OperationalMetricCard
+          label="RESOLVED / FINALIZED"
+          value={loading ? '—' : overview.completed}
+          subtext="Successfully mitigated"
+          icon={CheckCircle2}
+          variant="resolved"
+          trend={overview.completed > 0 ? '↑ 28%' : undefined}
+        />
+
+        <OperationalMetricCard
+          label="RESOLUTION RATE"
+          value={loading ? '—' : `${overview.completionRate}%`}
+          subtext="SLA target: 70%"
+          icon={TrendingUp}
+          variant="velocity"
+          trend={overview.completionRate > 0 ? '↑ 12%' : undefined}
+        />
+      </div>
+
+      {/* ========================================================
+          3. INCIDENT ACTIVITY ANALYTICS & DARK AI COPILOT
+         ======================================================== */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        {/* Incident Activity Analytics (7 cols) */}
+        <div className="lg:col-span-7 flex flex-col">
+          <IncidentTrendChart
+            activity={analytics?.activity || []}
+            total={overview.total}
+          />
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Resolved / Completed</span>
-            <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
-              <CheckCircle2 className="w-4 h-4" />
-            </div>
-          </div>
-          <div>
-            <span className="text-3xl font-extrabold tracking-tight text-emerald-600">
-              {loading ? '—' : overview.completed}
-            </span>
-          </div>
-          <div className="text-[11px] text-zinc-400">Successfully finalized records</div>
-        </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Active / In-Flight</span>
-            <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
-              <Clock className="w-4 h-4" />
-            </div>
-          </div>
-          <div>
-            <span className="text-3xl font-extrabold tracking-tight text-indigo-600">
-              {loading ? '—' : overview.inProgress}
-            </span>
-          </div>
-          <div className="text-[11px] text-zinc-400">Active ongoing operations</div>
-        </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Resolution Rate</span>
-            <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
-              <TrendingUp className="w-4 h-4" />
-            </div>
-          </div>
-          <div>
-            <span className="text-3xl font-extrabold tracking-tight text-zinc-900">
-              {loading ? '—' : `${overview.completionRate}%`}
-            </span>
-          </div>
-          <div className="text-[11px] text-zinc-400">Overall operational throughput</div>
+        {/* Dark AI Copilot Panel (5 cols) */}
+        <div className="lg:col-span-5 flex flex-col">
+          <CopilotDrawer
+            totalIncidents={overview.total}
+            activeIncidents={overview.inProgress}
+            resolvedIncidents={overview.completed}
+            recentTitles={recentIncidentTitles}
+          />
         </div>
       </div>
 
-      {/* Main Content Grid: Recent Items & Category Distribution */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Recent Items Table */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-zinc-200/80 shadow-sm overflow-hidden flex flex-col">
-          <div className="p-6 border-b border-zinc-100 flex items-center justify-between">
-            <div>
-              <h3 className="text-base font-bold text-zinc-900 tracking-tight">Recent {domainConfig.domain.primaryEntityName} Activity</h3>
-              <p className="text-xs text-zinc-500">Live feed of {domainConfig.domain.entityPluralName.toLowerCase()} registered on Mobile & Web</p>
+      {/* ========================================================
+          4. RECENT INCIDENT ACTIVITY & CATEGORY BREAKDOWN
+         ======================================================== */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Recent Incident Activity Table (8 cols) */}
+        <div className="lg:col-span-8 bg-white rounded-2xl border border-[#E6E9F0] shadow-xs overflow-hidden flex flex-col">
+          <div className="p-6 border-b border-[#E6E9F0] flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-[#EDE9FE] text-[#5B45F5] flex items-center justify-center">
+                <Clock className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-[#101226]">
+                  Recent Incident Activity
+                </h3>
+                <p className="text-xs text-[#68728A]">
+                  Latest incidents across all platforms
+                </p>
+              </div>
             </div>
+
             <Link
               href="/items"
-              className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-500"
+              className="text-xs font-semibold text-[#5B45F5] hover:underline flex items-center gap-1"
             >
               <span>View All</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span>&rarr;</span>
             </Link>
           </div>
 
           <div className="flex-1 overflow-x-auto">
-            {loading ? (
-              <div className="p-8 text-center text-sm text-zinc-400">Loading live activity...</div>
-            ) : recentItems.length === 0 ? (
-              <div className="p-12 text-center space-y-3">
-                <Layers className="w-8 h-8 text-zinc-300 mx-auto" />
-                <p className="text-sm font-medium text-zinc-600">No items created yet</p>
-                <Link
-                  href="/items/new"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs font-semibold"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Create first item</span>
-                </Link>
-              </div>
-            ) : (
-              <table className="w-full text-left text-sm">
-                <thead className="bg-zinc-50/50 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider border-b border-zinc-100">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-[#F8F9FC] text-[11px] font-bold text-[#68728A] border-b border-[#E6E9F0]">
+                <tr>
+                  <th className="px-5 py-3">#</th>
+                  <th className="px-5 py-3">Title</th>
+                  <th className="px-5 py-3">Category</th>
+                  <th className="px-5 py-3">Platform</th>
+                  <th className="px-5 py-3">Severity</th>
+                  <th className="px-5 py-3">Status</th>
+                  <th className="px-5 py-3">Created At</th>
+                  <th className="px-5 py-3 text-right"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#E6E9F0]">
+                {recentItems.length === 0 ? (
                   <tr>
-                    <th className="px-6 py-3">Title & Category</th>
-                    <th className="px-6 py-3">Status</th>
-                    <th className="px-6 py-3">Created</th>
-                    <th className="px-6 py-3 text-right">Action</th>
+                    <td colSpan={8} className="px-6 py-12 text-center text-[#68728A] text-xs">
+                      No incidents logged yet. Click &ldquo;Log Incident&rdquo; to create the first record.
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-100">
-                  {recentItems.map((item, index) => {
-                    const itemId = item.id || item._id || `item-${index}`;
-                    const badge = getStatusBadgeStyle(item.status);
-                    return (
-                      <tr key={itemId} className="hover:bg-zinc-50/70 transition-colors group">
-                        <td className="px-6 py-4">
-                          <div className="font-semibold text-zinc-900">{item.title}</div>
-                          <div className="text-xs text-zinc-400">{item.category || 'General'}</div>
-                        </td>
-                        <td className="px-6 py-4">
+                ) : (
+                  recentItems.slice(0, 5).map((row: any, idx: number) => {
+                    const id = row.id || row._id || `INC-${1024 - idx}`;
+                    const title = row.title;
+                    const category = row.category || 'General';
+                    const platform = row.attributes?.platform || (idx % 2 === 0 ? 'Web' : 'Mobile');
+                    const severity =
+                      row.priority === 'urgent'
+                        ? 'Critical'
+                        : row.priority === 'high'
+                        ? 'Major'
+                        : 'Minor';
+                    const status =
+                      row.status === 'completed'
+                        ? 'Resolved'
+                        : row.status === 'in_progress'
+                        ? 'In-Flight'
+                        : 'Investigating';
+                    const createdAt = formatDate(row.createdAt);
+
+                    const isCritical = severity === 'Critical';
+                    const isMajor = severity === 'Major';
+                    const isResolved = status === 'Resolved';
+                    const isInvestigating = status === 'Investigating';
+
+                  return (
+                    <tr
+                      key={id}
+                      className="hover:bg-[#F8F9FC]/60 transition-colors"
+                    >
+                      <td className="px-5 py-3.5 text-[#68728A] font-mono text-[11px]">
+                        {id}
+                      </td>
+
+                      <td className="px-5 py-3.5 font-bold text-[#101226]">
+                        <div className="flex items-center gap-2">
                           <span
-                            className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold border ${badge.bg} ${badge.text}`}
+                            className={`w-2 h-2 rounded-full ${
+                              idx === 0
+                                ? 'bg-[#EF4444]'
+                                : idx === 1
+                                ? 'bg-[#F59E0B]'
+                                : idx === 2
+                                ? 'bg-[#3B82F6]'
+                                : idx === 3
+                                ? 'bg-[#8B5CF6]'
+                                : 'bg-[#10B981]'
+                            }`}
+                          />
+                          <span>{title}</span>
+                        </div>
+                      </td>
+
+                      <td className="px-5 py-3.5 text-[#68728A] font-medium">
+                        {category}
+                      </td>
+
+                      <td className="px-5 py-3.5 text-[#68728A] font-medium">
+                        {platform}
+                      </td>
+
+                      <td className="px-5 py-3.5">
+                        <span className="flex items-center gap-1.5 font-semibold">
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              isCritical
+                                ? 'bg-[#EF4444]'
+                                : isMajor
+                                ? 'bg-[#F59E0B]'
+                                : 'bg-[#10B981]'
+                            }`}
+                          />
+                          <span
+                            className={
+                              isCritical
+                                ? 'text-[#EF4444]'
+                                : isMajor
+                                ? 'text-[#D97706]'
+                                : 'text-[#16B981]'
+                            }
                           >
-                            {badge.label}
+                            {severity}
                           </span>
-                        </td>
-                        <td className="px-6 py-4 text-xs text-zinc-500 whitespace-nowrap">
-                          {formatDate(item.createdAt)}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <Link
-                            href={`/items/${itemId}`}
-                            className="inline-flex items-center text-xs font-semibold text-indigo-600 hover:text-indigo-800"
-                          >
-                            View
-                            <ArrowUpRight className="w-3.5 h-3.5 ml-1" />
-                          </Link>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            )}
+                        </span>
+                      </td>
+
+                      <td className="px-5 py-3.5">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
+                            isResolved
+                              ? 'bg-[#DCFCE7] text-[#16B981]'
+                              : isInvestigating
+                              ? 'bg-[#E0F2FE] text-[#0284C7]'
+                              : 'bg-[#FEF3C7] text-[#D97706]'
+                          }`}
+                        >
+                          <span
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{
+                              backgroundColor: isResolved
+                                ? '#16B981'
+                                : isInvestigating
+                                ? '#0284C7'
+                                : '#D97706',
+                            }}
+                          />
+                          <span>{status}</span>
+                        </span>
+                      </td>
+
+                      <td className="px-5 py-3.5 text-[#68728A] whitespace-nowrap">
+                        {createdAt}
+                      </td>
+
+                      <td className="px-5 py-3.5 text-right text-[#68728A] font-bold">
+                        ...
+                      </td>
+                    </tr>
+                  );
+                }))}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        {/* Side Panel: Category Breakdown & Quick AI Card */}
-        <div className="space-y-6">
-          {/* Category Distribution */}
-          <div className="bg-white p-6 rounded-2xl border border-zinc-200/80 shadow-sm space-y-4">
-            <h3 className="text-base font-bold text-zinc-900 tracking-tight">Category Breakdown</h3>
-            <div className="space-y-3">
-              {loading ? (
-                <div className="text-xs text-zinc-400">Loading metrics...</div>
-              ) : !analytics?.categories || analytics.categories.length === 0 ? (
-                <div className="text-xs text-zinc-400">No category data yet.</div>
-              ) : (
-                analytics.categories.map((c) => (
-                  <div key={c.category} className="space-y-1">
-                    <div className="flex items-center justify-between text-xs font-semibold">
-                      <span className="text-zinc-700">{c.category}</span>
-                      <span className="text-zinc-900">{c.count}</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-zinc-900 rounded-full transition-all duration-500"
-                        style={{
-                          width: `${Math.min(100, (c.count / (overview.total || 1)) * 100)}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Quick AI Gateway Card */}
-          <div className="bg-gradient-to-br from-indigo-900 to-zinc-900 p-6 rounded-2xl text-white space-y-4 shadow-lg shadow-indigo-950/20">
-            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-indigo-300">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
-              <h4 className="font-bold text-base">AI Copilot Gateway</h4>
-              <p className="text-xs text-zinc-300 mt-1">
-                Decompose requirements, summarize status logs, and generate actionable operational plans.
-              </p>
-            </div>
-            <Link
-              href="/ai-assistant"
-              className="inline-flex items-center justify-between w-full px-4 py-2.5 rounded-xl bg-white text-zinc-900 text-xs font-bold hover:bg-zinc-100 transition-colors"
-            >
-              <span>Launch AI Workspace</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
+        {/* Category Breakdown Card (4 cols) */}
+        <div className="lg:col-span-4">
+          <CategoryBreakdownCard
+            categories={analytics?.categories || []}
+            totalIncidents={overview.total}
+          />
         </div>
       </div>
+
+      {/* ========================================================
+          5. SERVICE HEALTH SECTION
+         ======================================================== */}
+      <ServiceHealthSection />
     </div>
   );
 }

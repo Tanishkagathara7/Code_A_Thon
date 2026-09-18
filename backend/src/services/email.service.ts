@@ -39,6 +39,43 @@ async function sendViaResend(apiKey: string, mailOptions: SendMailOptions) {
 }
 
 /**
+ * Dispatches email via Brevo (formerly Sendinblue) HTTPS API (Port 443 - zero firewall blocks on Render).
+ * Works with free Gmail accounts without custom domain requirements.
+ */
+async function sendViaBrevo(apiKey: string, mailOptions: SendMailOptions) {
+  const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.BREVO_FROM || 'tanishtechmatrix@gmail.com';
+  const senderName = process.env.BREVO_SENDER_NAME || 'CodeAThon';
+  const to = Array.isArray(mailOptions.to)
+    ? mailOptions.to.map((t) => ({ email: String(t) }))
+    : [{ email: String(mailOptions.to) }];
+
+  console.log(`🚀 [EMAIL] Dispatching email to ${to.map(t => t.email).join(', ')} via Brevo HTTPS API (Port 443)...`);
+
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': apiKey.trim(),
+    },
+    body: JSON.stringify({
+      sender: { name: senderName, email: senderEmail },
+      to,
+      subject: mailOptions.subject,
+      htmlContent: mailOptions.html,
+      textContent: mailOptions.text,
+    }),
+  });
+
+  const data = (await res.json().catch(() => ({}))) as any;
+  if (!res.ok) {
+    throw new Error(data?.message || `Brevo HTTP error ${res.status}: ${JSON.stringify(data)}`);
+  }
+
+  console.log(`✅ [EMAIL] Delivered via Brevo HTTPS! MessageId: ${data?.messageId}`);
+  return { messageId: data?.messageId };
+}
+
+/**
  * Dispatches email via SendGrid HTTPS API (Port 443).
  */
 async function sendViaSendGrid(apiKey: string, mailOptions: SendMailOptions) {
@@ -82,10 +119,20 @@ async function sendViaSendGrid(apiKey: string, mailOptions: SendMailOptions) {
  * 3. Nodemailer Gmail SMTP (Port 587/465) with IPv4 enforcement
  */
 export const sendEmailWithRetries = async (mailOptions: SendMailOptions, maxRetries = 3) => {
+  const brevoKey = process.env.BREVO_API_KEY ? process.env.BREVO_API_KEY.trim() : '';
   const resendKey = process.env.RESEND_API_KEY ? process.env.RESEND_API_KEY.trim() : '';
   const sendgridKey = process.env.SENDGRID_API_KEY ? process.env.SENDGRID_API_KEY.trim() : '';
 
-  // Provider 1: Resend HTTPS API (Port 443)
+  // Provider 1: Brevo HTTPS API (Port 443) - Free, allows sending from verified Gmail to anyone, works on Render
+  if (brevoKey) {
+    try {
+      return await sendViaBrevo(brevoKey, mailOptions);
+    } catch (brevoErr: any) {
+      console.warn(`⚠️ [BREVO] HTTPS delivery failed: ${brevoErr.message}. Falling back to next channel...`);
+    }
+  }
+
+  // Provider 2: Resend HTTPS API (Port 443)
   if (resendKey) {
     try {
       return await sendViaResend(resendKey, mailOptions);
