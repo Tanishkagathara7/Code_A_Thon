@@ -9,6 +9,7 @@ import {
   Sparkles,
   FolderOpen,
   Bell,
+  Settings,
   ArrowRight,
   ShieldAlert,
   X,
@@ -95,6 +96,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
     { label: 'Launch AI Copilot Workspace', href: '/ai-assistant', icon: Sparkles, badge: 'Intelligence' },
     { label: 'Storage & Incident Assets', href: '/files', icon: FolderOpen, badge: 'Media' },
     { label: 'Operational Notifications', href: '/notifications', icon: Bell, badge: 'Alerts' },
+    { label: 'Settings & Profile Preferences', href: '/settings', icon: Settings, badge: 'Account' },
   ];
 
   const navigate = (href: string) => {

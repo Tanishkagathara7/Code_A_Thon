@@ -68,40 +68,30 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
   };
 
   return (
-    <div className="bg-[#11152F] rounded-2xl p-6 text-white shadow-md flex flex-col justify-between relative overflow-hidden h-full">
-      {/* Subtle faint grid overlay only */}
-      <div
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, #FFFFFF 1px, transparent 1px),
-            linear-gradient(to bottom, #FFFFFF 1px, transparent 1px)
-          `,
-          backgroundSize: '24px 24px',
-        }}
-      />
-
+    <div className="bg-white rounded-2xl border border-[#E6E9F0] p-6 shadow-xs flex flex-col justify-between relative overflow-hidden h-full">
       <div className="space-y-4 relative z-10">
         {/* Header */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-[#A78BFA]">
-            <Sparkles className="w-4 h-4 text-[#A78BFA]" />
-          </div>
-          <div className="flex items-center gap-2">
-            <h3 className="text-base font-bold text-white tracking-tight">Pulse AI Copilot</h3>
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#10B981]/20 border border-[#10B981]/30 text-[10px] font-medium text-[#34D399]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
-              Online
-            </span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-[#EDE9FE] text-[#5B45F5] flex items-center justify-center">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold text-[#101226]">Pulse AI Copilot</h3>
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#F0FDF4] border border-[#DCFCE7] text-[10px] font-bold text-[#16A34A]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A]" />
+                  Online
+                </span>
+              </div>
+              <p className="text-xs text-[#68728A] mt-0.5">
+                Turn incident data into clear operational actions.
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Subtitle */}
-        <p className="text-xs text-zinc-300">
-          Turn incident data into clear operational actions.
-        </p>
-
-        {/* Action Buttons */}
+        {/* Quick Action Prompt Chips */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
           <button
             type="button"
@@ -111,9 +101,9 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
               )
             }
             disabled={loading}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-zinc-200 transition-colors text-left cursor-pointer"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#F8F9FC] hover:bg-[#EEF2F6] border border-[#E6E9F0] text-xs font-semibold text-[#101226] transition-colors text-left cursor-pointer"
           >
-            <FileText className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+            <FileText className="w-3.5 h-3.5 text-[#5B45F5] shrink-0" />
             <span className="truncate">Summarize incidents</span>
           </button>
 
@@ -125,9 +115,9 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
               )
             }
             disabled={loading}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-zinc-200 transition-colors text-left cursor-pointer"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#F8F9FC] hover:bg-[#EEF2F6] border border-[#E6E9F0] text-xs font-semibold text-[#101226] transition-colors text-left cursor-pointer"
           >
-            <Search className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+            <Search className="w-3.5 h-3.5 text-[#5B45F5] shrink-0" />
             <span className="truncate">Find recurring issues</span>
           </button>
 
@@ -139,41 +129,46 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
               )
             }
             disabled={loading}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-zinc-200 transition-colors text-left cursor-pointer"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#F8F9FC] hover:bg-[#EEF2F6] border border-[#E6E9F0] text-xs font-semibold text-[#101226] transition-colors text-left cursor-pointer"
           >
-            <MessageSquare className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+            <MessageSquare className="w-3.5 h-3.5 text-[#5B45F5] shrink-0" />
             <span className="truncate">Draft status update</span>
           </button>
         </div>
 
-        {/* Output area when generated */}
+        {/* Output area when generating */}
         {loading && (
-          <div className="p-4 rounded-xl bg-black/40 border border-white/10 text-xs text-zinc-300 flex items-center justify-center gap-2 font-mono">
-            <Loader2 className="w-4 h-4 animate-spin text-[#A78BFA]" />
+          <div className="p-4 rounded-xl bg-[#F8F9FC] border border-[#E6E9F0] text-xs text-[#5B45F5] flex items-center justify-center gap-2 font-medium">
+            <Loader2 className="w-4 h-4 animate-spin text-[#5B45F5]" />
             <span>Analyzing operational streams...</span>
           </div>
         )}
 
+        {/* AI Result Card */}
         {response && !loading && (
-          <div className="p-3.5 rounded-xl bg-black/40 border border-white/10 text-xs text-zinc-200 space-y-2">
-            <div className="flex items-center justify-between border-b border-white/10 pb-1.5 text-[11px] text-zinc-400">
-              <span className="font-semibold text-[#A78BFA]">Copilot Response</span>
+          <div className="p-4 rounded-xl bg-[#F8F9FC] border border-[#E6E9F0] text-xs text-[#101226] space-y-2">
+            <div className="flex items-center justify-between border-b border-[#E6E9F0] pb-2 text-[11px] text-[#68728A]">
+              <span className="font-bold text-[#5B45F5] flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" />
+                Copilot Response
+              </span>
               <button
+                type="button"
                 onClick={handleCopy}
-                className="flex items-center gap-1 hover:text-white transition-colors"
+                className="flex items-center gap-1 text-[#68728A] hover:text-[#101226] font-medium transition-colors cursor-pointer"
               >
-                {copied ? <Check className="w-3 h-3 text-[#10B981]" /> : <Copy className="w-3 h-3" />}
+                {copied ? <Check className="w-3 h-3 text-[#16A34A]" /> : <Copy className="w-3 h-3" />}
                 <span>{copied ? 'Copied' : 'Copy'}</span>
               </button>
             </div>
-            <div className="max-h-36 overflow-y-auto pr-1 whitespace-pre-wrap leading-relaxed">
+            <div className="max-h-36 overflow-y-auto pr-1 whitespace-pre-wrap leading-relaxed text-xs text-[#334155]">
               {response}
             </div>
           </div>
         )}
       </div>
 
-      {/* White Input Field with Purple Arrow Button */}
+      {/* Input Field with Purple Action Button */}
       <form onSubmit={handleSubmit} className="pt-4 relative z-10 flex items-center gap-2">
         <div className="relative flex-1">
           <input
@@ -181,14 +176,15 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Ask Pulse AI anything..."
-            className="w-full bg-white text-[#101226] placeholder:text-[#68728A] px-4 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#5B45F5] font-sans"
+            className="w-full bg-[#F8F9FC] border border-[#E6E9F0] text-[#101226] placeholder:text-[#68728A] px-4 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#5B45F5]/20 focus:border-[#5B45F5] font-sans transition-all"
           />
         </div>
 
         <button
           type="submit"
           disabled={loading || !prompt.trim()}
-          className="w-9 h-9 rounded-xl bg-[#5B45F5] hover:bg-[#4834df] text-white flex items-center justify-center transition-all disabled:opacity-40 cursor-pointer shrink-0"
+          className="w-9 h-9 rounded-xl bg-[#5B45F5] hover:bg-[#4834df] text-white flex items-center justify-center transition-all disabled:opacity-40 cursor-pointer shrink-0 shadow-xs"
+          title="Send to Pulse AI"
         >
           {loading ? (
             <Loader2 className="w-4 h-4 animate-spin" />

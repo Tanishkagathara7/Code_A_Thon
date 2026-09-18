@@ -9,5 +9,8 @@
   },
   "devDependencies": {
     "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "app-workspace": "file:.."
   }
 }

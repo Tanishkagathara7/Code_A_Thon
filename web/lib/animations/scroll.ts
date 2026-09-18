@@ -45,6 +45,25 @@ export const initScrollStory = (rootContainer: HTMLElement | null) => {
         },
       });
 
+      const productHeader = document.querySelector('.product-header');
+      if (productHeader) {
+        gsap.fromTo(
+          productHeader,
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.5,
+            ease: MOTION.ease.smooth,
+            scrollTrigger: {
+              trigger: '.product-stage-section',
+              start: 'top 85%',
+              toggleActions: 'play none none none',
+            },
+          }
+        );
+      }
+
       gsap.fromTo(
         '.tablet-3d-body',
         {

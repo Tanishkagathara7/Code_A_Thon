@@ -9,10 +9,23 @@ import LoadingLines from '@/components/ui/loading-lines';
 
 interface LoadingScreenProps {
   onExitComplete?: () => void;
+  standalone?: boolean;
+  isReady?: boolean;
+  onComplete?: () => void;
+  statusMessage?: string;
 }
 
-export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onExitComplete }) => {
-  const { isLoading, isReady, completeLoading } = useLoading();
+export const LoadingScreen: React.FC<LoadingScreenProps> = ({
+  onExitComplete,
+  standalone = false,
+  isReady: standaloneReady,
+  onComplete,
+  statusMessage,
+}) => {
+  const contextLoading = useLoading();
+  const isLoading = standalone ? true : contextLoading.isLoading;
+  const isReady = standalone ? Boolean(standaloneReady) : contextLoading.isReady;
+  const completeLoading = standalone ? (onComplete || (() => {})) : contextLoading.completeLoading;
 
   const containerRef   = useRef<HTMLDivElement>(null);
   const numberRef      = useRef<HTMLSpanElement>(null);
@@ -181,6 +194,12 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onExitComplete }) 
         >
           0%
         </span>
+
+        {statusMessage && (
+          <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest pt-2 animate-pulse">
+            {statusMessage}
+          </p>
+        )}
       </div>
 
 

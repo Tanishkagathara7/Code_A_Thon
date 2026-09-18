@@ -102,18 +102,18 @@ export const InteractiveDemonstrator: React.FC = () => {
               onClick={() => setActiveStep(idx)}
               className={`p-5 rounded-xl text-left transition-all duration-200 border cursor-pointer flex flex-col justify-between min-h-[140px] relative overflow-hidden ${
                 isActive
-                  ? 'bg-white border-blue-600 shadow-lg shadow-blue-500/[0.12] ring-2 ring-blue-500/25'
+                  ? 'bg-white border-zinc-950 shadow-lg shadow-black/[0.08] ring-2 ring-zinc-900/20'
                   : 'bg-white/80 hover:bg-white border-black/[0.08] hover:border-black/[0.16] shadow-xs hover:-translate-y-0.5'
               }`}
             >
               {/* High-contrast top accent bar for active tab */}
               {isActive && (
-                <span className="absolute top-0 left-0 right-0 h-1 bg-blue-600" />
+                <span className="absolute top-0 left-0 right-0 h-1 bg-zinc-950" />
               )}
               <div className="flex items-center justify-between w-full mb-3">
                 <span
                   className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded-md border ${
-                    isActive ? step.badgeBg : 'bg-zinc-100 text-zinc-600 border-zinc-200'
+                    isActive ? 'bg-zinc-900 text-white border-zinc-900' : 'bg-zinc-100 text-zinc-600 border-zinc-200'
                   }`}
                 >
                   PHASE {step.phase}
@@ -126,8 +126,8 @@ export const InteractiveDemonstrator: React.FC = () => {
               <div className="flex items-center justify-between w-full pt-3 mt-2 border-t border-zinc-100 text-xs font-medium text-zinc-500">
                 <span>{step.client}</span>
                 {isActive ? (
-                  <span className="text-blue-600 font-bold text-[11px] flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                  <span className="text-zinc-950 font-bold text-[11px] flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-950 animate-pulse" />
                     Active
                   </span>
                 ) : (

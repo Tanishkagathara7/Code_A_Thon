@@ -18,8 +18,10 @@ interface AuthContextType {
   ) => Promise<void>;
   loginWithOAuth: (payload: { email: string; name?: string; provider: 'google' | 'github'; providerId?: string; avatarUrl?: string }) => Promise<void>;
   loginWithGitHub: (code: string, redirectUri?: string) => Promise<void>;
+  loginAsGuest: () => void;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  updateProfile: (updated: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,10 +43,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const cached = localStorage.getItem(USER_STORAGE_KEY);
       if (cached) {
         try {
-          setUser(JSON.parse(cached));
+          const parsed = JSON.parse(cached);
+          setUser(parsed);
+          if (parsed.isGuest || parsed.provider === 'guest' || token === 'guest-token') {
+            setIsLoading(false);
+            return;
+          }
         } catch {}
       }
-      // Re-verify with backend
+      // Re-verify with backend for real tokens
       const res = await authApi.getMe();
       if (res.success && res.user) {
         setUser(res.user);
@@ -76,7 +83,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const cached = localStorage.getItem(USER_STORAGE_KEY);
         if (cached && active) {
           try {
-            setUser(JSON.parse(cached));
+            const parsed = JSON.parse(cached);
+            setUser(parsed);
+            if (parsed.isGuest || parsed.provider === 'guest' || token === 'guest-token') {
+              setIsLoading(false);
+              return;
+            }
           } catch {}
         }
         const res = await authApi.getMe();
@@ -141,14 +153,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const loginAsGuest = () => {
+    const guestUser: User = {
+      id: 'guest-user-' + Math.random().toString(36).substring(2, 9),
+      name: 'Guest User',
+      email: 'guest@app.local',
+      role: 'guest',
+      organization: 'Guest Session',
+      provider: 'guest',
+      isGuest: true,
+      createdAt: new Date().toISOString(),
+    };
+    localStorage.setItem(TOKEN_STORAGE_KEY, 'guest-token');
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(guestUser));
+    setUser(guestUser);
+    router.push('/dashboard');
+  };
+
   const logout = () => {
     authApi.logout();
     setUser(null);
     router.push('/login');
   };
 
+  const updateProfile = (updated: Partial<User>) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+      const nextUser = { ...prev, ...updated };
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(nextUser));
+      return nextUser;
+    });
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, signup, loginWithOAuth, loginWithGitHub, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, isLoading, login, signup, loginWithOAuth, loginWithGitHub, loginAsGuest, logout, refreshUser, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

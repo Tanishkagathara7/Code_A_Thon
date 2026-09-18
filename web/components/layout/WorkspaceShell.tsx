@@ -8,7 +8,7 @@ import { CommandPalette } from '@/components/layout/CommandPalette';
 import { PulseBackgroundSystem } from '@/components/background/PulseBackgroundSystem';
 import { useAuth } from '@/lib/context/AuthContext';
 import { notificationsApi } from '@/lib/api/domain';
-import { Loader2 } from 'lucide-react';
+import { LoadingScreen } from '@/components/loading/LoadingScreen';
 
 export default function WorkspaceShell({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -46,10 +46,11 @@ export default function WorkspaceShell({ children }: { children: React.ReactNode
 
   if (isLoading || !user) {
     return (
-      <div className="min-h-screen bg-[#F7F5EF] flex flex-col items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#0A0A0A] animate-spin mb-3" />
-        <p className="text-sm font-medium text-[#687080]">Authenticating Pulse Command session...</p>
-      </div>
+      <LoadingScreen
+        standalone
+        isReady={false}
+        statusMessage="Connecting Command Session..."
+      />
     );
   }
 

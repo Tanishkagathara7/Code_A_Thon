@@ -26,6 +26,7 @@ export const Topbar: React.FC<TopbarProps> = ({
     if (pathname.startsWith('/ai-assistant')) return { title: 'Pulse AI Copilot', section: 'Intelligence' };
     if (pathname.startsWith('/files')) return { title: 'Assets & Evidence', section: 'Files & Media' };
     if (pathname.startsWith('/notifications')) return { title: 'Operational Alerts', section: 'Feed' };
+    if (pathname.startsWith('/settings')) return { title: 'Settings & Profile', section: 'Account' };
     return { title: 'Workspace', section: 'System' };
   };
 
@@ -45,10 +46,10 @@ export const Topbar: React.FC<TopbarProps> = ({
 
         {/* Operational Breadcrumbs */}
         <div className="flex items-center gap-2 text-xs">
-          <span className="font-medium text-[#68728A]">Operations</span>
+          <span className="font-medium text-[#68728A]">{breadcrumb.section}</span>
           <span className="text-[#68728A]">/</span>
           <h1 className="font-bold text-[#101226] text-sm tracking-tight">
-            Command Center
+            {breadcrumb.title}
           </h1>
         </div>
       </div>
@@ -78,12 +79,6 @@ export const Topbar: React.FC<TopbarProps> = ({
         >
           <Search className="w-4 h-4" />
         </button>
-
-        {/* Live System Connectivity Chip */}
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F0FDF4] border border-[#DCFCE7] text-[11px] font-bold text-[#16B981]">
-          <span className="w-2 h-2 rounded-full bg-[#16B981]" />
-          <span className="font-mono text-[10px]">SYS_ONLINE</span>
-        </div>
 
         {/* Notification Bell */}
         <Link

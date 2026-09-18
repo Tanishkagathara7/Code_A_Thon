@@ -10,6 +10,7 @@ import {
   FolderOpen,
   Activity,
   Bell,
+  Settings,
   ChevronsLeft,
   ChevronsRight,
   Search,
@@ -43,6 +44,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { name: 'Files & Media', href: '/files', icon: FolderOpen },
     { name: 'Analytics', href: '/dashboard/analytics', icon: Activity },
     { name: 'Notifications', href: '/notifications', icon: Bell, badge: unreadNotifications || 2 },
+    { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
   const userRole = user?.role || 'operator';
@@ -259,35 +261,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </nav>
         </div>
 
-        {/* Ambient Decorative Graphic */}
+        {/* Ambient Decorative Graphic — Perfectly balanced in the empty space */}
         {!collapsed && (
-          <div className="absolute inset-x-0 bottom-44 pointer-events-none select-none z-0 overflow-hidden h-[220px]">
+          <div className="absolute inset-x-0 bottom-16 pointer-events-none select-none z-0 overflow-hidden h-[210px]">
             <svg
-              className="absolute -left-12 bottom-0 w-80 h-80"
+              className="absolute -left-12 -bottom-4 w-80 h-80 opacity-75"
               viewBox="0 0 300 300"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
               <circle cx="90" cy="210" r="75" fill="#5C4CF6" fillOpacity="0.03" />
-              <circle cx="90" cy="210" r="115" stroke="#5C4CF6" strokeWidth="1.2" strokeOpacity="0.14" />
-              <circle cx="90" cy="210" r="165" stroke="#5C4CF6" strokeWidth="1" strokeOpacity="0.08" />
+              <circle cx="90" cy="210" r="115" stroke="#5C4CF6" strokeWidth="1.2" strokeOpacity="0.12" />
+              <circle cx="90" cy="210" r="165" stroke="#5C4CF6" strokeWidth="1" strokeOpacity="0.07" />
 
-              {Array.from({ length: 5 }).map((_, r) =>
-                Array.from({ length: 6 }).map((_, c) => (
+              {Array.from({ length: 4 }).map((_, r) =>
+                Array.from({ length: 5 }).map((_, c) => (
                   <circle
                     key={`${r}-${c}`}
                     cx={180 + c * 10}
-                    cy={130 + r * 10}
+                    cy={150 + r * 10}
                     r="1.2"
                     fill="#6366F1"
-                    fillOpacity="0.16"
+                    fillOpacity="0.14"
                   />
                 ))
               )}
             </svg>
 
             {/* Motivational motto */}
-            <div className="absolute bottom-3 right-7 text-right flex flex-col items-end">
+            <div className="absolute bottom-4 right-7 text-right flex flex-col items-end opacity-90">
               <span className="text-[10px] font-semibold text-[#8692A6] leading-[1.35]">Monitor</span>
               <span className="text-[10px] font-semibold text-[#8692A6] leading-[1.35]">Respond</span>
               <span className="text-[10px] font-semibold text-[#8692A6] leading-[1.35]">Resolve</span>
@@ -297,46 +299,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         )}
 
-        {/* Footer Area: Telemetry + User Profile & Logout */}
-        <div className="p-3.5 border-t border-[#EEF2F6] bg-[#FAFCFF] relative z-10 space-y-2.5">
-          {/* Telemetry status chip */}
-          {!collapsed ? (
-            <div className="h-10 px-3 rounded-xl bg-[#ECFDF5] border border-[#D1FAE5] flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#10B981]" />
-                <span className="font-bold text-[#141824] text-[12px]">
-                  Telemetry Active
-                </span>
-              </div>
-              <span className="font-mono text-[11.5px] font-bold text-[#059669]">
-                24ms
-              </span>
-            </div>
-          ) : (
-            <div
-              className="w-9 h-9 mx-auto rounded-xl bg-[#ECFDF5] border border-[#D1FAE5] flex items-center justify-center"
-              title="Telemetry Active (24ms)"
-            >
-              <span className="w-2 h-2 rounded-full bg-[#10B981]" />
-            </div>
-          )}
+        {/* Footer Area: User Profile & Logout */}
+        <div className="p-3 border-t border-[#EEF2F6] bg-[#FAFCFF] relative z-10">
 
           {/* User Profile Card & Sign Out */}
           {!collapsed ? (
             <div className="pt-1 flex items-center justify-between gap-2 px-1">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-full bg-[#EDE8FF] border border-[#DDD6FE] text-[#5C4CF6] flex items-center justify-center font-bold text-xs flex-shrink-0">
+              <Link
+                href="/settings"
+                onClick={onClose}
+                className="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-85 transition-opacity cursor-pointer group"
+                title="Open Settings & Profile"
+              >
+                <div className="w-8 h-8 rounded-full bg-[#EDE8FF] border border-[#DDD6FE] text-[#5C4CF6] flex items-center justify-center font-bold text-xs flex-shrink-0 group-hover:scale-105 transition-transform">
                   {user?.name ? user.name.slice(0, 2).toUpperCase() : 'OP'}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-bold text-[#161828] truncate leading-tight">
-                    {user?.name || 'Operator'}
-                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-xs font-bold text-[#161828] truncate leading-tight group-hover:text-indigo-600 transition-colors">
+                      {user?.name || 'Operator'}
+                    </p>
+                    {user?.isGuest && (
+                      <span className="text-[9px] font-mono font-bold bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded border border-amber-200">
+                        GUEST
+                      </span>
+                    )}
+                  </div>
                   <p className="text-[10px] text-[#8692A6] truncate leading-tight mt-0.5">
-                    {user?.email || 'operator@pulse.io'}
+                    {user?.isGuest ? 'Browsing in guest mode' : (user?.email || 'operator@pulse.io')}
                   </p>
                 </div>
-              </div>
+              </Link>
 
               {/* Logout button */}
               <button
@@ -350,12 +343,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2 pt-1">
-              <div
-                className="w-8 h-8 rounded-full bg-[#EDE8FF] border border-[#DDD6FE] text-[#5C4CF6] flex items-center justify-center font-bold text-xs cursor-pointer"
-                title={`${user?.name || 'Operator'} (${user?.email || 'operator@pulse.io'})`}
+              <Link
+                href="/settings"
+                onClick={onClose}
+                className="w-8 h-8 rounded-full bg-[#EDE8FF] border border-[#DDD6FE] text-[#5C4CF6] flex items-center justify-center font-bold text-xs cursor-pointer hover:scale-105 transition-transform"
+                title={`Settings & Profile: ${user?.name || 'Operator'} (${user?.email || 'operator@pulse.io'})`}
               >
                 {user?.name ? user.name.slice(0, 2).toUpperCase() : 'OP'}
-              </div>
+              </Link>
               <button
                 onClick={logout}
                 className="p-1.5 rounded-lg text-[#8692A6] hover:text-[#EF4444] hover:bg-[#FEE2E2]/40 transition-colors cursor-pointer"

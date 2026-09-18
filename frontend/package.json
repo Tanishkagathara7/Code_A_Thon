@@ -15,6 +15,7 @@
     "@expo/vector-icons": "^15.0.2",
     "@react-native-community/netinfo": "^12.0.1",
     "@react-native-google-signin/google-signin": "^16.1.5",
+    "app-workspace": "file:..",
     "expo": "~57.0.21",
     "expo-auth-session": "~57.0.11",
     "expo-constants": "~57.0.17",

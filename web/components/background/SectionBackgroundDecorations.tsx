@@ -37,18 +37,18 @@ export const SectionBackgroundDecorations: React.FC = () => {
         />
       </div>
 
-      {/* Left Philosophy Linework: Clean mathematical arc */}
-      <div className="hidden md:block absolute top-[1440px] left-4 lg:left-12 xl:left-24">
+      {/* Left Philosophy Linework: Clean mathematical arc safely positioned in viewport gutter */}
+      <div className="hidden 2xl:block absolute top-[1440px] left-4">
         <PrecisionArc
-          width={340}
-          height={340}
+          width={320}
+          height={320}
           viewBox="0 0 340 340"
           cx={170}
           cy={170}
           radius={140}
           startAngle={220}
           endAngle={380}
-          strokeColor="rgba(32, 32, 82, 0.16)"
+          strokeColor="rgba(32, 32, 82, 0.12)"
           showTicks
           tickCount={8}
           startNodeColor="#2563EB"
@@ -57,9 +57,9 @@ export const SectionBackgroundDecorations: React.FC = () => {
       </div>
 
       {/* Left Crosshair Cluster */}
-      <div className="hidden lg:flex flex-col gap-6 absolute top-[1660px] left-12 xl:left-24">
+      <div className="hidden 2xl:flex flex-col gap-6 absolute top-[1660px] left-8">
         <TechnicalCrosshair size={12} color="#2563EB" />
-        <TechnicalConnectingLine length={90} vertical color="rgba(37, 99, 235, 0.25)" withArrow />
+        <TechnicalConnectingLine length={90} vertical color="rgba(37, 99, 235, 0.2)" withArrow />
         <TechnicalCrosshair size={10} color="#059669" />
       </div>
 
@@ -230,78 +230,17 @@ export const SectionBackgroundDecorations: React.FC = () => {
       {/* =========================================================================
           SECTION 07: CREATOR / ENGINEER PROFILE (5600px - 6400px)
          ========================================================================= */}
-      {/* Left Portrait Supporting Arc */}
-      <div className="hidden md:block absolute top-[5750px] left-6 lg:left-14 xl:left-24">
-        <PrecisionArc
-          width={320}
-          height={320}
-          viewBox="0 0 320 320"
-          cx={60}
-          cy={160}
-          radius={130}
-          startAngle={20}
-          endAngle={160}
-          secondaryRadius={110}
-          secondaryDasharray="2 4"
-          strokeColor="rgba(32, 32, 82, 0.16)"
-          startNodeColor="#EC4899"
-          endNodeColor="#3B82F6"
-        />
-      </div>
 
-      {/* Right Editorial Callout */}
-      <div className="hidden xl:block absolute top-[5920px] right-14">
-        <EditorialAnnotation
-          text="Build. Learn. Ship. Repeat."
-          subtext="Continuous refinement"
-          rotation="-rotate-6"
-        />
-      </div>
+
+
 
       {/* =========================================================================
           SECTION 08: TOPOLOGY ARCHITECTURE (6400px - 7300px)
           Pushed to side gutters to cleanly frame the section without overlapping cards
          ========================================================================= */}
-      {/* Left Topology Multi-Node Bus System - Far left margin */}
-      <div className="hidden 2xl:block absolute top-[6480px] -left-12 2xl:left-4 opacity-75">
-        <NodeNetwork
-          width={260}
-          height={180}
-          viewBox="0 0 260 180"
-          nodes={[
-            { id: 'edge-1', x: 30, y: 35, color: '#059669', radius: 3 },
-            { id: 'edge-2', x: 30, y: 90, color: '#2563EB', radius: 3 },
-            { id: 'edge-3', x: 30, y: 145, color: '#8B5CF6', radius: 3 },
-            { id: 'hub', x: 140, y: 90, color: '#09090B', radius: 4, pulse: true },
-            { id: 'db', x: 210, y: 90, color: '#10B981', radius: 3.5 },
-          ]}
-          connections={[
-            { from: 'edge-1', to: 'hub', dashed: true, color: 'rgba(5, 150, 105, 0.35)' },
-            { from: 'edge-2', to: 'hub', dashed: false, color: 'rgba(37, 99, 235, 0.35)' },
-            { from: 'edge-3', to: 'hub', dashed: true, color: 'rgba(139, 92, 246, 0.35)' },
-            { from: 'hub', to: 'db', dashed: false, color: 'rgba(16, 185, 129, 0.45)', strokeWidth: 1.5 },
-          ]}
-        />
-      </div>
 
-      {/* Right Topology Linework - Far right margin */}
-      <div className="hidden 2xl:block absolute top-[6520px] -right-28 2xl:-right-8 opacity-75">
-        <PrecisionArc
-          width={340}
-          height={340}
-          viewBox="0 0 340 340"
-          cx={280}
-          cy={170}
-          radius={150}
-          startAngle={190}
-          endAngle={340}
-          secondaryRadius={125}
-          secondaryDasharray="3 6"
-          strokeColor="rgba(32, 32, 82, 0.16)"
-          startNodeColor="#3B82F6"
-          endNodeColor="#10B981"
-        />
-      </div>
+
+
 
       {/* =========================================================================
           SECTION 09: FREQUENTLY ASKED QUESTIONS (7300px - 8100px)
@@ -329,14 +268,7 @@ export const SectionBackgroundDecorations: React.FC = () => {
         />
       </div>
 
-      {/* Right Editorial Note near FAQ */}
-      <div className="hidden xl:block absolute top-[7620px] right-16">
-        <EditorialAnnotation
-          text="Good Questions. Better Builders."
-          subtext="Developer accessibility"
-          rotation="rotate-6"
-        />
-      </div>
+
 
       {/* =========================================================================
           SECTION 10 & FOOTER: FINAL CTA (8100px - End)

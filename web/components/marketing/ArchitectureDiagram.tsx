@@ -64,13 +64,13 @@ export const ArchitectureDiagram: React.FC = () => {
   return (
     <div className="w-full space-y-8 select-none">
       <div className="topology-header max-w-2xl space-y-2">
-        <div className="text-xs font-mono font-bold tracking-wider text-zinc-500 uppercase">
+        <div className="font-mono text-xs font-semibold uppercase tracking-wider text-blue-600">
           {'// 08. TOPOLOGY & DATA BUS'}
         </div>
-        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
-          CENTRAL ENGINE & EDGE TOPOLOGY
+        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-950">
+          Central Engine & Edge Topology
         </h2>
-        <p className="text-sm text-zinc-600">
+        <p className="text-sm sm:text-base text-zinc-600 leading-relaxed font-normal">
           One authoritative REST architecture powers both client applications without code duplication or state divergence.
         </p>
       </div>
@@ -89,12 +89,12 @@ export const ArchitectureDiagram: React.FC = () => {
               onClick={() => setSelectedNode(node.id)}
               className={`topology-node-btn p-5 rounded-2xl text-left transition-all duration-200 border relative overflow-hidden cursor-pointer group flex flex-col justify-between min-h-[145px] ${
                 isSelected
-                  ? 'bg-white border-blue-600 shadow-lg shadow-blue-500/[0.12] ring-2 ring-blue-500/25'
+                  ? 'bg-white border-zinc-950 shadow-lg shadow-black/[0.08] ring-2 ring-zinc-900/20'
                   : 'bg-white/80 hover:bg-white border-black/[0.06] hover:border-black/[0.16] shadow-sm hover:-translate-y-0.5'
               }`}
             >
               {isSelected && (
-                <span className="absolute top-0 left-0 right-0 h-1 bg-blue-600" />
+                <span className="absolute top-0 left-0 right-0 h-1 bg-zinc-950" />
               )}
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -103,8 +103,8 @@ export const ArchitectureDiagram: React.FC = () => {
                   </span>
                   <div className="flex items-center gap-1.5">
                     {isSelected ? (
-                      <span className="text-[10px] font-bold font-mono text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                      <span className="text-[10px] font-bold font-mono text-white bg-zinc-900 px-1.5 py-0.5 rounded border border-zinc-900 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                         Selected
                       </span>
                     ) : (
@@ -126,7 +126,7 @@ export const ArchitectureDiagram: React.FC = () => {
 
               <div className="pt-2.5 mt-2 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-400">
                 <span>Click to view specs</span>
-                <span className={`transition-transform duration-200 ${isSelected ? 'text-blue-600 translate-x-0.5' : 'group-hover:translate-x-0.5'}`}>
+                <span className={`transition-transform duration-200 ${isSelected ? 'text-zinc-950 translate-x-0.5 font-bold' : 'group-hover:translate-x-0.5'}`}>
                   &rarr;
                 </span>
               </div>
@@ -136,37 +136,56 @@ export const ArchitectureDiagram: React.FC = () => {
       </div>
 
       {/* Detailed Spec Sheet */}
-      <div className="topology-detail-card bento-card p-6 sm:p-8 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/[0.06] pb-4">
-          <div>
+      <div className="topology-detail-card bento-card p-6 sm:p-8 space-y-6 bg-white/90 backdrop-blur-md border border-black/[0.08] shadow-md">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-black/[0.06] pb-5">
+          <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded-full border ${active.badgeColor}`}>
+              <span className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded-md border ${active.badgeColor}`}>
                 {active.badge}
               </span>
-              <span className="text-xs font-mono text-zinc-400">• ACTIVE INSPECTOR</span>
+              <span className="text-xs font-mono text-zinc-400">• ARCHITECTURE INSPECTOR</span>
             </div>
-            <h3 className="text-2xl font-bold tracking-tight text-zinc-900 mt-1">
+            <h3 className="text-2xl font-bold tracking-tight text-zinc-950">
               {active.name}
             </h3>
+            <p className="text-xs font-mono text-zinc-500 uppercase tracking-wide">
+              {active.role}
+            </p>
           </div>
-          <span className="text-xs font-mono font-semibold text-zinc-500 uppercase">
-            {active.role}
-          </span>
+
+          <div className="flex items-center gap-3">
+            <div className="px-3.5 py-2 rounded-xl bg-zinc-50 border border-zinc-200/80 shadow-xs text-xs font-mono">
+              <div className="text-[10px] text-zinc-400 uppercase font-semibold">Parity Status</div>
+              <div className="text-emerald-600 font-bold mt-0.5 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Active Core
+              </div>
+            </div>
+            <div className="px-3.5 py-2 rounded-xl bg-zinc-50 border border-zinc-200/80 shadow-xs text-xs font-mono">
+              <div className="text-[10px] text-zinc-400 uppercase font-semibold">Security Spec</div>
+              <div className="text-zinc-900 font-bold mt-0.5">Strict Types</div>
+            </div>
+          </div>
         </div>
 
-        <p className="text-sm text-zinc-600 leading-relaxed max-w-3xl">
-          {active.specs}
-        </p>
+        <div className="space-y-2">
+          <div className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">
+            System Specification & Runtime Responsibility
+          </div>
+          <p className="text-sm text-zinc-700 leading-relaxed max-w-4xl font-normal">
+            {active.specs}
+          </p>
+        </div>
 
-        <div>
-          <div className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider mb-2">
-            Integrated Technologies & Modules
+        <div className="pt-2 border-t border-black/[0.04]">
+          <div className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider mb-2.5">
+            Integrated Technologies & Production Modules
           </div>
           <div className="flex flex-wrap gap-2">
             {active.tech.map((t) => (
               <span
                 key={t}
-                className="px-3 py-1 rounded-lg bg-zinc-100/80 border border-zinc-200 text-zinc-800 text-xs font-mono font-medium"
+                className="px-3 py-1.5 rounded-lg bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-zinc-900 text-xs font-mono font-semibold transition-colors shadow-2xs"
               >
                 {t}
               </span>

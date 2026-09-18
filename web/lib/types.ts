@@ -6,7 +6,8 @@ export interface User {
   organization?: string;
   domainProfile?: Record<string, any>;
   avatarUrl?: string;
-  provider?: 'email' | 'google' | 'github';
+  provider?: 'email' | 'google' | 'github' | 'guest';
+  isGuest?: boolean;
   createdAt?: string;
 }
 

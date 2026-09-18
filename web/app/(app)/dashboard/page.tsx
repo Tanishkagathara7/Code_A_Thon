@@ -141,11 +141,6 @@ export default function DashboardPage() {
         {/* Left Side: Brand Badges, Title, Subtitle, and Action Buttons */}
         <div className="space-y-3 max-w-2xl">
           <div className="flex flex-wrap items-center gap-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#101226] text-white text-[11px] font-bold">
-              <span className="w-2 h-2 rounded-full bg-[#16B981]" />
-              <span>PULSE DISPATCH MESH</span>
-            </div>
-
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EDE9FE] text-[11px] font-bold text-[#5B45F5]">
               <span className="w-1.5 h-1.5 rounded-full bg-[#5B45F5]" />
               <span>Role: <strong className="uppercase">{userRole}</strong></span>
@@ -179,8 +174,8 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Right Side: Operational Context Block & Lifecycle Stepper */}
-        <div className="flex items-center gap-8 lg:border-l lg:border-[#E6E9F0] lg:pl-8">
+        {/* Right Side: Operational Context Block */}
+        <div className="flex items-center lg:border-l lg:border-[#E6E9F0] lg:pl-8">
           <div className="space-y-1 text-right sm:text-left">
             <div className="text-xs font-medium text-[#68728A]">
               {new Date().toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
@@ -191,13 +186,6 @@ export default function DashboardPage() {
             <p className="text-xs text-[#68728A] pt-2 max-w-[180px] leading-snug">
               Keep systems reliable. Turn signals into action.
             </p>
-          </div>
-
-          <div className="hidden sm:flex flex-col space-y-1.5 text-[9px] font-bold tracking-widest text-[#94A3B8] uppercase pl-4 border-l border-[#E6E9F0]">
-            <span className="text-[#101226]">OBSERVE</span>
-            <span>INVESTIGATE</span>
-            <span>RESOLVE</span>
-            <span>IMPROVE</span>
           </div>
         </div>
       </div>
@@ -259,7 +247,7 @@ export default function DashboardPage() {
       </div>
 
       {/* ========================================================
-          3. INCIDENT ACTIVITY ANALYTICS & DARK AI COPILOT
+          3. INCIDENT ACTIVITY ANALYTICS & AI COPILOT
          ======================================================== */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         {/* Incident Activity Analytics (7 cols) */}

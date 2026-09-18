@@ -6,12 +6,15 @@ import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useToast } from '@/lib/context/ToastContext';
 
+import { LoadingScreen } from '@/components/loading/LoadingScreen';
+
 function OAuthCallbackContent({ provider }: { provider: 'google' | 'github' }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { loginWithOAuth, loginWithGitHub } = useAuth();
   const { toast } = useToast();
-  const status = 'Authenticating with ' + (provider === 'google' ? 'Google' : 'GitHub') + '...';
+  const [isReady, setIsReady] = React.useState(false);
+  const status = 'Authenticating with ' + (provider === 'google' ? 'Google' : 'GitHub');
   const processedRef = React.useRef(false);
 
   useEffect(() => {
@@ -51,7 +54,7 @@ function OAuthCallbackContent({ provider }: { provider: 'google' | 'github' }) {
           });
 
           toast('Signed in with Google successfully!', 'success');
-          router.push('/dashboard');
+          setIsReady(true);
         } else if (provider === 'github') {
           const code = searchParams.get('code');
           if (!code) {
@@ -62,7 +65,7 @@ function OAuthCallbackContent({ provider }: { provider: 'google' | 'github' }) {
 
           await loginWithGitHub(code, `${window.location.origin}/auth/callback/github`);
           toast('Signed in with GitHub successfully!', 'success');
-          router.push('/dashboard');
+          setIsReady(true);
         }
       } catch (err: unknown) {
         console.error('OAuth callback error:', err);
@@ -76,17 +79,14 @@ function OAuthCallbackContent({ provider }: { provider: 'google' | 'github' }) {
   }, [provider, searchParams, loginWithOAuth, loginWithGitHub, router, toast]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#FAFAFA] text-zinc-900 px-4">
-      <div className="bento-card p-8 max-w-sm w-full text-center space-y-4">
-        <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto" />
-        <h3 className="text-base font-bold tracking-tight text-zinc-900">
-          Connecting your account
-        </h3>
-        <p className="text-xs text-zinc-500 font-mono">
-          {status}
-        </p>
-      </div>
-    </div>
+    <LoadingScreen
+      standalone
+      isReady={isReady}
+      onExitComplete={() => {
+        router.push('/dashboard');
+      }}
+      statusMessage={status}
+    />
   );
 }
 
@@ -94,9 +94,11 @@ export function OAuthCallbackPage({ provider }: { provider: 'google' | 'github' 
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
-          <Loader2 className="w-6 h-6 text-zinc-400 animate-spin" />
-        </div>
+        <LoadingScreen
+          standalone
+          isReady={false}
+          statusMessage={`Connecting ${provider === 'google' ? 'Google' : 'GitHub'}...`}
+        />
       }
     >
       <OAuthCallbackContent provider={provider} />
