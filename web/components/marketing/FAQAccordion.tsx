@@ -15,33 +15,39 @@ export const FAQAccordion: React.FC = () => {
   const faqs: FAQItem[] = [
     {
       id: '01',
-      question: 'How is state synchronized between Next.js and React Native?',
+      question: 'How does VyaaparGST calculate intra-state vs. inter-state GST?',
       answer:
-        'Both clients consume a unified Node.js / Express REST API backed by MongoDB Atlas. Authentication is maintained via cryptographically verified JWT tokens (stored in secure browser storage for web, and expo-secure-store for native mobile). Cache invalidation triggers immediate re-fetches for consistent operational metrics across both platforms.',
+        'The tax engine compares your business operating state (e.g. Gujarat, State Code 24) with the customer’s place of supply state. If the buyer is also located in Gujarat, the item GST slab rate is divided 50:50 into Central Tax (CGST) and State Tax (SGST). If the buyer is located outside Gujarat (e.g. Maharashtra, State Code 27), the full GST percentage is applied as Integrated Tax (IGST) in accordance with Indian tax rules.',
     },
     {
       id: '02',
-      question: 'What AI gateway capabilities are natively integrated?',
+      question: 'Can I generate tax invoices for walk-in retail customers without a GSTIN?',
       answer:
-        'The shared backend incorporates OpenRouter AI Gateway integration. It executes structured entity summarization, priority classification, and action plan generation across your operations items with strict rate-limiting and token usage tracking.',
+        'Yes. The GSTIN field is completely optional. For retail counter B2C sales, simply provide the customer’s name and mobile number. The system generates a valid Tax Invoice with full itemized rates, HSN codes, and tax totals.',
     },
     {
       id: '03',
-      question: 'Can this architecture pivot to new hackathon problem statements?',
+      question: 'Are saved invoices editable after generation?',
       answer:
-        'Yes. The core data model is designed around extensible domain entities, automated file storage (via Multer), notification routing, and dynamic analytics. New domain attributes can be mapped in the shared contracts without altering the base cross-platform plumbing.',
+        'To comply with statutory accounting requirements and prevent audit tampering, finalized invoices are saved immutably with sequential numbering (e.g. INV-2026-4749). If a correction is needed, shopkeepers can delete the draft record or issue a new bill.',
     },
     {
       id: '04',
-      question: 'Does the mobile application support native offline-first workflows?',
+      question: 'How does invoice printing and PDF export work?',
       answer:
-        'Yes. The React Native Expo mobile client utilizes Reanimated 4.5.1 gesture handling, persistent secure credentials, local caching, and automated network detection to provide seamless mobile agility in spotty network environments.',
+        'Every bill is rendered in standard A4 portrait format with clean CSS print styles. Clicking "Print / Export PDF" launches the browser print dialog where you can save as a PDF or print directly to any office laser, inkjet, or thermal printer without extra software.',
     },
     {
       id: '05',
-      question: 'Is the web application production-ready and accessible?',
+      question: 'Can I access VyaaparGST from any web browser or tablet?',
       answer:
-        'The web client is built on Next.js App Router with strict WCAG AA contrast ratios, keyboard navigation, full semantic HTML5 elements, and dynamic client-side rendering with motion fallbacks for users preferring reduced motion.',
+        'Yes. VyaaparGST is built on Next.js and operates entirely in modern web browsers (Chrome, Edge, Safari, Firefox) on desktop monitors, laptops, and tablets. No manual software installation or database drivers are required.',
+    },
+    {
+      id: '06',
+      question: 'Which GST rate slabs are supported?',
+      answer:
+        'VyaaparGST natively supports standard Indian GST slabs: 0% (exempt goods), 5% (essentials/foodgrains), 12% (processed goods), 18% (electronics/general retail), and 28% (luxury items), with automatic calculation of taxable values and tax splits per line item.',
     },
   ];
 
@@ -53,13 +59,13 @@ export const FAQAccordion: React.FC = () => {
           <div
             key={faq.id}
             className={`faq-accordion-item bento-card overflow-hidden transition-all duration-300 ${
-              isOpen ? 'border-blue-500/40 shadow-md ring-1 ring-blue-500/10' : 'hover:border-black/[0.14]'
+              isOpen ? 'border-zinc-950/40 shadow-md ring-1 ring-zinc-950/10 bg-white' : 'hover:border-black/[0.14] bg-white/80'
             }`}
           >
             <button
               onClick={() => setOpenIndex(isOpen ? null : index)}
               aria-expanded={isOpen}
-              className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 font-semibold text-zinc-900 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl"
+              className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 font-semibold text-zinc-900 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black rounded-xl"
             >
               <span className="text-base sm:text-lg tracking-tight">
                 {faq.question}
@@ -67,7 +73,7 @@ export const FAQAccordion: React.FC = () => {
               <span
                 className={`p-2 rounded-lg border border-black/[0.06] transition-transform duration-300 ${
                   isOpen
-                    ? 'rotate-180 bg-blue-50 text-blue-600 border-blue-200 shadow-xs'
+                    ? 'rotate-180 bg-zinc-950 text-white border-zinc-950 shadow-xs'
                     : 'bg-zinc-50 text-zinc-500'
                 }`}
               >
@@ -75,7 +81,6 @@ export const FAQAccordion: React.FC = () => {
               </span>
             </button>
 
-            {/* Smooth CSS Grid Height Transition without layout jumps */}
             <div
               className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${
                 isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'

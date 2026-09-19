@@ -8,9 +8,7 @@ import {
   LayoutDashboard,
   Layers,
   Sparkles,
-  FolderOpen,
   Activity,
-  Bell,
   Settings,
   ChevronsLeft,
   ChevronsRight,
@@ -18,9 +16,9 @@ import {
   LogOut,
   X,
   Bot,
+  type LucideIcon,
 } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';
-import { useNotifications } from '@/lib/context/NotificationContext';
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
@@ -31,22 +29,18 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
-  unreadNotifications,
   isOpen = false,
   onClose,
   onOpenCommandPalette,
 }) => {
   const pathname = usePathname();
   const { user, logout } = useAuth();
-  const { unreadCount: contextUnreadCount } = useNotifications();
   const [collapsed, setCollapsed] = useState(false);
-
-  const effectiveUnread = unreadNotifications !== undefined ? unreadNotifications : contextUnreadCount;
 
   const navigation: Array<{
     name: string;
     href: string;
-    icon: any;
+    icon: LucideIcon;
     badge?: number | string;
   }> = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -56,8 +50,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { name: 'Sales Analytics', href: '/dashboard/analytics', icon: Activity },
     { name: 'Settings & Profile', href: '/settings', icon: Settings },
   ];
-
-  const userRole = user?.role || 'operator';
 
   return (
     <>
@@ -202,10 +194,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Navigation Items */}
           <nav className={cn('space-y-2', collapsed ? 'px-3 pt-2' : 'px-4 pt-1')}>
             {navigation.map((item) => {
-              const isActive =
-                item.name === 'Dashboard'
-                  ? pathname === '/dashboard' || pathname === '/'
-                  : pathname === item.href;
+              // Normalize pathname for trailing slashes
+              const currentPath = pathname ? pathname.replace(/\/$/, '') || '/' : '/';
+              const targetPath = item.href.replace(/\/$/, '') || '/';
+
+              let isActive = false;
+              if (item.name === 'Dashboard') {
+                // Dashboard is only active on /dashboard (or root / if redirected/treated as dashboard)
+                isActive = currentPath === '/dashboard' || currentPath === '/';
+              } else if (item.name === 'Bills & Invoices') {
+                // Bills & Invoices should be active on /items or /items/:id, but NOT /items/new (which belongs to 'Create Bill')
+                isActive = currentPath === '/items' || (currentPath.startsWith('/items/') && currentPath !== '/items/new');
+              } else if (item.name === 'Create Bill') {
+                // Create Bill is active on /items/new
+                isActive = currentPath === '/items/new';
+              } else if (item.name === 'Sales Analytics') {
+                // Sales Analytics is active on /dashboard/analytics or its subroutes
+                isActive = currentPath === '/dashboard/analytics' || currentPath.startsWith('/dashboard/analytics/');
+              } else {
+                // Other items like AI Tax Assistant (/ai-assistant), Settings (/settings)
+                isActive = currentPath === targetPath || currentPath.startsWith(`${targetPath}/`);
+              }
 
               const Icon = item.icon;
 
@@ -215,8 +224,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   href={item.href}
                   onClick={onClose}
                   title={collapsed ? item.name : undefined}
+                  aria-current={isActive ? 'page' : undefined}
                   className={cn(
-                    'flex items-center transition-all duration-150 group relative select-none',
+                    'flex items-center transition-all duration-150 group relative select-none outline-none focus-visible:ring-2 focus-visible:ring-[#5C4CF6] focus-visible:ring-offset-2',
                     collapsed
                       ? 'justify-center w-11 h-11 mx-auto rounded-xl'
                       : 'justify-between px-4 py-3 rounded-2xl text-[13.5px]',

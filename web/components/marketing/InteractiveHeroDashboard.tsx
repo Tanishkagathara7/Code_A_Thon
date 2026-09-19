@@ -160,28 +160,28 @@ export const InteractiveHeroDashboard: React.FC = () => {
       <div className="rounded-2xl sm:rounded-3xl bg-white/95 backdrop-blur-md border border-zinc-200/80 p-4 sm:p-6 shadow-xl shadow-zinc-950/5 space-y-5 text-zinc-900">
         
         {/* ========================================================
-            1. COMMAND BANNER (COMPACT & SLEEK)
+            1. COMMAND BANNER (WARM EDITORIAL & REFINED)
            ======================================================== */}
-        <div className="rounded-xl sm:rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900 to-zinc-950 text-white p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm relative overflow-hidden">
-          {/* Ambient decorative glow */}
-          <div className="absolute top-0 right-0 w-80 h-full bg-emerald-500/10 blur-2xl pointer-events-none" />
+        <div className="rounded-xl sm:rounded-2xl bg-[#FAF9F5] border border-zinc-200/90 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs relative overflow-hidden">
+          {/* Subtle warm tint accent */}
+          <div className="absolute top-0 right-0 w-80 h-full bg-emerald-500/5 blur-2xl pointer-events-none" />
 
           <div className="space-y-1.5 relative z-10">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-950/70 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-[10px] font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
                 GSTIN: 24AAACV1234F1Z5
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-white/10 text-zinc-300 text-[10px] font-medium">
+              <span className="px-2.5 py-0.5 rounded-full bg-white border border-zinc-200/80 text-zinc-600 text-[10px] font-semibold">
                 Gujarat (24) • FY 2025-26
               </span>
             </div>
 
-            <h3 className="text-lg sm:text-xl font-black tracking-tight text-white flex items-center gap-2">
+            <h3 className="text-lg sm:text-xl font-extrabold tracking-tight text-zinc-950 flex items-center gap-2">
               <span>GST Billing & Sales Hub</span>
             </h3>
 
-            <p className="text-xs text-zinc-400 max-w-xl leading-relaxed">
+            <p className="text-xs text-zinc-600 max-w-xl leading-relaxed">
               Real-time counter invoicing, automatic CGST/SGST splitting, and instant statutory tax ledger reconciliation.
             </p>
           </div>
@@ -190,17 +190,17 @@ export const InteractiveHeroDashboard: React.FC = () => {
             <button
               type="button"
               onClick={handleQuickAddBill}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>+ Create Demo Bill</span>
+              <span>Create Demo Bill</span>
             </button>
 
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-all border border-white/15 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-zinc-50 text-zinc-800 text-xs font-semibold transition-all border border-zinc-300/80 shadow-xs cursor-pointer"
             >
-              <Layers className="w-3.5 h-3.5 text-zinc-300" />
+              <Layers className="w-3.5 h-3.5 text-zinc-500" />
               <span>Bill History</span>
             </Link>
           </div>

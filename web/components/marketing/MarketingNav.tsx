@@ -23,11 +23,10 @@ export const MarketingNav: React.FC = () => {
   }, []);
 
   const navItems = [
-    { href: '/#product', hash: '#product', label: 'Product' },
-    { href: '/#platform', hash: '#platform', label: 'Two Clients' },
+    { href: '/#product', hash: '#product', label: 'Dashboard' },
     { href: '/#workflow', hash: '#workflow', label: 'Workflow' },
-    { href: '/#architecture', hash: '#architecture', label: 'Architecture' },
-    { href: '/#heritage', hash: '#heritage', label: 'Heritage' },
+    { href: '/#tax-engine', hash: '#tax-engine', label: 'GST Split' },
+    { href: '/#invoice-showcase', hash: '#invoice-showcase', label: 'A4 Invoice' },
     { href: '/#faq', hash: '#faq', label: 'FAQ' },
   ];
 

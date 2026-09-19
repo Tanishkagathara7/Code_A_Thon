@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -10,12 +10,19 @@ import {
   Code2,
   Monitor,
   Smartphone,
+  Calculator,
+  Printer,
+  ShoppingBag,
+  Users,
+  ShieldCheck,
+  Zap,
 } from 'lucide-react';
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { Highlight } from '@/components/marketing/Highlight';
 import { InteractiveDemonstrator } from '@/components/marketing/InteractiveDemonstrator';
+import { GstCalculationEngine } from '@/components/marketing/GstCalculationEngine';
+import { AuthenticInvoiceShowcase } from '@/components/marketing/AuthenticInvoiceShowcase';
 import { ArchitectureDiagram } from '@/components/marketing/ArchitectureDiagram';
-import { HeroProductShowcase } from '@/components/marketing/HeroProductShowcase';
 import { InteractiveHeroDashboard } from '@/components/marketing/InteractiveHeroDashboard';
 import { FAQAccordion } from '@/components/marketing/FAQAccordion';
 import { MarketingFooter } from '@/components/marketing/MarketingFooter';
@@ -37,7 +44,6 @@ export default function MarketingPage() {
   const rootRef = useRef<HTMLDivElement>(null);
   const siteUrl = getSiteUrl();
 
-  // Valid Schema.org structured data declarations
   const jsonLdSchemas = [
     {
       '@context': 'https://schema.org',
@@ -61,70 +67,25 @@ export default function MarketingPage() {
       '@type': 'SoftwareApplication',
       name: SITE_CONFIG.name,
       operatingSystem: 'Web, iOS, Android',
-      applicationCategory: 'BusinessApplication, DeveloperApplication',
+      applicationCategory: 'BusinessApplication, FinancialApplication',
       description: SITE_CONFIG.fullDescription,
       offers: {
         '@type': 'Offer',
         price: '0.00',
-        priceCurrency: 'USD',
+        priceCurrency: 'INR',
       },
       featureList: [
-        'Real-time state synchronization between Next.js and React Native',
-        'OpenRouter AI Gateway task synthesis and categorization',
-        'Cryptographic JWT Bearer token authentication and SecureStore integration',
-        'Offline-first mobile agility with React Native Expo SDK 57',
-        'High-density operational dashboard and domain items CRUD pipeline',
+        'Deterministic GST calculation with CGST/SGST 50:50 split and 100% IGST routing',
+        'Customer party master with GSTIN and state code verification',
+        'Reusable item catalog with HSN codes and GST slab picker',
+        'Sequential invoice numbering and finalized bill immutability',
+        'Standard A4 printable tax invoice format with amount in words',
+        'Real-time synchronization between Next.js Web POS and React Native Expo Mobile',
       ],
       author: {
         '@type': 'Organization',
         name: SITE_CONFIG.author,
       },
-    },
-    {
-      '@context': 'https://schema.org',
-      '@type': 'FAQPage',
-      mainEntity: [
-        {
-          '@type': 'Question',
-          name: 'How is state synchronized between Next.js and React Native?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Both clients consume a unified Node.js / Express REST API backed by MongoDB Atlas. Authentication is maintained via cryptographically verified JWT tokens (stored in secure browser storage for web, and expo-secure-store for native mobile). Cache invalidation triggers immediate re-fetches for consistent operational metrics across both platforms.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'What AI gateway capabilities are natively integrated?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'The shared backend incorporates OpenRouter AI Gateway integration. It executes structured entity summarization, priority classification, and action plan generation across your operations items with strict rate-limiting and token usage tracking.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Can this architecture pivot to new hackathon problem statements?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Yes. The core data model is designed around extensible domain entities, automated file storage (via Multer), notification routing, and dynamic analytics. New domain attributes can be mapped in the shared contracts without altering the base cross-platform plumbing.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Does the mobile application support native offline-first workflows?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Yes. The React Native Expo mobile client utilizes Reanimated 4.5.1 gesture handling, persistent secure credentials, local caching, and automated network detection to provide seamless mobile agility in spotty network environments.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Is the web application production-ready and accessible?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'The web client is built on Next.js App Router with strict WCAG AA contrast ratios, keyboard navigation, full semantic HTML5 elements, and dynamic client-side rendering with motion fallbacks for users preferring reduced motion.',
-          },
-        },
-      ],
     },
   ];
 
@@ -134,10 +95,8 @@ export default function MarketingPage() {
   const scrollCtxRef = useRef<gsap.Context | null>(null);
 
   useEffect(() => {
-    // If still loading (initial site visit), wait for loader to complete
     if (isLoading) return;
 
-    // Clean up any prior animation context before re-initializing
     if (heroCtxRef.current) {
       heroCtxRef.current.revert();
       heroCtxRef.current = null;
@@ -151,13 +110,10 @@ export default function MarketingPage() {
       scrollCtxRef.current = null;
     }
 
-    // 1. Run the cohesive hero entrance timeline
     heroCtxRef.current = createHeroEntranceTimeline(rootRef.current);
-    // 2. Start the word highlight animation synchronized right with the hero reveal
     typoAnimRef.current = initHeroTypographyAnimation(rootRef.current);
-    // 3. Init scroll-driven storytelling
     scrollCtxRef.current = initScrollStory(rootRef.current);
-    // Small rAF delay lets the browser paint before Refresh
+
     requestAnimationFrame(() => {
       ScrollTrigger.refresh();
     });
@@ -174,32 +130,24 @@ export default function MarketingPage() {
 
   return (
     <SmoothScrollProvider>
-      {/* Top-Level High-End Technical Product Initialization Overlay */}
       <LoadingScreen />
 
       <div
         ref={rootRef}
         className="min-h-screen text-zinc-900 selection:bg-zinc-900 selection:text-white relative isolate overflow-clip font-sans bg-[#FBF9F4]"
       >
-        {/* Full-Page Editorial Decorative SVG Background System */}
         <EditorialBackgroundSystem />
-
-        {/* Schema.org Structured Data */}
         <JsonLd data={jsonLdSchemas} />
-
         <MarketingNav />
 
         {/* ========================================================
-            01. HERO SECTION: BENTO COMPOSITION & EDITORIAL TYPOGRAPHY
+            01. HERO SECTION: EDITORIAL HEADLINE & VALUE PROPOSITION
            ======================================================== */}
-        <section className="hero-section relative min-h-screen flex flex-col justify-center items-center pt-24 sm:pt-28 pb-16 sm:pb-24 px-4 sm:px-6 overflow-hidden border-b border-black/[0.06]">
-          {/* Subtle ambient lighting accent matching Auth view */}
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-tr from-blue-500/5 via-indigo-500/5 to-transparent blur-3xl pointer-events-none -z-10" />
-          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-blue-500/[0.03] rounded-full blur-3xl pointer-events-none -translate-y-1/2 -z-10" />
-          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-pink-500/[0.025] rounded-full blur-3xl pointer-events-none translate-y-1/2 -z-10" />
+        <section className="hero-section relative min-h-screen flex flex-col justify-center items-center pt-24 sm:pt-28 pb-14 sm:pb-20 px-4 sm:px-6 overflow-hidden border-b border-black/[0.06]">
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-tr from-emerald-500/5 via-blue-500/5 to-transparent blur-3xl pointer-events-none -z-10" />
 
           <div className="max-w-5xl mx-auto relative z-10 space-y-8 hero-text-container text-center flex flex-col items-center">
-            {/* Editorial Display Headline — Unified Color with Kinetic Multi-Color Animated Transitions */}
+            {/* Display Headline */}
             <div className="hero-headline-wrapper space-y-1.5 sm:space-y-3 max-w-4xl lg:max-w-5xl cursor-default select-none mx-auto py-1">
               <h1 className="text-5xl sm:text-7xl lg:text-[5.25rem] xl:text-[5.75rem] font-extrabold tracking-tight leading-[1.10] sm:leading-[1.07] text-center text-[#1E1B4B]">
                 {/* Line 1: Effortless GST */}
@@ -303,37 +251,51 @@ export default function MarketingPage() {
               </h1>
             </div>
 
-            {/* Value Proposition & CTAs (Centered, Balanced Rhythm) */}
+            {/* Clear Value Proposition */}
             <div className="max-w-2xl mx-auto space-y-6 pt-1">
-              {/* opacity:0 inline style ensures no flash before GSAP fromTo sets initial state */}
               <p className="hero-copy text-base sm:text-lg text-zinc-600 leading-relaxed font-normal text-center" style={{ opacity: 0 }}>
-                {domainConfig.landing.hero.subheadline}
+                Generate GST-compliant tax invoices in 30 seconds. Automatic CGST, SGST, and IGST tax splits, reusable party ledgers, item catalogs with HSN codes, and instant A4 PDF export.
               </p>
 
               <div className="hero-cta flex flex-wrap items-center justify-center gap-3.5" style={{ opacity: 0 }}>
                 <Link
-                  href={domainConfig.landing.hero.ctaPrimary.href}
+                  href="/items/new"
                   className="btn-primary px-7 py-3.5 text-xs font-semibold tracking-wide shadow-md shadow-zinc-950/10 inline-flex items-center"
                 >
-                  <span>{domainConfig.landing.hero.ctaPrimary.label}</span>
+                  <span>Launch Billing Desk</span>
                   <ArrowUpRight className="w-4 h-4 ml-1.5 opacity-80" />
                 </Link>
                 <Link
-                  href="#product"
+                  href="#workflow"
                   onClick={(e) => {
                     e.preventDefault();
-                    const el = document.getElementById('product');
+                    const el = document.getElementById('workflow');
                     if (el) {
                       scrollTo(el, { offset: -80 });
-                      window.history.pushState(null, '', '#product');
+                      window.history.pushState(null, '', '#workflow');
                     }
                   }}
                   className="btn-secondary px-6 py-3.5 text-xs font-semibold cursor-pointer shadow-sm hover:shadow inline-flex items-center border border-zinc-300/90 bg-white/95 hover:bg-zinc-50"
-                  aria-label="Explore platform features"
                 >
-                  <span>{domainConfig.landing.hero.ctaSecondary.label}</span>
+                  <span>How Billing Works</span>
                   <ArrowUpRight className="w-4 h-4 ml-1.5 opacity-60" />
                 </Link>
+              </div>
+
+              {/* Quick Feature Badges */}
+              <div className="pt-2 flex flex-wrap items-center justify-center gap-4 text-xs font-medium text-zinc-500">
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  Intra/Inter-State Tax Split
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  Standard A4 Printable PDF
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  100% Web Browser Ready
+                </span>
               </div>
             </div>
           </div>
@@ -344,9 +306,12 @@ export default function MarketingPage() {
            ======================================================== */}
         <section id="product" className="product-stage-section relative pt-6 sm:pt-10 pb-8 sm:pb-12 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
           <div className="max-w-6xl mx-auto relative z-10 space-y-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between">
               <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
-                {'// 01. INTERACTIVE GST DASHBOARD'}
+                {'// 01. INTERACTIVE GST DASHBOARD & SALES LEDGER'}
+              </span>
+              <span className="text-xs text-zinc-500 font-mono hidden sm:inline">
+                Live Simulation • Click buttons to test
               </span>
             </div>
             <div className="hero-product-stage">
@@ -356,169 +321,20 @@ export default function MarketingPage() {
         </section>
 
         {/* ========================================================
-            02. EDITORIAL STATEMENT: CINEMATIC CONTRAST
-           ======================================================== */}
-        <section className="section-philosophy py-10 sm:py-14 px-4 sm:px-6 border-b border-black/[0.06]">
-          <div className="max-w-6xl mx-auto space-y-5">
-            <div className="philosophy-eyebrow font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
-              {'// 02. ARCHITECTURAL PHILOSOPHY'}
-            </div>
-            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-zinc-950 leading-tight">
-              <span className="philosophy-heading-line block overflow-hidden">
-                <span className="inline-block bg-zinc-950 text-white px-3 sm:px-4 py-1 sm:py-1.5 rounded-sm">
-                  BUILT FOR HIGH VELOCITY.
-                </span>
-              </span>
-              <span className="philosophy-heading-line block overflow-hidden mt-2 sm:mt-3">
-                ENGINEERED FOR{' '}
-                <span className="philosophy-highlight inline-block">
-                  <Highlight variant="green">ZERO DRIFT.</Highlight>
-                </span>
-              </span>
-            </h2>
-            <p className="philosophy-body text-base sm:text-xl text-zinc-600 leading-relaxed max-w-3xl font-normal">
-              We rejected the compromise of single-codebase wrappers. Desktop operations demand data density, keyboard efficiency, and batch processing. Mobile operations demand biometric gestures and zero-latency caching. APP gives both clients direct access to an authoritative central engine.
-            </p>
-          </div>
-        </section>
-
-        {/* ========================================================
-            03. PRODUCT EXPERIENCE: BENTO GRID CLIENT PARITY
-           ======================================================== */}
-        <section id="platform" className="section-parity py-12 sm:py-16 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
-          <div className="max-w-6xl mx-auto space-y-12">
-            <div className="parity-header max-w-3xl space-y-2">
-              <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-zinc-500">
-                {'// 03. CLIENT PURPOSE & PARITY'}
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
-                Two Dedicated Clients. One Core API.
-              </h2>
-            </div>
-
-            {/* Asymmetric 2-Column Bento Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-              {/* Desktop Client Bento Card */}
-              <div className="parity-card lg:col-span-6 bento-card p-8 flex flex-col justify-between space-y-6 bg-white/80 backdrop-blur-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                <div className="space-y-4">
-                  <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-200/60 shadow-sm">
-                    <Monitor className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-zinc-900 tracking-tight">
-                    Next.js 14 Desktop Center
-                  </h3>
-                  <p className="text-sm text-zinc-600 leading-relaxed">
-                    Designed for heavy operational density. Filter hundreds of domain items, manage multi-megabyte file uploads via Multer, run batch updates, and inspect full telemetry dashboards.
-                  </p>
-                </div>
-                <div className="pt-6 border-t border-black/[0.06] space-y-2.5 text-xs font-medium text-zinc-700">
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Next.js App Router + React 19 Hydration</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Reactive AuthContext & Token Interception</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Accessible Keyboard Navigation & Modals</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Mobile Client Bento Card */}
-              <div className="parity-card lg:col-span-6 bento-card p-8 flex flex-col justify-between space-y-6 bg-white/80 backdrop-blur-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                <div className="space-y-4">
-                  <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200/60 shadow-sm">
-                    <Smartphone className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-zinc-900 tracking-tight">
-                    React Native Expo Mobile
-                  </h3>
-                  <p className="text-sm text-zinc-600 leading-relaxed">
-                    Built for gesture-native speed on iOS and Android. Incorporates biometric authorization, fluid Reanimated 4.5.1 interactions, secure persistent credential storage, and instant cache updates.
-                  </p>
-                </div>
-                <div className="pt-6 border-t border-black/[0.06] space-y-2.5 text-xs font-medium text-zinc-700">
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Expo Router v57 File System Navigation</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>expo-secure-store Cryptographic Credentials</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Offline-First State & Network Recovery</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ========================================================
-            04. SYNCHRONIZATION CORRIDOR: CINEMATIC DEPTH
-           ======================================================== */}
-        <section id="sync" className="sync-section py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
-          <div className="max-w-6xl mx-auto space-y-12">
-            <div className="sync-header text-left max-w-3xl space-y-2">
-              <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-zinc-500">
-                {'// 04. SYNCHRONIZATION CORRIDOR'}
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
-                One Backend. Two Clients. Zero Drift.
-              </h2>
-              <p className="text-sm text-zinc-600 leading-relaxed">
-                Watch desktop state changes synchronize with mobile native clients in under 35ms through atomic Mongoose mutations.
-              </p>
-            </div>
-
-            {/* Visual Docking Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center max-w-5xl">
-              {/* Desktop Dispatch Preview */}
-              <div className="sync-desktop-card md:col-span-7 bento-card p-6 space-y-4 bg-white/85 backdrop-blur-md transition-all duration-300 hover:shadow-lg">
-                <div className="flex items-center justify-between border-b border-black/[0.06] pb-3 text-xs font-semibold text-zinc-800">
-                  <span>CLIENT A: DESKTOP DISPATCH</span>
-                  <span className="font-mono text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-200">Port 3000</span>
-                </div>
-                <div className="space-y-2 font-mono text-xs text-zinc-900 bg-zinc-50/80 p-4 rounded-xl border border-black/[0.06]">
-                  <div className="text-zinc-500">{'// Dispatching item state change'}</div>
-                  <div className="font-semibold">mutateItem(&apos;66f1...&apos;, &#123; status: &apos;resolved&apos; &#125;)</div>
-                  <div className="text-emerald-600 font-semibold">✓ Express REST confirmed: HTTP 200 OK</div>
-                </div>
-              </div>
-
-              {/* Mobile Sync Preview */}
-              <div className="sync-mobile-card md:col-span-5 bento-card p-6 space-y-4 bg-white/85 backdrop-blur-md transition-all duration-300 hover:shadow-lg">
-                <div className="flex items-center justify-between border-b border-black/[0.06] pb-3 text-xs font-semibold text-zinc-800">
-                  <span>CLIENT B: MOBILE SYNC</span>
-                  <span className="font-mono text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200">Expo 57</span>
-                </div>
-                <div className="space-y-2 font-mono text-xs text-zinc-900 bg-zinc-50/80 p-4 rounded-xl border border-black/[0.06]">
-                  <div className="text-zinc-500">{'// Revalidated via cache invalidation'}</div>
-                  <div className="font-semibold">onItemCacheInvalidate(&apos;66f1...&apos;)</div>
-                  <div className="text-emerald-600 font-semibold">✓ Native list updated in &lt; 35ms</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ========================================================
-            05. OPERATIONAL WORKFLOW: INTERACTIVE BENTO DEMO
+            02. COMPLETE 4-STEP BILLING WORKFLOW
            ======================================================== */}
         <section id="workflow" className="section-workflow relative z-10 py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
           <div className="max-w-6xl mx-auto space-y-8 relative z-10">
             <div className="workflow-header max-w-2xl space-y-2">
               <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-zinc-500">
-                {'// 05. INTERACTIVE WORKFLOW'}
+                {'// 02. END-TO-END BILLING WORKFLOW'}
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
-                End-to-End Execution with Real Payloads
+                How an Invoice is Generated in 30 Seconds
               </h2>
+              <p className="text-sm text-zinc-600 leading-relaxed">
+                Step through the four essential phases of modern GST retail invoicing: from selecting customer tax residency to instantaneous A4 print and WhatsApp dispatch.
+              </p>
             </div>
 
             <InteractiveDemonstrator />
@@ -526,7 +342,25 @@ export default function MarketingPage() {
         </section>
 
         {/* ========================================================
-            06. REAL ASSET: CODE-A-THON HERITAGE
+            03. STATUTORY TAX CALCULATION ENGINE
+           ======================================================== */}
+        <section id="tax-engine" className="py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
+          <div className="max-w-6xl mx-auto space-y-8">
+            <GstCalculationEngine />
+          </div>
+        </section>
+
+        {/* ========================================================
+            04. AUTHENTIC A4 TAX INVOICE SHOWCASE
+           ======================================================== */}
+        <section id="invoice-showcase" className="py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
+          <div className="max-w-6xl mx-auto space-y-8">
+            <AuthenticInvoiceShowcase />
+          </div>
+        </section>
+
+        {/* ========================================================
+            05. REAL ASSET: CODE-A-THON HERITAGE
            ======================================================== */}
         <section id="heritage" className="codeathon-section py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
           <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
@@ -539,24 +373,23 @@ export default function MarketingPage() {
                 Born Under Hackathon Pressure.
               </h2>
               <p className="text-sm sm:text-base text-zinc-600 leading-relaxed">
-                APP was conceived and built to solve a concrete engineering challenge: how to architect a production-ready, cross-platform system at breakneck speed without introducing architectural drift or sacrificing mobile security.
+                VyaaparGST was engineered to solve a concrete real-world challenge: empowering small retail businesses to escape spreadsheet errors and manual bill preparation with an automated, compliant web billing system.
               </p>
               <p className="text-xs sm:text-sm text-zinc-500 leading-relaxed">
-                Engineered with strict API contracts, end-to-end type safety, atomic state synchronization, and biometric persistence built into the core baseline from day one.
+                Built with strict TypeScript domain contracts, deterministic tax math, and instant browser-based A4 tax invoice generation.
               </p>
               <div className="space-y-3 font-mono text-xs font-semibold text-zinc-800 pt-1">
                 <div className="p-3.5 rounded-xl bg-white/80 backdrop-blur-sm border border-black/[0.06] flex items-center justify-between">
-                  <span>ARCHITECTURAL PARITY</span>
+                  <span>STATUTORY GST FORMULA</span>
                   <span className="bg-zinc-900 text-white px-2.5 py-0.5 rounded text-xs">100% VERIFIED</span>
                 </div>
                 <div className="p-3.5 rounded-xl bg-white/80 backdrop-blur-sm border border-black/[0.06] flex items-center justify-between">
-                  <span>MOBILE RUNTIME</span>
-                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-xs">EXPO 57 SAFE</span>
+                  <span>WEB CLIENT RUNTIME</span>
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-xs">NEXT.JS 16 READY</span>
                 </div>
               </div>
             </div>
 
-            {/* Real GST Billing Brand Asset Frame */}
             <div className="lg:col-span-7 relative">
               <TiltCard maxTilt={14} perspective={1200} className="w-full">
                 <div className="codeathon-visual-frame bento-card p-4 sm:p-6 shadow-xl bg-white/90 backdrop-blur-md transition-all duration-300 hover:shadow-2xl">
@@ -575,7 +408,7 @@ export default function MarketingPage() {
                       <span className="w-2 h-2 rounded-full bg-blue-600" />
                       Official Architecture Artifact
                     </span>
-                    <span className="text-zinc-500 font-mono text-xs">Next.js + Expo Shared Core</span>
+                    <span className="text-zinc-500 font-mono text-xs">Next.js Web Operations Core</span>
                   </div>
                 </div>
               </TiltCard>
@@ -584,11 +417,10 @@ export default function MarketingPage() {
         </section>
 
         {/* ========================================================
-            07. REAL ASSET: TANISH (CREATOR & ARCHITECT)
+            07. CREATOR & ARCHITECT: TANISH
            ======================================================== */}
         <section className="tanish-section py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06]">
           <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-            {/* Real Tanish portrait in sleek frame */}
             <div className="lg:col-span-5 relative order-2 lg:order-1 flex justify-center">
               <TiltCard maxTilt={18} perspective={1000} className="max-w-xs w-full">
                 <div className="tanish-portrait-frame bento-card p-3 shadow-xl bg-white/90 backdrop-blur-md transition-all duration-300 hover:shadow-2xl">
@@ -620,7 +452,7 @@ export default function MarketingPage() {
                 <Highlight variant="green">Delivered for Speed.</Highlight>
               </h2>
               <p className="text-base text-zinc-600 leading-relaxed italic font-normal">
-                &ldquo;A great cross-platform product is not a single codebase stretched across two form factors. It is an authoritative backend and shared data contract powering two unapologetically native client experiences.&rdquo;
+                &ldquo;Real-world billing systems cannot afford mathematical drift or confusing tax configurations. VyaaparGST guarantees deterministic GST calculation, compliant A4 invoicing, and zero lag in any web browser.&rdquo;
               </p>
               <div className="flex items-center gap-4 pt-2 text-xs font-medium">
                 <div className="p-3.5 rounded-xl bg-white/85 border border-black/[0.06] shadow-sm backdrop-blur-sm">
@@ -629,7 +461,7 @@ export default function MarketingPage() {
                 </div>
                 <div className="p-3.5 rounded-xl bg-white/85 border border-black/[0.06] shadow-sm backdrop-blur-sm">
                   <span className="text-zinc-400 block text-xs font-mono">APPLICATION</span>
-                  <span className="text-zinc-900 font-semibold">APP Multi-Platform Core</span>
+                  <span className="text-zinc-900 font-semibold">VyaaparGST Suite</span>
                 </div>
               </div>
             </div>
@@ -637,26 +469,20 @@ export default function MarketingPage() {
         </section>
 
         {/* ========================================================
-            08. TECHNICAL ARCHITECTURE: TOPOLOGY BENTO
-           ======================================================== */}
-        <section id="architecture" className="section-topology relative z-10 py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
-          <div className="max-w-6xl mx-auto space-y-8 relative z-10">
-            <ArchitectureDiagram />
-          </div>
-        </section>
-
-        {/* ========================================================
-            09. FAQ SECTION: BENTO ACCORDION
+            08. FREQUENTLY ASKED QUESTIONS
            ======================================================== */}
         <section id="faq" className="section-faq py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
           <div className="max-w-4xl mx-auto space-y-10">
             <div className="faq-header text-left space-y-2">
               <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-zinc-500">
-                {'// 09. FREQUENTLY ASKED QUESTIONS'}
+                {'// 08. FREQUENTLY ASKED QUESTIONS'}
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
-                Technical FAQ
+                GST Billing & Compliance FAQ
               </h2>
+              <p className="text-sm text-zinc-600">
+                Straight answers about tax splits, invoice numbering, printing, and cross-platform synchronization.
+              </p>
             </div>
 
             <FAQAccordion />
@@ -664,37 +490,36 @@ export default function MarketingPage() {
         </section>
 
         {/* ========================================================
-            10. FINAL CTA: CINEMATIC BENTO FINALE
+            09. FINAL CALL TO ACTION
            ======================================================== */}
         <section className="section-cta py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] relative overflow-hidden">
           <div className="max-w-4xl mx-auto text-left relative z-10 space-y-8">
-
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-950 leading-tight">
               <span className="cta-headline-line block overflow-hidden">
-                Built once.
+                Ready to bill faster?
               </span>
               <span className="cta-headline-line block overflow-hidden mt-1">
-                Designed for <Highlight variant="blue">everywhere.</Highlight>
+                Create your first <Highlight variant="blue">GST invoice today.</Highlight>
               </span>
             </h2>
 
             <p className="cta-subhead max-w-xl text-base text-zinc-600 leading-relaxed font-normal">
-              Launch the Next.js desktop operations center or connect via native mobile credentials to experience synchronized real-time workflows.
+              Launch the desktop billing counter directly or sign in to access your customer khata ledger and past invoices.
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <Link
-                href="/signup"
+                href="/items/new"
                 className="cta-button btn-primary px-8 py-4 text-xs font-semibold tracking-wide shadow-md shadow-zinc-950/10 hover:shadow-lg transition-all inline-flex items-center"
               >
-                <span>Get Started Now</span>
+                <span>Create First GST Bill</span>
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
               <Link
                 href="/login"
                 className="cta-button btn-secondary px-8 py-4 text-xs font-semibold shadow-xs hover:shadow transition-all inline-flex items-center"
               >
-                <span>Sign In</span>
+                <span>Sign In to Store</span>
                 <ArrowUpRight className="w-4 h-4 ml-1.5 opacity-60" />
               </Link>
             </div>
@@ -702,7 +527,7 @@ export default function MarketingPage() {
         </section>
 
         {/* ========================================================
-            11. TECHNICAL FOOTER
+            10. TECHNICAL FOOTER
            ======================================================== */}
         <MarketingFooter />
       </div>

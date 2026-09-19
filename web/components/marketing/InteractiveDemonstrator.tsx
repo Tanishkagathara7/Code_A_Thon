@@ -1,220 +1,198 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Terminal, CheckCircle2, ShieldCheck } from 'lucide-react';
-import { domainConfig } from '@/lib/domain.config';
+import { Users, ShoppingBag, Calculator, Printer, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export const InteractiveDemonstrator: React.FC = () => {
   const [activeStep, setActiveStep] = useState<number>(0);
 
-  const entity = domainConfig.domain.primaryEntityName;
-  const category = domainConfig.domain.categories[0] || 'Operational';
-
   const steps = [
     {
       id: 0,
-      phase: '01',
-      title: 'Customer Selection & Item Line Entry',
-      client: 'NEXT.JS POS CLIENT',
-      accent: 'blue',
-      badgeBg: 'bg-blue-50 text-blue-700 border-blue-200',
+      phase: 'STEP 01',
+      title: 'Customer (Party) Selection',
+      subtitle: 'Identify Tax Residency & GSTIN',
+      icon: Users,
+      badge: 'Party Master',
+      badgeBg: 'bg-amber-50 text-amber-800 border-amber-200',
       description:
-        'Select registered party with GSTIN state identification or quick-add walk-in customer. Add catalog items with HSN codes, unit rates, and quantities.',
-      requestMethod: 'POST',
-      requestPath: '/api/items (GST Invoicing)',
-      payload: `{
-  "invoiceNo": "INV-2026-0089",
-  "party": {
-    "name": "Rajesh Traders",
-    "gstin": "24AABCR1234F1Z9",
-    "state": "Gujarat (24)"
-  },
-  "items": [
-    { "name": "Basmati Rice (25kg)", "hsn": "1006", "qty": 2, "rate": 1850, "gstRate": 5 }
-  ]
-}`,
-      responseStatus: 'HTTP/1.1 200 OK',
-      responseDetail: 'Taxable Subtotal: ₹3,700.00 • Intra-State State Match: True',
-      systemMetrics: [
-        { label: 'Subtotal', value: '₹3,700' },
-        { label: 'HSN Match', value: 'Verified' },
-      ],
+        'Select a registered customer or enter a walk-in retail buyer. The system verifies their state code (e.g., Gujarat State 24) to prepare the statutory tax routing.',
+      previewData: {
+        customer: 'Rajesh Traders',
+        phone: '+91 98251 23456',
+        state: 'Gujarat (State Code 24)',
+        gstin: '24AABCR1234F1Z9',
+        type: 'Registered B2B Party',
+      },
+      highlights: ['Automatic State Matching', 'B2B GSTIN or B2C Walk-in', 'Khata Balance Tracking'],
     },
     {
       id: 1,
-      phase: '02',
-      title: 'Real-time GST Split Engine (CGST + SGST vs IGST)',
-      client: 'EXPRESS BILLING CORE',
-      accent: 'lavender',
-      badgeBg: 'bg-violet-50 text-violet-700 border-violet-200',
+      phase: 'STEP 02',
+      title: 'Product Catalog & HSN Entry',
+      subtitle: 'Instant Item & Slab Selection',
+      icon: ShoppingBag,
+      badge: 'Item Catalog',
+      badgeBg: 'bg-blue-50 text-blue-800 border-blue-200',
       description:
-        'Computes statutory Indian tax rules. Same state splits tax 50:50 between Central and State GST. Out-of-state routing calculates IGST in full.',
-      requestMethod: 'POST',
-      requestPath: '/api/tax/compute',
-      payload: `{
-  "subtotal": 3700.00,
-  "taxRule": "intra_state_split",
-  "cgst": { "rate": 2.5, "amount": 92.50 },
-  "sgst": { "rate": 2.5, "amount": 92.50 },
-  "totalTax": 185.00,
-  "grandTotal": 3885.00
-}`,
-      responseStatus: 'HTTP/1.1 200 OK',
-      responseDetail: 'Statutory GSTIN Verification: Passed • Mathematical Precision: 100%',
-      systemMetrics: [
-        { label: 'Total GST', value: '₹185.00' },
-        { label: 'Grand Total', value: '₹3,885.00' },
-      ],
+        'Add items from your saved catalog or type custom items. Unit price, statutory HSN code, and GST slab rate (0%, 5%, 12%, 18%, 28%) load instantly without manual typing.',
+      previewData: {
+        item: 'Basmati Rice (25kg Bag)',
+        hsn: '1006 (Cereals)',
+        rate: '₹1,850.00 / bag',
+        quantity: '2 Bags',
+        gstSlab: '5% Goods Slab',
+      },
+      highlights: ['HSN Code Classification', 'Reusable Product Prices', 'Custom Quantity Multiplier'],
     },
     {
       id: 2,
-      phase: '03',
-      title: 'Printable A4 PDF & Mobile POS Sync',
-      client: 'REACT NATIVE EXPO + WEB PRINT',
-      accent: 'green',
-      badgeBg: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      phase: 'STEP 03',
+      title: 'Statutory GST Tax Computation',
+      subtitle: 'Same State vs Out of State',
+      icon: Calculator,
+      badge: 'Tax Engine',
+      badgeBg: 'bg-purple-50 text-purple-800 border-purple-200',
       description:
-        'Generates instant printable A4 GST tax invoice with amount in words and shopkeeper header. Synchronizes bill history directly with mobile counter app.',
-      requestMethod: 'GET',
-      requestPath: '/api/items/INV-2026-0089/print',
-      payload: `// Synchronized Tax Bill & PDF Record
-{
-  "invoiceNo": "INV-2026-0089",
-  "status": "Paid in Full",
-  "amountInWords": "Three Thousand Eight Hundred Eighty-Five Only",
-  "pdfStatus": "Ready for Print & WhatsApp Share"
-}`,
-      responseStatus: 'HTTP/1.1 200 OK',
-      responseDetail: 'Bill Saved Immutably • Mobile Notification: Delivered (< 20ms)',
-      systemMetrics: [
-        { label: 'Print Render', value: 'A4 Ready' },
-        { label: 'Invoice State', value: 'Immutable' },
-      ],
+        'The tax engine calculates Taxable Value = Rate × Qty. If Buyer State matches Shop State (Gujarat), it splits 50:50 between CGST and SGST. For other states, it computes IGST.',
+      previewData: {
+        taxableSubtotal: '₹3,700.00',
+        cgstSplit: '2.5% = ₹92.50',
+        sgstSplit: '2.5% = ₹92.50',
+        totalTax: '₹185.00',
+        grandTotal: '₹3,885.00',
+      },
+      highlights: ['CGST + SGST Equal Split', 'IGST Single Out-of-State Tax', 'Zero Calculation Drift'],
+    },
+    {
+      id: 3,
+      phase: 'STEP 04',
+      title: 'A4 Tax Invoice & Share',
+      subtitle: 'Print, WhatsApp & Save Ledger',
+      icon: Printer,
+      badge: 'Finalized Bill',
+      badgeBg: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+      description:
+        'Generates an immutable Tax Invoice with sequential number, date, amount in words, and legal declaration. Print directly to A4 or send 1-click summary to customer WhatsApp.',
+      previewData: {
+        invoiceNo: 'INV-2026-4749',
+        date: '2026-09-19',
+        status: 'Paid in Full',
+        amountInWords: 'Three Thousand Eight Hundred Eighty-Five Only',
+        delivery: 'A4 Print + WhatsApp Ready',
+      },
+      highlights: ['Sequential Numbering', 'Amount in Words Included', 'Immutable Audit Record'],
     },
   ];
 
   const current = steps[activeStep];
+  const IconComponent = current.icon;
 
   return (
-    <div className="workflow-container w-full space-y-6 select-none">
+    <div className="w-full space-y-6 select-none">
       {/* Step Selector Tabs */}
-      <div role="tablist" aria-label="Workflow Phases" className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {steps.map((step, idx) => {
-          const isActive = activeStep === idx;
+          const isSelected = activeStep === idx;
+          const StepIcon = step.icon;
           return (
             <button
               key={step.id}
-              role="tab"
-              id={`workflow-tab-${step.id}`}
-              aria-selected={isActive}
-              aria-controls={`workflow-panel-${step.id}`}
-              tabIndex={isActive ? 0 : -1}
               onClick={() => setActiveStep(idx)}
-              className={`p-5 rounded-xl text-left transition-all duration-200 border cursor-pointer flex flex-col justify-between min-h-[140px] relative overflow-hidden ${
-                isActive
-                  ? 'bg-white border-zinc-950 shadow-lg shadow-black/[0.08] ring-2 ring-zinc-900/20'
-                  : 'bg-white/80 hover:bg-white border-black/[0.08] hover:border-black/[0.16] shadow-xs hover:-translate-y-0.5'
+              className={`p-4 rounded-2xl text-left transition-all duration-200 border cursor-pointer relative overflow-hidden flex flex-col justify-between ${
+                isSelected
+                  ? 'bg-white border-zinc-950 shadow-md ring-2 ring-zinc-950/10'
+                  : 'bg-white/80 hover:bg-white border-black/[0.06] hover:border-black/[0.14]'
               }`}
             >
-              {/* High-contrast top accent bar for active tab */}
-              {isActive && (
-                <span className="absolute top-0 left-0 right-0 h-1 bg-zinc-950" />
+              {isSelected && (
+                <div className="absolute top-0 left-0 right-0 h-1 bg-zinc-950" />
               )}
-              <div className="flex items-center justify-between w-full mb-3">
-                <span
-                  className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded-md border ${
-                    isActive ? 'bg-zinc-900 text-white border-zinc-900' : 'bg-zinc-100 text-zinc-600 border-zinc-200'
-                  }`}
-                >
-                  PHASE {step.phase}
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-mono text-[10px] font-bold uppercase text-zinc-400">
+                  {step.phase}
                 </span>
-                <span className="text-xs font-mono text-zinc-400">0{idx + 1}/03</span>
+                <span className={`p-1.5 rounded-lg ${isSelected ? 'bg-zinc-950 text-white' : 'bg-zinc-100 text-zinc-600'}`}>
+                  <StepIcon className="w-3.5 h-3.5" />
+                </span>
               </div>
-              <div className="text-sm font-semibold text-zinc-900 leading-snug my-auto">
-                {step.title}
-              </div>
-              <div className="flex items-center justify-between w-full pt-3 mt-2 border-t border-zinc-100 text-xs font-medium text-zinc-500">
-                <span>{step.client}</span>
-                {isActive ? (
-                  <span className="text-zinc-950 font-bold text-[11px] flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-950 animate-pulse" />
-                    Active
-                  </span>
-                ) : (
-                  <span className="text-zinc-400 text-[11px]">Inspect &rarr;</span>
-                )}
+              <div>
+                <div className="font-bold text-xs sm:text-sm text-zinc-900 leading-snug">
+                  {step.title}
+                </div>
+                <div className="text-[11px] text-zinc-500 mt-0.5 truncate">
+                  {step.subtitle}
+                </div>
               </div>
             </button>
           );
         })}
       </div>
 
-      {/* Main Execution Stage */}
-      <div
-        role="tabpanel"
-        id={`workflow-panel-${current.id}`}
-        aria-labelledby={`workflow-tab-${current.id}`}
-        className="bento-card p-6 sm:p-8 space-y-6"
-      >
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-black/[0.06] pb-5">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className={`px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold border ${current.badgeBg}`}>
-                {current.client}
-              </span>
-              <span className="text-xs text-zinc-400 font-mono">• ACTIVE PIPELINE</span>
-            </div>
-            <h3 className="text-xl font-bold tracking-tight text-zinc-900">
-              {current.title}
-            </h3>
-            <p className="text-sm text-zinc-600 max-w-2xl">
-              {current.description}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3 font-mono text-xs">
-            {current.systemMetrics.map((m, i) => (
-              <div key={i} className="p-2.5 rounded-lg bg-zinc-50 border border-zinc-200/80 shadow-xs">
-                <div className="text-[10px] text-zinc-400 uppercase font-semibold">{m.label}</div>
-                <div className="text-zinc-900 font-bold mt-0.5">{m.value}</div>
+      {/* Main Active Step Showcase Card */}
+      <div className="bento-card p-6 sm:p-8 bg-white/95 backdrop-blur-md border border-black/[0.08] shadow-xl rounded-3xl">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          {/* Left Column: Explanation and Checklist */}
+          <div className="lg:col-span-6 space-y-5">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold border shadow-xs">
+                <IconComponent className="w-3.5 h-3.5" />
+                <span>{current.phase}: {current.badge}</span>
               </div>
-            ))}
-          </div>
-        </div>
+              <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-950">
+                {current.title}
+              </h3>
+              <p className="text-sm text-zinc-600 leading-relaxed">
+                {current.description}
+              </p>
+            </div>
 
-        {/* Request & Response Split Display */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          {/* Request Stream */}
-          <div className="rounded-xl bg-zinc-50/80 text-zinc-900 p-4 font-mono text-xs space-y-3 shadow-xs border border-zinc-200/80">
-            <div className="flex items-center justify-between border-b border-zinc-200/80 pb-2 text-xs">
-              <span className="text-zinc-600 flex items-center gap-1.5 font-semibold">
-                <Terminal className="w-3.5 h-3.5 text-blue-600" />
-                OUTBOUND DISPATCH
-              </span>
-              <span className="text-blue-600 font-bold">
-                {current.requestMethod} {current.requestPath}
+            <div className="space-y-2 pt-2">
+              {current.highlights.map((h, i) => (
+                <div key={i} className="flex items-center gap-2.5 text-xs font-medium text-zinc-800">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>{h}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-2 flex items-center gap-4">
+              <button
+                onClick={() => setActiveStep((prev) => (prev + 1) % steps.length)}
+                className="px-4 py-2 bg-zinc-900 text-white rounded-xl text-xs font-semibold hover:bg-zinc-800 transition-colors inline-flex items-center gap-1.5 shadow-xs cursor-pointer"
+              >
+                <span>{activeStep === steps.length - 1 ? 'Back to Step 1' : 'Next Billing Step'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+              <span className="text-xs text-zinc-400 font-mono">
+                Step {activeStep + 1} of 4
               </span>
             </div>
-            <pre className="text-zinc-800 overflow-x-auto p-2.5 bg-white rounded-lg text-xs leading-relaxed border border-zinc-200/60 shadow-2xs">
-              {current.payload}
-            </pre>
           </div>
 
-          {/* Response Stream */}
-          <div className="rounded-xl bg-zinc-50/80 text-zinc-900 p-4 font-mono text-xs space-y-3 shadow-xs border border-zinc-200/80">
-            <div className="flex items-center justify-between border-b border-zinc-200/80 pb-2 text-xs">
-              <span className="text-zinc-600 flex items-center gap-1.5 font-semibold">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                CONFIRMED RECEIPT
-              </span>
-              <span className="text-emerald-700 font-bold text-xs font-mono">
-                {current.responseStatus}
-              </span>
-            </div>
-            <div className="space-y-2 p-2.5 bg-white rounded-lg border border-zinc-200/60 shadow-2xs">
-              <div className="text-zinc-600 text-xs">{current.responseDetail}</div>
-              <div className="text-emerald-700 text-xs flex items-center gap-1.5 font-semibold">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Cryptographic Handshake Verified
+          {/* Right Column: Visual Real Data Mockup */}
+          <div className="lg:col-span-6">
+            <div className="bg-[#FAF9F5] p-5 sm:p-6 rounded-2xl border border-black/[0.06] space-y-4 shadow-sm">
+              <div className="flex items-center justify-between border-b border-black/[0.06] pb-3">
+                <span className="font-mono text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
+                  LIVE WORKFLOW PREVIEW
+                </span>
+                <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-white text-zinc-800 border border-black/[0.06] shadow-xs">
+                  {current.badge}
+                </span>
+              </div>
+
+              <div className="space-y-3 font-mono text-xs">
+                {Object.entries(current.previewData).map(([k, v], idx) => (
+                  <div key={idx} className="flex items-center justify-between bg-white p-3 rounded-xl border border-black/[0.04]">
+                    <span className="text-zinc-500 capitalize">{k.replace(/([A-Z])/g, ' $1')}:</span>
+                    <span className="font-bold text-zinc-950 text-right">{v}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="text-[11px] text-zinc-500 italic pt-1">
+                Data flows deterministically into your store ledger and generates instant tax records.
               </div>
             </div>
           </div>
