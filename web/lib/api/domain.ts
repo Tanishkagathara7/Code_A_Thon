@@ -726,29 +726,39 @@ const DEFAULT_INITIAL_CUSTOMERS = [
   },
 ];
 
-function getStoredCustomers(): any[] {
-  if (typeof window === 'undefined') return DEFAULT_INITIAL_CUSTOMERS;
+function getCurrentCustomerStorageKey(): string {
+  if (typeof window === 'undefined') return 'vyaapar_customers_guest';
   try {
-    const raw = localStorage.getItem('vyaapar_customers_guest');
-    if (!raw) {
-      localStorage.setItem('vyaapar_customers_guest', JSON.stringify(DEFAULT_INITIAL_CUSTOMERS));
-      return DEFAULT_INITIAL_CUSTOMERS;
+    const userStr = localStorage.getItem(USER_STORAGE_KEY);
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      if (user.id) return `vyaapar_customers_${user.id}`;
+      if (user.isGuest || user.role === 'guest') return 'vyaapar_customers_guest';
     }
+    const token = localStorage.getItem(TOKEN_STORAGE_KEY);
+    if (token === 'guest-token') return 'vyaapar_customers_guest';
+  } catch {}
+  return 'vyaapar_customers_guest';
+}
+
+function getStoredCustomers(): any[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const key = getCurrentCustomerStorageKey();
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      localStorage.setItem('vyaapar_customers_guest', JSON.stringify(DEFAULT_INITIAL_CUSTOMERS));
-      return DEFAULT_INITIAL_CUSTOMERS;
-    }
-    return parsed;
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
-    return DEFAULT_INITIAL_CUSTOMERS;
+    return [];
   }
 }
 
 function saveStoredCustomers(custs: any[]) {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem('vyaapar_customers_guest', JSON.stringify(custs));
+    const key = getCurrentCustomerStorageKey();
+    localStorage.setItem(key, JSON.stringify(custs));
   } catch {}
 }
 
@@ -786,7 +796,7 @@ export const customersApi = {
 
     try {
       const res = await apiClient.get<any>('/customers', params);
-      if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
+      if (res && res.data && Array.isArray(res.data)) {
         return res;
       }
       const local = filterLocally(getStoredCustomers());

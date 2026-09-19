@@ -4,21 +4,13 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import {
   User as UserIcon,
-  Shield,
-  KeyRound,
   Bell,
   Sliders,
-  CheckCircle2,
-  Copy,
-  ExternalLink,
   Laptop,
-  Smartphone,
   Save,
   AlertTriangle,
   LogOut,
   RefreshCw,
-  Eye,
-  EyeOff,
   Sparkles,
 } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';
@@ -43,10 +35,6 @@ export default function SettingsProfilePage() {
   const [soundEffects, setSoundEffects] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
 
-  // Security / Token Display
-  const [copiedToken, setCopiedToken] = useState(false);
-  const [showToken, setShowToken] = useState(false);
-
   const isGuest = Boolean(user?.isGuest || user?.provider === 'guest');
   const providerDisplay = user?.provider ? user.provider.toUpperCase() : (isGuest ? 'GUEST' : 'EMAIL');
 
@@ -65,14 +53,6 @@ export default function SettingsProfilePage() {
     } finally {
       setIsSavingProfile(false);
     }
-  };
-
-  const handleCopySessionId = () => {
-    const sessionVal = user?.id || 'sess-anonymous-device-cache';
-    navigator.clipboard.writeText(sessionVal);
-    setCopiedToken(true);
-    toast('Session ID copied to clipboard', 'info');
-    setTimeout(() => setCopiedToken(false), 2000);
   };
 
   return (
@@ -483,94 +463,6 @@ export default function SettingsProfilePage() {
         </div>
       </div>
 
-      {/* Security & Multi-Device Sync Card */}
-      <div className="bg-white rounded-2xl border border-zinc-200/80 p-6 shadow-xs">
-        <div className="flex items-center justify-between mb-5">
-          <div>
-            <h3 className="text-base font-bold text-zinc-900">Security & Device Sync</h3>
-            <p className="text-xs text-zinc-500 mt-0.5">
-              Inspect active authentication tokens, encryption status, and cross-platform mobile connectivity.
-            </p>
-          </div>
-          <Shield className="w-5 h-5 text-emerald-600" />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Active Session Info */}
-          <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200/70 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-zinc-700 flex items-center gap-1.5">
-                <KeyRound className="w-3.5 h-3.5 text-indigo-600" />
-                <span>Session Credentials</span>
-              </span>
-              <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">
-                SECURE
-              </span>
-            </div>
-
-            <div className="space-y-1">
-              <p className="text-[11px] text-zinc-500">Active User ID / Token Identifier</p>
-              <div className="flex items-center justify-between gap-2 p-2 bg-white rounded-lg border border-zinc-200">
-                <span className="font-mono text-xs text-zinc-700 truncate">
-                  {showToken
-                    ? (user?.id || 'guest-session-token-v1')
-                    : `${(user?.id || 'guest-session-token').slice(0, 12)}••••••••`}
-                </span>
-                <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => setShowToken(!showToken)}
-                    className="p-1 text-zinc-400 hover:text-zinc-700 rounded transition-colors cursor-pointer"
-                    title={showToken ? 'Hide ID' : 'Show ID'}
-                  >
-                    {showToken ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleCopySessionId}
-                    className="p-1 text-zinc-400 hover:text-zinc-700 rounded transition-colors cursor-pointer"
-                    title="Copy ID"
-                  >
-                    {copiedToken ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <p className="text-[11px] text-zinc-400">
-              Authenticated through HTTP Bearer header with JWT cryptographic verification.
-            </p>
-          </div>
-
-          {/* Mobile App Parity Info */}
-          <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200/70 space-y-3 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-zinc-700 flex items-center gap-1.5">
-                  <Smartphone className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>Mobile Expo Companion</span>
-                </span>
-                <span className="text-[10px] font-mono font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">
-                  PARITY
-                </span>
-              </div>
-              <p className="text-xs text-zinc-600 mt-2">
-                This account can be seamlessly opened on your iOS / Android phone using Expo Go or native APK.
-              </p>
-              <div className="mt-2 text-[11px] text-zinc-500 space-y-1">
-                <p>• Same database and backend API endpoint</p>
-                <p>• Real-time synchronization across devices</p>
-                <p>• Offline cache with Stale-While-Revalidate</p>
-              </div>
-            </div>
-
-            <div className="pt-2 border-t border-zinc-200/60 flex items-center justify-between text-[11px]">
-              <span className="text-zinc-500">API Protocol:</span>
-              <span className="font-mono font-semibold text-zinc-700">REST v1 + SSE</span>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
