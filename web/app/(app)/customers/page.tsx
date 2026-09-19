@@ -177,19 +177,19 @@ export default function CustomersPage() {
   };
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 pb-16">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 text-xs text-zinc-500 mb-1">
             <span>Parties</span>
             <span>/</span>
-            <span className="font-semibold text-zinc-900">Customers & Khata Ledger</span>
+            <span className="font-semibold text-zinc-900">Directory</span>
           </div>
-          <h1 className="text-2xl font-black tracking-tight text-zinc-900">
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900">
             Customer Directory
           </h1>
-          <p className="text-xs text-zinc-500 mt-0.5">
+          <p className="text-xs sm:text-sm text-zinc-500 mt-0.5">
             Manage buyer parties, verified GSTINs, state place-of-supply mappings, and historical bill ledgers.
           </p>
         </div>
@@ -213,7 +213,7 @@ export default function CustomersPage() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="p-4 rounded-2xl bg-white border border-zinc-100 shadow-[0_1px_3px_rgba(0,0,0,0.03)] flex flex-col md:flex-row items-center justify-between gap-3">
+      <div className="p-4 rounded-2xl bg-white border border-zinc-100 shadow-[0_1px_3px_rgba(0,0,0,0.03)] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="relative w-full md:w-80">
           <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" />
           <input
@@ -225,7 +225,7 @@ export default function CustomersPage() {
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full md:w-auto">
           <select
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}

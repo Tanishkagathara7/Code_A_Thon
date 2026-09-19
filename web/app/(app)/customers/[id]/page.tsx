@@ -81,7 +81,7 @@ export default function CustomerProfilePage({ params }: { params: Promise<{ id: 
   const { customer, stats, invoices } = profile;
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 pb-16">
       {/* Back Button & Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -93,7 +93,7 @@ export default function CustomerProfilePage({ params }: { params: Promise<{ id: 
             <span>Back to Customers Directory</span>
           </Link>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-black tracking-tight text-zinc-900">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900">
               {customer.name}
             </h1>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700">
@@ -108,7 +108,7 @@ export default function CustomerProfilePage({ params }: { params: Promise<{ id: 
         <div className="flex items-center gap-3">
           <Link
             href={`/items/new?partyName=${encodeURIComponent(customer.name)}&partyMobile=${encodeURIComponent(customer.mobile)}&partyState=${encodeURIComponent(customer.state)}&partyGstin=${encodeURIComponent(customer.gstin || '')}`}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold transition-all shadow-xs"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold transition-all shadow-xs w-full sm:w-auto justify-center"
           >
             <Plus className="w-4 h-4" />
             <span>Create Invoice for Party</span>
@@ -117,7 +117,7 @@ export default function CustomerProfilePage({ params }: { params: Promise<{ id: 
       </div>
 
       {/* Stats Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="p-4 rounded-2xl bg-white border border-zinc-100 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Total Invoices</p>
           <p className="text-xl font-black text-zinc-900 mt-1">{stats.totalInvoices}</p>
@@ -231,7 +231,7 @@ export default function CustomerProfilePage({ params }: { params: Promise<{ id: 
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs divide-y divide-zinc-100">
+              <table className="w-full text-left text-xs divide-y divide-zinc-100 min-w-[650px]">
                 <thead>
                   <tr className="text-[10.5px] font-bold text-zinc-400 uppercase tracking-wider pb-2">
                     <th className="pb-2 font-semibold">Invoice No</th>

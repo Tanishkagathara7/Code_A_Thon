@@ -202,7 +202,7 @@ export default function ItemsPage() {
               </Link>
             </div>
           ) : (
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm min-w-[750px]">
               <thead className="bg-zinc-50/70 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider border-b border-zinc-100">
                 <tr>
                   <th className="px-6 py-3.5">Invoice No</th>

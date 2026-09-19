@@ -302,7 +302,7 @@ export default function ProductsPage() {
   }, [products]);
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 pb-16">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -311,10 +311,10 @@ export default function ProductsPage() {
             <span>/</span>
             <span className="font-semibold text-zinc-900">Products & Inventory</span>
           </div>
-          <h1 className="text-2xl font-black tracking-tight text-zinc-900">
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900">
             Products & Stock Management
           </h1>
-          <p className="text-xs text-zinc-500 mt-0.5">
+          <p className="text-xs sm:text-sm text-zinc-500 mt-0.5">
             Configure product-wise GST rates, manage stock inventory levels, and track stock movements.
           </p>
         </div>
@@ -338,52 +338,52 @@ export default function ProductsPage() {
       </div>
 
       {/* Metrics Banner */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="p-4 rounded-2xl bg-white border border-zinc-100 shadow-[0_1px_3px_rgba(0,0,0,0.03)] flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-900 shrink-0">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-900 shrink-0">
             <Package className="w-5 h-5" />
           </div>
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Total Products</p>
-            <p className="text-xl font-black text-zinc-900 mt-0.5">{summary.totalProducts}</p>
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-zinc-400 truncate">Total Products</p>
+            <p className="text-lg sm:text-xl font-black text-zinc-900 mt-0.5">{summary.totalProducts}</p>
           </div>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-zinc-100 shadow-[0_1px_3px_rgba(0,0,0,0.03)] flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
             <AlertTriangle className="w-5 h-5" />
           </div>
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Low Stock Alert</p>
-            <p className="text-xl font-black text-amber-600 mt-0.5">{summary.lowStockCount}</p>
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-zinc-400 truncate">Low Stock Alert</p>
+            <p className="text-lg sm:text-xl font-black text-amber-600 mt-0.5">{summary.lowStockCount}</p>
           </div>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-zinc-100 shadow-[0_1px_3px_rgba(0,0,0,0.03)] flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600 shrink-0">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600 shrink-0">
             <XCircle className="w-5 h-5" />
           </div>
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Out of Stock</p>
-            <p className="text-xl font-black text-rose-600 mt-0.5">{summary.outOfStockCount}</p>
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-zinc-400 truncate">Out of Stock</p>
+            <p className="text-lg sm:text-xl font-black text-rose-600 mt-0.5">{summary.outOfStockCount}</p>
           </div>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-zinc-100 shadow-[0_1px_3px_rgba(0,0,0,0.03)] flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
             <TrendingUp className="w-5 h-5" />
           </div>
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Inventory Value</p>
-            <p className="text-xl font-black text-emerald-600 mt-0.5">₹{Number(summary.totalInventoryValue || 0).toLocaleString('en-IN')}</p>
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-zinc-400 truncate">Inventory Value</p>
+            <p className="text-lg sm:text-xl font-black text-emerald-600 mt-0.5">₹{Number(summary.totalInventoryValue || 0).toLocaleString('en-IN')}</p>
           </div>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="p-4 rounded-2xl bg-white border border-zinc-100 shadow-[0_1px_3px_rgba(0,0,0,0.03)] flex flex-col md:flex-row items-center justify-between gap-3">
+      <div className="p-4 rounded-2xl bg-white border border-zinc-100 shadow-[0_1px_3px_rgba(0,0,0,0.03)] flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
         {/* Search */}
-        <div className="relative w-full md:w-80">
+        <div className="relative w-full lg:w-80">
           <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" />
           <input
             type="text"
@@ -395,12 +395,12 @@ export default function ProductsPage() {
         </div>
 
         {/* Filter Pills */}
-        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full lg:w-auto">
           {/* Category */}
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 text-zinc-700 font-medium focus:outline-none cursor-pointer"
+            className="w-full sm:w-auto px-3 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 text-zinc-700 font-medium focus:outline-none cursor-pointer"
           >
             <option value="all">All Categories</option>
             {categoriesList.map((cat) => (
@@ -412,7 +412,7 @@ export default function ProductsPage() {
           <select
             value={selectedGstRate}
             onChange={(e) => setSelectedGstRate(e.target.value)}
-            className="px-3 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 text-zinc-700 font-medium focus:outline-none cursor-pointer"
+            className="w-full sm:w-auto px-3 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 text-zinc-700 font-medium focus:outline-none cursor-pointer"
           >
             <option value="all">All GST Slabs</option>
             {GST_SLABS.map((rate) => (
@@ -424,7 +424,7 @@ export default function ProductsPage() {
           <select
             value={selectedStockStatus}
             onChange={(e) => setSelectedStockStatus(e.target.value as any)}
-            className="px-3 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 text-zinc-700 font-medium focus:outline-none cursor-pointer"
+            className="w-full sm:w-auto px-3 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 text-zinc-700 font-medium focus:outline-none cursor-pointer"
           >
             <option value="all">All Stock Statuses</option>
             <option value="in_stock">In Stock</option>
@@ -436,7 +436,7 @@ export default function ProductsPage() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="px-3 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 text-zinc-700 font-medium focus:outline-none cursor-pointer"
+            className="w-full sm:w-auto px-3 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 text-zinc-700 font-medium focus:outline-none cursor-pointer"
           >
             <option value="createdAt_desc">Recently Added</option>
             <option value="name_asc">Name: A to Z</option>
@@ -451,7 +451,7 @@ export default function ProductsPage() {
       {/* Products Table */}
       <div className="rounded-2xl bg-white border border-zinc-100 shadow-[0_1px_3px_rgba(0,0,0,0.03)] overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="bg-zinc-50/70 border-b border-zinc-100 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
                 <th className="px-5 py-3.5">Product Name & SKU</th>

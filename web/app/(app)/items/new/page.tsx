@@ -647,7 +647,7 @@ Verify HSN codes, correct intra/inter-state tax assignment, and provide a 2-sent
 
           {/* Line Items Table */}
           <div className="overflow-x-auto -mx-6 px-6">
-            <table className="w-full text-left text-xs">
+            <table className="w-full text-left text-xs min-w-[780px]">
               <thead className="bg-[#F8F9FC] text-[11px] font-bold text-[#68728A] border-y border-[#E6E9F0]">
                 <tr>
                   <th className="px-3 py-2.5">Item Description</th>

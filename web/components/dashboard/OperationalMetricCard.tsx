@@ -44,14 +44,14 @@ export const OperationalMetricCard: React.FC<MetricCardProps> = ({
       </div>
 
       {/* Main Metric Value & Trend Badge */}
-      <div className="flex items-baseline gap-2.5 mt-3">
-        <span className="text-3xl sm:text-4xl font-black tracking-tight text-[#101226]">
+      <div className="flex flex-wrap items-baseline gap-2 mt-3">
+        <span className="text-2xl sm:text-3xl xl:text-4xl font-black tracking-tight text-[#101226] truncate">
           {value !== undefined && value !== null ? value : 0}
         </span>
 
         {trend && (
           <span
-            className={`inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full ${
+            className={`inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
               variant === 'active'
                 ? 'bg-[#FEE2E2] text-[#EF4444]'
                 : 'bg-[#DCFCE7] text-[#16B981]'
@@ -61,6 +61,7 @@ export const OperationalMetricCard: React.FC<MetricCardProps> = ({
           </span>
         )}
       </div>
+
 
       {/* Bottom Subtext & Mini Sparkline Visualization */}
       <div className="flex items-end justify-between gap-3 mt-3 pt-1">

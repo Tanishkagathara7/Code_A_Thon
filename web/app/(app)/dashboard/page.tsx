@@ -167,11 +167,11 @@ export default function DashboardPage() {
   }, [recentItems]);
 
   return (
-    <div className="space-y-8 pb-16">
+    <div className="space-y-6 sm:space-y-8 pb-16">
       {/* ========================================================
           1. GST BILLING COMMAND CENTER HERO
          ======================================================== */}
-      <div className="bg-white rounded-2xl border border-[#E6E9F0] p-6 sm:p-8 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative overflow-hidden">
+      <div className="bg-white rounded-2xl border border-[#E6E9F0] p-5 sm:p-7 md:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
         {/* Left Side: Brand Badges, Title, Subtitle, and Action Buttons */}
         <div className="space-y-3 max-w-2xl">
           <div className="flex flex-wrap items-center gap-2">
@@ -195,7 +195,7 @@ export default function DashboardPage() {
           <div className="pt-2 flex flex-wrap items-center gap-3">
             <Link
               href="/items/new"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold transition-all shadow-sm"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold transition-all shadow-sm w-full sm:w-auto text-center"
             >
               <Plus className="w-4 h-4 text-emerald-400" />
               <span>Create New Bill</span>
@@ -203,7 +203,7 @@ export default function DashboardPage() {
 
             <Link
               href="/items"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-[#E6E9F0] hover:bg-[#F8F9FC] text-[#0A0A0A] text-xs font-bold transition-all shadow-xs"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-[#E6E9F0] hover:bg-[#F8F9FC] text-[#0A0A0A] text-xs font-bold transition-all shadow-xs w-full sm:w-auto text-center"
             >
               <Layers className="w-3.5 h-3.5 text-[#68728A]" />
               <span>Bill History & Invoices</span>
@@ -212,27 +212,27 @@ export default function DashboardPage() {
         </div>
 
         {/* Right Side: Operational Context Block */}
-        <div className="flex items-center lg:border-l lg:border-[#E6E9F0] lg:pl-8">
-          <div className="space-y-1 text-right sm:text-left">
+        <div className="flex items-center md:border-l md:border-[#E6E9F0] md:pl-8 pt-4 md:pt-0 border-t border-[#E6E9F0] md:border-t-0">
+          <div className="space-y-1 text-left">
             <div className="text-xs font-medium text-[#68728A]">
               {new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
             </div>
             <div className="text-sm font-black text-[#0A0A0A]">
               {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
             </div>
-            <p className="text-xs text-[#68728A] pt-2 max-w-[180px] leading-snug">
+            <p className="text-xs text-[#68728A] pt-1.5 max-w-[190px] leading-snug">
               Fast counter billing. 100% statutory Indian GST compliance.
             </p>
           </div>
         </div>
       </div>
 
-
       {/* ========================================================
           2. FOUR OPERATIONAL GST KPI CARDS
          ======================================================== */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
         <OperationalMetricCard
+
           label="TOTAL SALES (TODAY)"
           value={loading ? '—' : `₹${gstMetrics.totalSales.toLocaleString('en-IN')}`}
           subtext="Total invoiced counter volume"
@@ -323,7 +323,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex-1 overflow-x-auto">
-            <table className="w-full text-left text-xs">
+            <table className="w-full text-left text-xs min-w-[700px]">
               <thead className="bg-[#F8F9FC] text-[11px] font-bold text-[#68728A] border-b border-[#E6E9F0]">
                 <tr>
                   <th className="px-5 py-3">Invoice No</th>
