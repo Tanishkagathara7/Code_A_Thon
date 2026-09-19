@@ -12,6 +12,8 @@ import {
   LogOut,
   RefreshCw,
   Sparkles,
+  CheckCircle2,
+  ExternalLink,
 } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useToast } from '@/lib/context/ToastContext';
