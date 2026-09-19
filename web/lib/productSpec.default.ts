@@ -6,8 +6,8 @@ export const defaultProductSpec: CompleteProductSpec = {
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   meta: {
-    name: 'GST Billing',
-    shortName: 'GST Billing',
+    name: 'VyaaparGST',
+    shortName: 'VyaaparGST',
     tagline: 'Bill Smarter • Grow Faster',
     description: 'High-density GST billing and financial operational management with real-time web & mobile synchronization.',
     objective: 'Provide high-density multi-platform operational intelligence and real-time incident lifecycle management across web and native mobile clients.',
@@ -273,7 +273,7 @@ export const defaultProductSpec: CompleteProductSpec = {
     loginGuidanceText: 'Sign in with your operational credentials to access your designated workspace.',
   },
   mobileExperience: {
-    appName: 'GST Billing',
+    appName: 'VyaaparGST',
     tabBarItems: [
       { key: 'home', label: 'Home', iconName: 'Home' },
       { key: 'items', label: 'Records', iconName: 'Shield' },

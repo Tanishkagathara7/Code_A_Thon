@@ -339,7 +339,7 @@ export default function HomeScreen() {
               resizeMode="contain"
             />
             <View>
-              <Text style={styles.appNameText}>GST Billing</Text>
+              <Text style={styles.appNameText}>VyaaparGST</Text>
               <Text style={styles.appSubText}>
                 {activeTab === 'profile'
                   ? 'Operator Profile & Settings'

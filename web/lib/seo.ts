@@ -4,13 +4,14 @@
  */
 
 export const SITE_CONFIG = {
-  name: 'GST Billing',
-  fullName: 'GST Billing — Bill Smarter, Grow Faster',
+  name: 'VyaaparGST',
+  fullName: 'VyaaparGST — Bill Smarter, Grow Faster',
   shortDescription:
     'Modern GST Billing & Invoicing System with real-time cross-platform synchronization across Web and Mobile.',
   fullDescription:
-    'GST Billing is a high-speed, compliant invoicing and tax management system. Generate GST-compliant invoices, track payments, monitor sales analytics, and manage client accounts with real-time sync across web and mobile clients.',
+    'VyaaparGST is a high-speed, compliant invoicing and tax management system. Generate GST-compliant invoices, track payments, monitor sales analytics, and manage client accounts with real-time sync across web and mobile clients.',
   defaultKeywords: [
+    'VyaaparGST',
     'GST Billing',
     'invoicing system',
     'tax invoice',
@@ -22,8 +23,8 @@ export const SITE_CONFIG = {
     'business accounting',
     'inventory and billing',
   ],
-  author: 'GST Billing Engineering Team',
-  twitterHandle: '@GSTBilling',
+  author: 'VyaaparGST Engineering Team',
+  twitterHandle: '@VyaaparGST',
   themeColor: '#FAFAFA',
 };
 
