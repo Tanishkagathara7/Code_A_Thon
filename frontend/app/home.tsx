@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   StyleSheet,
   View,
   Text,
   TouchableOpacity,
   ScrollView,
-  Image,
   Platform,
   RefreshControl,
   AppState,
@@ -13,54 +12,52 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Svg, { Path } from 'react-native-svg';
 import { useAuth } from '../context/AuthContext';
 import { useNetwork } from '../context/NetworkContext';
 import { InteractiveNavbar, TabKey } from '../components/navigation/InteractiveNavbar';
-import { Colors } from '../theme/colors';
-import { AISummarizerCard } from '../components/ai';
-import { FileUploadDemoCard } from '../components/file/FileUploadDemoCard';
 import { analyticsApi } from '../services/api/analyticsApi';
-import { AnalyticsOverviewData } from '../types/analytics';
-import { DashboardAnalyticsView } from '../components/analytics/DashboardAnalyticsView';
-
-
-import { NotificationBadge } from '../components/notifications/NotificationBadge';
+import { hackathonItemApi } from '../services/api/hackathonItemApi';
 import { notificationApi } from '../services/api/notificationApi';
+import { AnalyticsOverviewData } from '../types/analytics';
+import { HackathonItem } from '../types/domain';
+import { DashboardAnalyticsView } from '../components/analytics/DashboardAnalyticsView';
+import { CategoryDistributionChart } from '../components/analytics/CategoryDistributionChart';
+import { ActivityTrendChart } from '../components/analytics/ActivityTrendChart';
+import { MobileCopilotCard } from '../components/ai/MobileCopilotCard';
+import { DashboardRecentIncidents } from '../components/domain/DashboardRecentIncidents';
+import { MobileServiceHealth } from '../components/domain/MobileServiceHealth';
+import { NotificationBadge } from '../components/notifications/NotificationBadge';
+import { ProfileSettingsView } from '../components/profile/ProfileSettingsView';
 import { appConfig } from '../config/appConfig';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { user, isLoading, isAuthenticating, logout } = useAuth();
+  const { user, logout } = useAuth();
   const { isOffline } = useNetwork();
   const [activeTab, setActiveTab] = useState<TabKey>('home');
 
-  // Analytics State
+  // Dashboard Data State
   const [analyticsData, setAnalyticsData] = useState<AnalyticsOverviewData | null>(null);
-  const [analyticsLoading, setAnalyticsLoading] = useState<boolean>(false);
+  const [recentItems, setRecentItems] = useState<HackathonItem[]>([]);
+  const [analyticsLoading, setAnalyticsLoading] = useState<boolean>(true);
   const [analyticsError, setAnalyticsError] = useState<string | null>(null);
-  const [isStaleAnalytics, setIsStaleAnalytics] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
 
-  const fetchAnalytics = React.useCallback(async () => {
+  const fetchDashboardData = useCallback(async () => {
     if (!user) {
-      setAnalyticsData(null);
       setAnalyticsLoading(false);
-      setIsStaleAnalytics(false);
       return;
     }
 
     setAnalyticsError(null);
 
-    // Stale-While-Revalidate: Load cached analytics instantly first (0ms delay)
+    // Instant cache retrieval
     const cached = await analyticsApi.getCachedOverview();
     if (cached) {
       setAnalyticsData(cached);
-      setIsStaleAnalytics(true);
       setAnalyticsLoading(false);
-    } else {
-      setAnalyticsLoading(true);
     }
 
     if (isOffline) {
@@ -69,56 +66,49 @@ export default function HomeScreen() {
     }
 
     try {
-      const data = await analyticsApi.getOverview();
-      setAnalyticsData(data);
-      setIsStaleAnalytics(false);
+      const [analyticsRes, itemsRes] = await Promise.all([
+        analyticsApi.getOverview(),
+        hackathonItemApi.getItems({ limit: 8, sort: 'createdAt_desc' }),
+      ]);
+      setAnalyticsData(analyticsRes);
+      setRecentItems(itemsRes.data || []);
     } catch (err: any) {
-      // Fall back to cached data if fetch failed (e.g. timeout or cold backend wake up)
-      const fallbackCache = await analyticsApi.getCachedOverview();
-      if (fallbackCache) {
-        setAnalyticsData(fallbackCache);
-        setIsStaleAnalytics(true);
-      } else {
-        setAnalyticsError(err.message || 'Failed to fetch analytics data');
+      if (!cached) {
+        setAnalyticsError(err.message || 'Failed to sync telemetry');
       }
     } finally {
       setAnalyticsLoading(false);
     }
   }, [user, isOffline]);
 
-  // Notification State
-  const [unreadCount, setUnreadCount] = useState<number>(0);
-
-  const fetchUnreadCount = React.useCallback(async () => {
+  const fetchUnreadCount = useCallback(async () => {
     if (!user) {
       setUnreadCount(0);
       return;
     }
-    // Set cached unread count immediately
     const cached = await notificationApi.getCachedUnreadCount();
     setUnreadCount(cached);
 
     if (isOffline) return;
-
     try {
       const count = await notificationApi.getUnreadCount();
       setUnreadCount(count);
     } catch {
-      // Retain cached count on network cold-start failure
+      // Retain cached count
     }
   }, [user, isOffline]);
 
-  React.useEffect(() => {
-    fetchAnalytics();
+  useEffect(() => {
+    fetchDashboardData();
     fetchUnreadCount();
-  }, [fetchAnalytics, fetchUnreadCount]);
+  }, [fetchDashboardData, fetchUnreadCount]);
 
-  // Refocus / AppState listener to automatically refresh dashboard when returning after 15-20 min
-  React.useEffect(() => {
+  // Handle app active focus refresh
+  useEffect(() => {
     let sub: any;
     if (Platform.OS === 'web' && typeof window !== 'undefined') {
       const handleFocus = () => {
-        fetchAnalytics();
+        fetchDashboardData();
         fetchUnreadCount();
       };
       window.addEventListener('focus', handleFocus);
@@ -126,26 +116,20 @@ export default function HomeScreen() {
     } else {
       sub = AppState.addEventListener('change', (state: any) => {
         if (state === 'active') {
-          fetchAnalytics();
+          fetchDashboardData();
           fetchUnreadCount();
         }
       });
       return () => sub?.remove?.();
     }
-  }, [fetchAnalytics, fetchUnreadCount]);
+  }, [fetchDashboardData, fetchUnreadCount]);
 
-  const onRefresh = React.useCallback(async () => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await Promise.all([fetchAnalytics(), fetchUnreadCount()]);
+    await Promise.all([fetchDashboardData(), fetchUnreadCount()]);
     setRefreshing(false);
-  }, [fetchAnalytics, fetchUnreadCount]);
+  }, [fetchDashboardData, fetchUnreadCount]);
 
-  React.useEffect(() => {
-    const t8 = Date.now();
-    console.log(`[TIMING] T8: Dashboard rendered at ${t8}`);
-  }, []);
-
-  // Guest browsing supported when user clicks Skip on login screen
   const handleAuthAction = async () => {
     if (user) {
       try {
@@ -159,6 +143,18 @@ export default function HomeScreen() {
     }
   };
 
+  const userRole = (user?.role || 'COORDINATOR').toUpperCase();
+
+  const overview = analyticsData?.overview || {
+    total: 0,
+    completed: 0,
+    inProgress: 0,
+    pending: 0,
+    completionRate: 0,
+  };
+
+  const recentTitles = useMemo(() => recentItems.map((i) => i.title), [recentItems]);
+
   const renderTabContent = () => {
     if (activeTab === 'home') {
       return (
@@ -169,183 +165,224 @@ export default function HomeScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              tintColor="#4F46E5"
-              colors={['#4F46E5']}
+              tintColor="#5B45F5"
+              colors={['#5B45F5']}
             />
           }
         >
-          {/* User Profile / Guest Summary Card */}
-          <Animated.View entering={FadeInDown.duration(250)} style={styles.profileCard}>
-            {/* Avatar image or initials */}
-            <View style={styles.avatarWrapper}>
-              {user?.avatarUrl ? (
-                <Image source={{ uri: user.avatarUrl }} style={styles.avatarImg} />
-              ) : (
-                <LinearGradient
-                  colors={['#8898DF', '#6D7FD5']}
-                  style={styles.avatarPlaceholder}
-                >
-                  <Text style={styles.avatarText}>
-                    {(user?.name?.[0] || user?.email?.[0] || 'G').toUpperCase()}
-                  </Text>
-                </LinearGradient>
-              )}
-            </View>
+          {/* ========================================================
+              1. OPERATIONAL COMMAND CENTER HERO CARD
+             ======================================================== */}
+          <View style={styles.heroCard}>
+            {/* Top Row: Mesh Badge & Role Pill */}
+            <View style={styles.heroBadgeRow}>
+              <View style={styles.meshPill}>
+                <View style={styles.meshPulseDot} />
+                <Text style={styles.meshText}>PULSE DISPATCH MESH</Text>
+              </View>
 
-            {/* User Name & Details */}
-            <Text style={styles.userName}>{user?.name || 'Guest User'}</Text>
-            <Text style={styles.userEmail}>
-              {user?.email || 'Browsing in guest mode'}
-            </Text>
-
-            {/* Account Metadata Pills */}
-            <View style={styles.metaRow}>
-              <View style={styles.pill}>
-                <Text style={styles.pillLabel}>Provider: </Text>
-                <Text style={styles.pillValue}>
-                  {user?.provider ? user.provider.toUpperCase() : 'GUEST'}
+              <View style={styles.rolePill}>
+                <View style={styles.roleDot} />
+                <Text style={styles.roleText}>
+                  ROLE: <Text style={styles.roleHighlight}>{userRole}</Text>
                 </Text>
               </View>
-              {user?.id && (
-                <View style={styles.pill}>
-                  <Text style={styles.pillLabel}>ID: </Text>
-                  <Text style={styles.pillValue}>{user.id.slice(0, 10)}...</Text>
-                </View>
-              )}
             </View>
 
-            {/* Guest Action Button */}
-            {!user && (
-              <TouchableOpacity
-                style={styles.guestLoginButton}
-                onPress={() => router.replace('/(auth)')}
-                activeOpacity={0.8}
-              >
-                <LinearGradient
-                  colors={['#6366F1', '#4F46E5']}
-                  style={styles.guestLoginGradient}
-                >
-                  <Text style={styles.guestLoginText}>Log In / Sign Up to Sync</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            )}
-          </Animated.View>
+            {/* Title & Subtitle */}
+            <Text style={styles.heroTitle}>Operational Command Center</Text>
+            <Text style={styles.heroSubtitle}>
+              Monitor incidents across web and mobile, analyze telemetry in real time, and coordinate faster with AI-powered intelligence.
+            </Text>
 
-          {/* Real-time Server-Calculated Analytics & Reusable Dashboard */}
+            {/* Action Buttons: Incident Ledger & Log Incident */}
+            <View style={styles.heroActionRow}>
+              <TouchableOpacity
+                style={styles.secondaryButton}
+                activeOpacity={0.8}
+                onPress={() => router.push('/items')}
+              >
+                <Svg width={15} height={15} viewBox="0 0 24 24" fill="none">
+                  <Path
+                    d="M12 2L2 7L12 12L22 7L12 2Z"
+                    stroke="#68728A"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <Path
+                    d="M2 17L12 22L22 17"
+                    stroke="#68728A"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </Svg>
+                <Text style={styles.secondaryButtonText}>Incident Ledger</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.primaryButton}
+                activeOpacity={0.8}
+                onPress={() => router.push('/items/create')}
+              >
+                <Svg width={15} height={15} viewBox="0 0 24 24" fill="none">
+                  <Path
+                    d="M12 5V19M5 12H19"
+                    stroke="#FFFFFF"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </Svg>
+                <Text style={styles.primaryButtonText}>Log Incident</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Lifecycle Status Stepper Line matching Web */}
+            <View style={styles.lifecycleRow}>
+              <View style={styles.stepGroup}>
+                <Text style={styles.stepActive}>OBSERVE</Text>
+                <Text style={styles.stepDivider}>•</Text>
+                <Text style={styles.stepInactive}>INVESTIGATE</Text>
+                <Text style={styles.stepDivider}>•</Text>
+                <Text style={styles.stepInactive}>RESOLVE</Text>
+                <Text style={styles.stepDivider}>•</Text>
+                <Text style={styles.stepInactive}>IMPROVE</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* ========================================================
+              2. FOUR OPERATIONAL KPI CARDS
+             ======================================================== */}
           <DashboardAnalyticsView
             data={analyticsData}
             isLoading={analyticsLoading}
             error={analyticsError}
-            onRetry={fetchAnalytics}
+            onRetry={fetchDashboardData}
             isGuest={!user}
-            isStale={isStaleAnalytics}
           />
 
-          {/* Quick Access Domain Items Card */}
-          <TouchableOpacity
-            style={styles.domainSectionCard}
-            onPress={() => router.push('/items')}
-            activeOpacity={0.85}
-          >
-            <LinearGradient
-              colors={['#4F46E5', '#3730A3']}
-              style={styles.domainCardGradient}
-            >
-              <View style={styles.domainCardHeader}>
-                <Text style={styles.domainCardBadge}>CRUD DOMAIN</Text>
-                <Text style={styles.domainCardArrow}>Explore ›</Text>
-              </View>
-              <Text style={styles.domainCardTitle}>Manage {appConfig.entityPluralName}</Text>
-              <Text style={styles.domainCardSubtitle}>
-                View, search, create, update, and delete {appConfig.entityPluralName.toLowerCase()} or custom entities.
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
+          {/* ========================================================
+              3. DARK PULSE AI COPILOT CARD
+             ======================================================== */}
+          <MobileCopilotCard
+            totalIncidents={overview.total}
+            activeIncidents={overview.inProgress}
+            resolvedIncidents={overview.completed}
+            recentTitles={recentTitles}
+          />
 
+          {/* ========================================================
+              4. LIVE RECENT INCIDENT FEED
+             ======================================================== */}
+          <DashboardRecentIncidents
+            items={recentItems}
+            isLoading={analyticsLoading}
+          />
 
-          {/* AI Foundation Reference Feature Card */}
-          <AISummarizerCard />
+          {/* ========================================================
+              5. INCIDENT ACTIVITY TREND CHART
+             ======================================================== */}
+          {analyticsData?.activity && (
+            <ActivityTrendChart activity={analyticsData.activity} />
+          )}
 
-          {/* File & Image Upload Foundation Reference Feature Card */}
-          <FileUploadDemoCard />
+          {/* ========================================================
+              6. CATEGORY BREAKDOWN DONUT / STACK
+             ======================================================== */}
+          {analyticsData?.categories && (
+            <CategoryDistributionChart
+              categories={analyticsData.categories}
+              totalCount={overview.total}
+            />
+          )}
+
+          {/* ========================================================
+              7. SERVICE HEALTH INFRASTRUCTURE SECTION
+             ======================================================== */}
+          <MobileServiceHealth />
         </ScrollView>
-
       );
-    }
-
-    // Tab switching handler
-    if (activeTab === 'items') {
-      router.push('/items');
-      setActiveTab('home');
-      return null;
-    }
-
-    if (activeTab === 'notifications') {
-      router.push('/notifications');
-      setActiveTab('home');
-      return null;
-    }
-
-    if (activeTab === 'create') {
-      router.push('/items/create');
-      setActiveTab('home');
-      return null;
     }
 
     if (activeTab === 'ai') {
       return (
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          <AISummarizerCard />
+          <View style={styles.tabHeadingBox}>
+            <Text style={styles.tabHeadingTitle}>AI Intelligence Copilot</Text>
+            <Text style={styles.tabHeadingSubtitle}>
+              Synthesize operational logs, draft project specifications, and decompose complex tasks.
+            </Text>
+          </View>
+          <MobileCopilotCard
+            totalIncidents={overview.total}
+            activeIncidents={overview.inProgress}
+            resolvedIncidents={overview.completed}
+            recentTitles={recentTitles}
+          />
         </ScrollView>
       );
     }
+
+    if (activeTab === 'profile') {
+      return <ProfileSettingsView />;
+    }
+
+    return null;
   };
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
 
-      {/* Atmospheric Twilight Header Background matching Login UI */}
-      <LinearGradient
-        colors={['#1E274A', '#2D3A6B', '#485897']}
-        style={styles.headerGradient}
-      >
-        <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeHeader}>
-          <View style={styles.headerRow}>
+      {/* Clean Top Navigation Bar matching Web Command Center */}
+      <SafeAreaView edges={['top']} style={styles.safeHeaderArea}>
+        <View style={styles.headerBar}>
+          <View style={styles.headerLeft}>
+            <View style={styles.brandIconBox}>
+              <Text style={styles.brandIconText}>⚡</Text>
+            </View>
             <View>
-              <Text style={styles.brandTitle}>{appConfig.appName}</Text>
-              <Text style={styles.headerSubtitle}>
-                {user ? `${appConfig.primaryEntityName} Hub` : 'Guest Mode'}
+              <Text style={styles.appNameText}>{appConfig.appName}</Text>
+              <Text style={styles.appSubText}>
+                {activeTab === 'profile'
+                  ? 'Operator Profile & Settings'
+                  : activeTab === 'ai'
+                  ? 'Copilot Gateway'
+                  : 'Command Console'}
               </Text>
             </View>
-
-            <View style={styles.headerRightActions}>
-              {user && (
-                <NotificationBadge unreadCount={unreadCount} />
-              )}
-              <TouchableOpacity
-                onPress={handleAuthAction}
-                style={styles.logoutButton}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.logoutText}>{user ? 'Sign Out' : 'Sign In'}</Text>
-              </TouchableOpacity>
-            </View>
           </View>
-        </SafeAreaView>
-      </LinearGradient>
 
-      {/* Content Area */}
-      <View style={styles.body}>
-        {renderTabContent()}
-      </View>
+          <View style={styles.headerRight}>
+            {user && <NotificationBadge unreadCount={unreadCount} />}
+            <TouchableOpacity
+              onPress={() => setActiveTab(activeTab === 'profile' ? 'home' : 'profile')}
+              style={styles.profileToggleBtn}
+              activeOpacity={0.8}
+              accessibilityLabel="Profile & Settings"
+            >
+              <Text style={styles.profileToggleText}>
+                {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </SafeAreaView>
 
-      {/* Interactive Bottom Navbar matching the design with custom purple center button */}
+      {/* Body Content */}
+      <View style={styles.body}>{renderTabContent()}</View>
+
+      {/* Bottom Floating Curvature Navbar */}
       <InteractiveNavbar
         activeTab={activeTab}
         onSelectTab={(tab: TabKey) => {
           if (tab === 'create') {
             router.push('/items/create');
+          } else if (tab === 'items') {
+            router.push('/items');
           } else {
             setActiveTab(tab);
           }
@@ -358,284 +395,276 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F7F8FC',
+    backgroundColor: '#F8F9FC',
   },
-  headerGradient: {
-    paddingBottom: 28,
+  safeHeaderArea: {
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E6E9F0',
   },
-  safeHeader: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
-  },
-  headerRow: {
+  headerBar: {
+    height: 56,
+    paddingHorizontal: 20,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  headerRightActions: {
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  brandIconBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: '#101226',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  brandIconText: {
+    fontSize: 15,
+  },
+  appNameText: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#101226',
+    fontFamily: 'PlusJakartaSans_700Bold',
+    letterSpacing: -0.3,
+  },
+  appSubText: {
+    fontSize: 10.5,
+    color: '#68728A',
+    fontFamily: 'PlusJakartaSans_500Medium',
+  },
+  headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
   },
-  brandTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    fontFamily: 'PlusJakartaSans_700Bold',
-    letterSpacing: -0.4,
-  },
-  headerSubtitle: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.75)',
-    fontWeight: '500',
-    marginTop: 2,
-  },
-  logoutButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 16,
-    paddingVertical: 7,
-    borderRadius: 20,
+  profileToggleBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: '#EDE9FE',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.35)',
+    borderColor: '#5B45F5',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  logoutText: {
-    color: '#FFFFFF',
+  profileToggleText: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#5B45F5',
+    fontFamily: 'PlusJakartaSans_700Bold',
+  },
+  tabHeadingBox: {
+    marginBottom: 16,
+    paddingHorizontal: 4,
+  },
+  tabHeadingTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#101226',
+    fontFamily: 'PlusJakartaSans_700Bold',
+    letterSpacing: -0.3,
+  },
+  tabHeadingSubtitle: {
     fontSize: 12.5,
-    fontWeight: '600',
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    color: '#68728A',
+    fontFamily: 'PlusJakartaSans_400Regular',
+    marginTop: 4,
+    lineHeight: 18,
+  },
+  authButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
+    backgroundColor: '#F8F9FC',
+    borderWidth: 1,
+    borderColor: '#E6E9F0',
+  },
+  authButtonText: {
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: '#101226',
+    fontFamily: 'PlusJakartaSans_700Bold',
   },
   body: {
     flex: 1,
-    paddingBottom: 68, // accommodate compact bottom navbar height
   },
   scrollContent: {
-    padding: 24,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 110,
   },
-  profileCard: {
+  heroCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    paddingVertical: 32,
-    paddingHorizontal: 24,
-    alignItems: 'center',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#E6E9F0',
     ...Platform.select({
       ios: {
-        shadowColor: '#1E274A',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.08,
-        shadowRadius: 18,
+        shadowColor: '#101226',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.04,
+        shadowRadius: 8,
       },
       android: {
-        elevation: 4,
+        elevation: 2,
       },
       default: {
-        filter: 'drop-shadow(0px 8px 24px rgba(30, 39, 74, 0.08))',
+        filter: 'drop-shadow(0px 2px 8px rgba(16, 18, 38, 0.04))',
       },
     }),
   },
-  avatarWrapper: {
-    marginBottom: 16,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#6D7FD5',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.25,
-        shadowRadius: 10,
-      },
-      android: {
-        elevation: 6,
-      },
-    }),
-  },
-  avatarImg: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    borderWidth: 3,
-    borderColor: '#6D7FD5',
-  },
-  avatarPlaceholder: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 3,
-    borderColor: '#FFFFFF',
-  },
-  avatarText: {
-    fontSize: 34,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    fontFamily: 'PlusJakartaSans_700Bold',
-  },
-  userName: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#1A1D2B',
-    fontFamily: 'PlusJakartaSans_700Bold',
-    marginBottom: 4,
-  },
-  userEmail: {
-    fontSize: 14,
-    color: '#71788E',
-    fontWeight: '500',
-    marginBottom: 20,
-    fontFamily: 'PlusJakartaSans_500Medium',
-  },
-  metaRow: {
+  heroBadgeRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     flexWrap: 'wrap',
-    gap: 10,
-    justifyContent: 'center',
+    gap: 8,
+    marginBottom: 12,
   },
-  pill: {
+  meshPill: {
     flexDirection: 'row',
-    backgroundColor: '#F0F3FA',
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E2E6F2',
-  },
-  pillLabel: {
-    fontSize: 12,
-    color: '#71788E',
-    fontWeight: '500',
-  },
-  pillValue: {
-    fontSize: 12,
-    color: '#4B5568',
-    fontWeight: '700',
-  },
-  guestLoginButton: {
-    marginTop: 24,
-    width: '100%',
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  guestLoginGradient: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: '#101226',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: 16,
   },
-  guestLoginText: {
+  meshPulseDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#16B981',
+  },
+  meshText: {
+    fontSize: 9.5,
+    fontWeight: '800',
     color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontFamily: 'PlusJakartaSans_700Bold',
+    letterSpacing: 0.6,
   },
-  comingSoonContainer: {
+  rolePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: '#EDE9FE',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 16,
+  },
+  roleDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: '#5B45F5',
+  },
+  roleText: {
+    fontSize: 9.5,
+    fontWeight: '700',
+    color: '#5B45F5',
+    fontFamily: 'PlusJakartaSans_700Bold',
+  },
+  roleHighlight: {
+    fontWeight: '900',
+  },
+  heroTitle: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#101226',
+    fontFamily: 'PlusJakartaSans_700Bold',
+    letterSpacing: -0.4,
+    marginBottom: 6,
+  },
+  heroSubtitle: {
+    fontSize: 12,
+    color: '#68728A',
+    fontFamily: 'PlusJakartaSans_400Regular',
+    lineHeight: 18,
+    marginBottom: 16,
+  },
+  heroActionRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 16,
+  },
+  secondaryButton: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-  },
-  comingSoonCard: {
+    gap: 6,
+    height: 40,
+    borderRadius: 12,
     backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 32,
+    borderWidth: 1,
+    borderColor: '#E6E9F0',
+  },
+  secondaryButtonText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#101226',
+    fontFamily: 'PlusJakartaSans_700Bold',
+  },
+  primaryButton: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
+    justifyContent: 'center',
+    gap: 6,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: '#5B45F5',
     ...Platform.select({
       ios: {
-        shadowColor: '#1E274A',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.06,
-        shadowRadius: 14,
+        shadowColor: '#5B45F5',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.28,
+        shadowRadius: 6,
       },
       android: {
         elevation: 3,
       },
-      default: {
-        filter: 'drop-shadow(0px 6px 18px rgba(30, 39, 74, 0.06))',
-      },
     }),
   },
-  comingSoonBadge: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 14,
-    marginBottom: 16,
-  },
-  comingSoonBadgeText: {
+  primaryButtonText: {
+    fontSize: 12,
+    fontWeight: '700',
     color: '#FFFFFF',
-    fontSize: 11.5,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-  },
-  comingSoonTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#1A1D2B',
-    marginBottom: 8,
     fontFamily: 'PlusJakartaSans_700Bold',
   },
-  comingSoonSubtitle: {
-    fontSize: 13.5,
-    color: '#71788E',
-    textAlign: 'center',
-    lineHeight: 20,
-    fontFamily: 'PlusJakartaSans_500Medium',
+  lifecycleRow: {
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#F1F3F9',
   },
-  domainSectionCard: {
-    marginTop: 16,
-    borderRadius: 24,
-    overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#4F46E5',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.18,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 4,
-      },
-      default: {
-        filter: 'drop-shadow(0px 6px 16px rgba(79, 70, 229, 0.18))',
-      },
-    }),
-  },
-  domainCardGradient: {
-    padding: 20,
-    borderRadius: 24,
-  },
-  domainCardHeader: {
+  stepGroup: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    justifyContent: 'space-between',
+    paddingHorizontal: 4,
   },
-  domainCardBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    color: '#FFFFFF',
-    fontSize: 10.5,
-    fontWeight: '700',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+  stepActive: {
+    fontSize: 9.5,
+    fontWeight: '800',
+    color: '#101226',
+    fontFamily: 'PlusJakartaSans_700Bold',
     letterSpacing: 0.8,
-    fontFamily: 'PlusJakartaSans_700Bold',
   },
-  domainCardArrow: {
-    color: 'rgba(255, 255, 255, 0.85)',
-    fontSize: 13,
-    fontWeight: '600',
-    fontFamily: 'PlusJakartaSans_600SemiBold',
-  },
-  domainCardTitle: {
-    fontSize: 18,
+  stepInactive: {
+    fontSize: 9.5,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 6,
+    color: '#94A3B8',
     fontFamily: 'PlusJakartaSans_700Bold',
+    letterSpacing: 0.8,
   },
-  domainCardSubtitle: {
-    fontSize: 13,
-    color: 'rgba(255, 255, 255, 0.82)',
-    lineHeight: 18,
-    fontFamily: 'PlusJakartaSans_400Regular',
+  stepDivider: {
+    color: '#CBD5E1',
+    fontSize: 10,
   },
 });

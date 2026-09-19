@@ -7,20 +7,16 @@ import {
   FlatList,
   ActivityIndicator,
   RefreshControl,
-  Alert,
-  Platform,
+  StatusBar,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
-import Svg, { Path } from 'react-native-svg';
 import { useAuth } from '../../context/AuthContext';
 import { useNetwork } from '../../context/NetworkContext';
 import { useToast } from '../../context/ToastContext';
 import { notificationApi } from '../../services/api/notificationApi';
 import { AppNotification } from '../../types/notification';
 import { NotificationCard } from '../../components/notifications/NotificationCard';
+import { AppHeader } from '../../components/navigation/AppHeader';
 
 export default function NotificationsScreen() {
   const router = useRouter();
@@ -84,7 +80,6 @@ export default function NotificationsScreen() {
         setHasNextPage(data.pagination?.hasNextPage ?? false);
         setPage(pageNum);
       } catch (err: any) {
-        // Fallback to cache if network request failed
         const cached = await notificationApi.getCachedNotifications();
         if (cached) {
           setNotifications(cached.notifications || []);
@@ -104,46 +99,32 @@ export default function NotificationsScreen() {
     loadNotifications(1);
   }, [loadNotifications]);
 
-  const handleRefresh = async () => {
+  const handleRefresh = () => {
     setIsRefreshing(true);
-    await loadNotifications(1, true);
+    loadNotifications(1, true);
   };
 
   const handleLoadMore = () => {
-    if (hasNextPage && !isLoading && !isOffline) {
-      loadNotifications(page + 1);
-    }
+    if (isLoading || isRefreshing || !hasNextPage) return;
+    loadNotifications(page + 1);
   };
 
-  const handleMarkAsRead = async (notification: AppNotification) => {
-    if (isOffline) {
-      showToast('Cannot update notification state while offline.', 'error');
-      return;
-    }
-
+  const handleNotificationPress = async (notification: AppNotification) => {
     if (!notification.read) {
-      try {
-        // Optimistic UI update
-        setNotifications((prev) =>
-          prev.map((n) => (n._id === notification._id ? { ...n, read: true } : n))
-        );
-        setUnreadCount((prev) => Math.max(0, prev - 1));
+      setNotifications((prev) =>
+        prev.map((n) => (n._id === notification._id ? { ...n, read: true } : n))
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
 
+      try {
         await notificationApi.markAsRead(notification._id);
-      } catch (err: any) {
-        // Revert on error
-        loadNotifications(page, true);
-        showToast(err.message || 'Failed to mark notification as read', 'error');
+      } catch {
+        // Optimistic update retained
       }
     }
 
-    // Navigation handling for entity metadata
-    if (notification.data?.entityId && notification.data?.entityType === 'item') {
-      try {
-        router.push(`/items/${notification.data.entityId}` as any);
-      } catch {
-        showToast('The linked item could not be opened.', 'error');
-      }
+    if (notification.data?.entityId) {
+      router.push(`/items/${notification.data.entityId}`);
     }
   };
 
@@ -157,7 +138,6 @@ export default function NotificationsScreen() {
 
     try {
       setIsMarkingAll(true);
-      // Optimistic update
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       setUnreadCount(0);
 
@@ -173,67 +153,31 @@ export default function NotificationsScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
+      <StatusBar barStyle="dark-content" />
 
-      {/* Atmospheric twilight header */}
-      <LinearGradient
-        colors={['#1E274A', '#2D3A6B', '#485897']}
-        style={styles.headerGradient}
-      >
-        <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeHeader}>
-          <View style={styles.headerRow}>
-            {/* Back Button */}
+      {/* Clean White Web Header */}
+      <AppHeader
+        title="Notifications"
+        subtitle={unreadCount > 0 ? `${unreadCount} unread alert${unreadCount > 1 ? 's' : ''}` : 'All caught up'}
+        onBack={() => router.back()}
+        backText="Back"
+        rightAction={
+          unreadCount > 0 ? (
             <TouchableOpacity
-              onPress={() => router.back()}
-              style={styles.backButton}
+              onPress={handleMarkAllAsRead}
+              disabled={isMarkingAll || isOffline}
+              style={styles.markAllBtn}
               activeOpacity={0.8}
-              accessibilityLabel="Go back"
-              accessibilityRole="button"
             >
-              <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-                <Path
-                  d="M15 19L8 12L15 5"
-                  stroke="#FFFFFF"
-                  strokeWidth={2.5}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </Svg>
-            </TouchableOpacity>
-
-            {/* Title & Unread Count Badge */}
-            <View style={styles.titleContainer}>
-              <Text style={styles.headerTitle}>Notifications</Text>
-              {unreadCount > 0 && (
-                <View style={styles.unreadPill}>
-                  <Text style={styles.unreadPillText}>{unreadCount} unread</Text>
-                </View>
+              {isMarkingAll ? (
+                <ActivityIndicator size="small" color="#5B45F5" />
+              ) : (
+                <Text style={styles.markAllBtnText}>Mark all read</Text>
               )}
-            </View>
-
-            {/* Mark All as Read Button */}
-            {unreadCount > 0 ? (
-              <TouchableOpacity
-                onPress={handleMarkAllAsRead}
-                disabled={isMarkingAll || isOffline}
-                style={[
-                  styles.markAllButton,
-                  isOffline && styles.buttonDisabled,
-                ]}
-                activeOpacity={0.8}
-              >
-                {isMarkingAll ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.markAllText}>Mark All Read</Text>
-                )}
-              </TouchableOpacity>
-            ) : (
-              <View style={styles.headerSpacer} />
-            )}
-          </View>
-        </SafeAreaView>
-      </LinearGradient>
+            </TouchableOpacity>
+          ) : null
+        }
+      />
 
       {/* Main Body */}
       <View style={styles.body}>
@@ -247,16 +191,16 @@ export default function NotificationsScreen() {
 
         {isLoading ? (
           <View style={styles.centerContainer}>
-            <ActivityIndicator size="large" color="#4F46E5" />
-            <Text style={styles.loadingText}>Loading notifications...</Text>
+            <ActivityIndicator size="large" color="#5B45F5" />
+            <Text style={styles.loadingText}>Syncing notifications...</Text>
           </View>
-        ) : error && notifications.length === 0 ? (
+        ) : error ? (
           <View style={styles.centerContainer}>
-            <Text style={styles.errorTitle}>Unable to Load</Text>
-            <Text style={styles.errorMessage}>{error}</Text>
+            <Text style={styles.errorIcon}>⚠️</Text>
+            <Text style={styles.errorText}>{error}</Text>
             <TouchableOpacity
-              style={styles.retryButton}
               onPress={() => loadNotifications(1)}
+              style={styles.retryButton}
               activeOpacity={0.8}
             >
               <Text style={styles.retryButtonText}>Retry</Text>
@@ -264,47 +208,41 @@ export default function NotificationsScreen() {
           </View>
         ) : notifications.length === 0 ? (
           <View style={styles.centerContainer}>
-            <View style={styles.emptyIconCircle}>
-              <Svg width={32} height={32} viewBox="0 0 24 24" fill="none">
-                <Path
-                  d="M15 17H20L18.5951 15.5951C18.2141 15.2141 18 14.6973 18 14.1585V11C18 7.68629 15.3137 5 12 5C8.68629 5 6 7.68629 6 11V14.1585C6 14.6973 5.78595 15.2141 5.40493 15.5951L4 17H9M15 17V18C15 19.6569 13.6569 21 12 21C10.3431 21 9 19.6569 9 18V17M15 17H9"
-                  stroke="#9CA3AF"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </Svg>
+            <View style={styles.emptyIconBox}>
+              <Text style={{ fontSize: 24 }}>🔔</Text>
             </View>
             <Text style={styles.emptyTitle}>No Notifications Yet</Text>
             <Text style={styles.emptySubtitle}>
-              When items are created, completed, or AI tasks finish, you will receive updates here.
+              You're completely up to date. Incident updates and operational alerts will appear here.
             </Text>
           </View>
         ) : (
           <FlatList
             data={notifications}
             keyExtractor={(item) => item._id}
-            renderItem={({ item }) => (
+            renderItem={({ item, index }) => (
               <NotificationCard
                 notification={item}
-                onPress={handleMarkAsRead}
+                index={index}
+                onPress={handleNotificationPress}
               />
             )}
             contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
             refreshControl={
               <RefreshControl
                 refreshing={isRefreshing}
                 onRefresh={handleRefresh}
-                tintColor="#4F46E5"
-                colors={['#4F46E5']}
+                tintColor="#5B45F5"
+                colors={['#5B45F5']}
               />
             }
             onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.3}
+            onEndReachedThreshold={0.4}
             ListFooterComponent={
               hasNextPage ? (
                 <View style={styles.footerLoader}>
-                  <ActivityIndicator size="small" color="#4F46E5" />
+                  <ActivityIndicator size="small" color="#5B45F5" />
                 </View>
               ) : null
             }
@@ -318,151 +256,98 @@ export default function NotificationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F7F8FC',
-  },
-  headerGradient: {
-    paddingBottom: 18,
-  },
-  safeHeader: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  backButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.25)',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    fontFamily: 'PlusJakartaSans_700Bold',
-  },
-  unreadPill: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 12,
-  },
-  unreadPillText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    fontFamily: 'PlusJakartaSans_700Bold',
-  },
-  markAllButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.35)',
-  },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
-  markAllText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-    fontFamily: 'PlusJakartaSans_600SemiBold',
-  },
-  headerSpacer: {
-    width: 36,
+    backgroundColor: '#F8F9FC',
   },
   body: {
     flex: 1,
+    backgroundColor: '#F8F9FC',
+  },
+  markAllBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: '#EDE9FE',
+  },
+  markAllBtnText: {
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: '#5B45F5',
+    fontFamily: 'PlusJakartaSans_700Bold',
+  },
+  listContent: {
+    padding: 16,
+    paddingBottom: 40,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+  },
+  emptyIconBox: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E6E9F0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#101226',
+    fontFamily: 'PlusJakartaSans_700Bold',
+    marginBottom: 6,
+  },
+  emptySubtitle: {
+    fontSize: 13,
+    color: '#68728A',
+    textAlign: 'center',
+    lineHeight: 19,
+    fontFamily: 'PlusJakartaSans_400Regular',
+    maxWidth: 280,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 13,
+    color: '#68728A',
+    fontFamily: 'PlusJakartaSans_500Medium',
+  },
+  errorIcon: {
+    fontSize: 32,
+    marginBottom: 8,
+  },
+  errorText: {
+    fontSize: 13,
+    color: '#EF4444',
+    textAlign: 'center',
+    marginBottom: 16,
+    fontFamily: 'PlusJakartaSans_500Medium',
+  },
+  retryButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 10,
+    backgroundColor: '#5B45F5',
+  },
+  retryButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 12.5,
+    fontFamily: 'PlusJakartaSans_700Bold',
   },
   staleNotice: {
     backgroundColor: '#FEF3C7',
     paddingVertical: 8,
     paddingHorizontal: 16,
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#FCD34D',
   },
   staleText: {
-    fontSize: 12,
-    color: '#92400E',
-    fontWeight: '600',
-    fontFamily: 'PlusJakartaSans_600SemiBold',
-  },
-  listContent: {
-    padding: 16,
-  },
-  centerContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 32,
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 14,
-    color: '#6B7280',
-    fontFamily: 'PlusJakartaSans_500Medium',
-  },
-  emptyIconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#E5E7EB',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1F2937',
-    marginBottom: 6,
-    fontFamily: 'PlusJakartaSans_700Bold',
-  },
-  emptySubtitle: {
-    fontSize: 13,
-    color: '#6B7280',
-    textAlign: 'center',
-    lineHeight: 18,
-    fontFamily: 'PlusJakartaSans_400Regular',
-  },
-  errorTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#EF4444',
-    marginBottom: 6,
-    fontFamily: 'PlusJakartaSans_700Bold',
-  },
-  errorMessage: {
-    fontSize: 13,
-    color: '#6B7280',
-    textAlign: 'center',
-    marginBottom: 16,
-    fontFamily: 'PlusJakartaSans_400Regular',
-  },
-  retryButton: {
-    backgroundColor: '#4F46E5',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 12,
-  },
-  retryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 11.5,
+    color: '#B45309',
     fontWeight: '600',
     fontFamily: 'PlusJakartaSans_600SemiBold',
   },

@@ -10,6 +10,7 @@ export interface DomainEntity {
   description?: string;
   status: ItemStatus;
   category?: string;
+  priority?: string;
   owner?: string;
   createdAt: string;
   updatedAt: string;

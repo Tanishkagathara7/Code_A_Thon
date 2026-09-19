@@ -1,6 +1,5 @@
 import React from 'react';
 import { PrecisionArc } from './PrecisionArc';
-import { NodeNetwork } from './NodeNetwork';
 import { OrganicBlob, FloatingSphere, AccentDot } from './EditorialShapes';
 import { TechnicalArc, TechnicalCrosshair, TechnicalConnectingLine } from './TechnicalLinework';
 import { EditorialAnnotation, TechnicalTag, GeometricCluster } from './FloatingEditorialAccents';
@@ -37,18 +36,18 @@ export const SectionBackgroundDecorations: React.FC = () => {
         />
       </div>
 
-      {/* Left Philosophy Linework: Clean mathematical arc safely positioned in viewport gutter */}
-      <div className="hidden 2xl:block absolute top-[1440px] left-4">
+      {/* Left Philosophy Linework: Clean mathematical arc */}
+      <div className="hidden md:block absolute top-[1440px] left-4 lg:left-12 xl:left-24">
         <PrecisionArc
-          width={320}
-          height={320}
+          width={340}
+          height={340}
           viewBox="0 0 340 340"
           cx={170}
           cy={170}
           radius={140}
           startAngle={220}
           endAngle={380}
-          strokeColor="rgba(32, 32, 82, 0.12)"
+          strokeColor="rgba(32, 32, 82, 0.16)"
           showTicks
           tickCount={8}
           startNodeColor="#2563EB"
@@ -57,9 +56,9 @@ export const SectionBackgroundDecorations: React.FC = () => {
       </div>
 
       {/* Left Crosshair Cluster */}
-      <div className="hidden 2xl:flex flex-col gap-6 absolute top-[1660px] left-8">
+      <div className="hidden lg:flex flex-col gap-6 absolute top-[1660px] left-12 xl:left-24">
         <TechnicalCrosshair size={12} color="#2563EB" />
-        <TechnicalConnectingLine length={90} vertical color="rgba(37, 99, 235, 0.2)" withArrow />
+        <TechnicalConnectingLine length={90} vertical color="rgba(37, 99, 235, 0.25)" withArrow />
         <TechnicalCrosshair size={10} color="#059669" />
       </div>
 
@@ -230,17 +229,57 @@ export const SectionBackgroundDecorations: React.FC = () => {
       {/* =========================================================================
           SECTION 07: CREATOR / ENGINEER PROFILE (5600px - 6400px)
          ========================================================================= */}
+      {/* Left Portrait Supporting Arc */}
+      <div className="hidden md:block absolute top-[5750px] left-6 lg:left-14 xl:left-24">
+        <PrecisionArc
+          width={320}
+          height={320}
+          viewBox="0 0 320 320"
+          cx={60}
+          cy={160}
+          radius={130}
+          startAngle={20}
+          endAngle={160}
+          secondaryRadius={110}
+          secondaryDasharray="2 4"
+          strokeColor="rgba(32, 32, 82, 0.16)"
+          startNodeColor="#EC4899"
+          endNodeColor="#3B82F6"
+        />
+      </div>
 
-
-
+      {/* Right Editorial Callout */}
+      <div className="hidden xl:block absolute top-[5920px] right-14">
+        <EditorialAnnotation
+          text="Build. Learn. Ship. Repeat."
+          subtext="Continuous refinement"
+          rotation="-rotate-6"
+        />
+      </div>
 
       {/* =========================================================================
           SECTION 08: TOPOLOGY ARCHITECTURE (6400px - 7300px)
           Pushed to side gutters to cleanly frame the section without overlapping cards
          ========================================================================= */}
 
-
-
+      {/* Right Topology Linework - Far right margin */}
+      <div className="hidden 2xl:block absolute top-[6520px] -right-28 2xl:-right-8 opacity-75">
+        <PrecisionArc
+          width={340}
+          height={340}
+          viewBox="0 0 340 340"
+          cx={280}
+          cy={170}
+          radius={150}
+          startAngle={190}
+          endAngle={340}
+          secondaryRadius={125}
+          secondaryDasharray="3 6"
+          strokeColor="rgba(32, 32, 82, 0.16)"
+          startNodeColor="#3B82F6"
+          endNodeColor="#10B981"
+        />
+      </div>
 
       {/* =========================================================================
           SECTION 09: FREQUENTLY ASKED QUESTIONS (7300px - 8100px)
@@ -248,7 +287,7 @@ export const SectionBackgroundDecorations: React.FC = () => {
          ========================================================================= */}
       {/* Left Cross-Grid Tile */}
       <div
-        className="hidden lg:block absolute top-[7420px] left-8 xl:left-24 w-40 h-40 opacity-70"
+        className="hidden lg:block absolute top-[7420px] left-8 xl:left-24 w-44 h-44 opacity-70"
         style={{ maskImage: 'radial-gradient(circle, black 40%, transparent 75%)', WebkitMaskImage: 'radial-gradient(circle, black 40%, transparent 75%)' }}
       >
         <svg width="100%" height="100%">
@@ -256,19 +295,69 @@ export const SectionBackgroundDecorations: React.FC = () => {
         </svg>
       </div>
 
-      {/* Right Lavender Blob near FAQ */}
-      <div className="absolute top-[7500px] -right-24 lg:-right-10 xl:right-8">
-        <OrganicBlob
-          width={440}
-          height={440}
-          viewBox="0 0 440 440"
-          path="M 220 40 C 330 40, 400 120, 400 220 C 400 330, 320 400, 210 400 C 100 400, 40 320, 40 210 C 40 100, 110 40, 220 40 Z"
-          fill="url(#grad-ochre-pink)"
-          opacity={0.42}
+      {/* Left Mathematical Inquiry Arc Framing FAQ */}
+      <div className="hidden md:block absolute top-[7340px] left-2 lg:left-10 xl:left-20">
+        <PrecisionArc
+          width={340}
+          height={340}
+          viewBox="0 0 340 340"
+          cx={70}
+          cy={170}
+          radius={145}
+          startAngle={25}
+          endAngle={155}
+          secondaryRadius={125}
+          secondaryDasharray="3 5"
+          showTicks
+          tickCount={9}
+          strokeColor="rgba(32, 32, 82, 0.18)"
+          startNodeColor="#6366F1"
+          endNodeColor="#EC4899"
+          tagLabel="INQUIRY BUS // RESOLUTION"
+          tagSubtext="09.KNOWLEDGE_BASE"
         />
       </div>
 
+      {/* Left Technical Crosshairs & Telemetry Label */}
+      <div className="hidden xl:flex flex-col gap-3 absolute top-[7590px] left-16 2xl:left-28">
+        <div className="flex items-center gap-3">
+          <TechnicalCrosshair size={10} color="#6366F1" />
+          <span className="text-[10px] font-mono tracking-widest text-zinc-400 uppercase">INDEX_TREE_VALIDATED</span>
+        </div>
+        <TechnicalConnectingLine length={70} vertical color="rgba(99, 102, 241, 0.25)" />
+      </div>
 
+      {/* Right Soft Ochre-Pink Blob near FAQ */}
+      <div className="absolute top-[7440px] -right-24 lg:-right-10 xl:right-8">
+        <OrganicBlob
+          width={460}
+          height={460}
+          viewBox="0 0 460 460"
+          path="M 230 40 C 345 40, 420 120, 420 230 C 420 345, 335 420, 220 420 C 105 420, 40 335, 40 220 C 40 105, 115 40, 230 40 Z"
+          fill="url(#grad-ochre-pink)"
+          opacity={0.44}
+          className="editorial-float-slow"
+        />
+      </div>
+
+      {/* Right Gentle Floating Accent Sphere */}
+      <div className="hidden md:block absolute top-[7480px] right-24 xl:right-40">
+        <FloatingSphere size={52} gradientId="sphere-cyan-pink" className="editorial-float" />
+      </div>
+
+      {/* Right Editorial Note & Query Tag */}
+      <div className="hidden xl:block absolute top-[7620px] right-14 2xl:right-24">
+        <EditorialAnnotation
+          text="Good Questions. Better Builders."
+          subtext="Developer accessibility // v2.4"
+          rotation="rotate-6"
+          withArrow
+        />
+        <div className="mt-3 flex items-center gap-2">
+          <AccentDot size={6} color="#EC4899" pulse />
+          <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">STATE: UNROLLED_FAQ</span>
+        </div>
+      </div>
 
       {/* =========================================================================
           SECTION 10 & FOOTER: FINAL CTA (8100px - End)

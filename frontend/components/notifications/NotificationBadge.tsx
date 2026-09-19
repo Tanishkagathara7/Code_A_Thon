@@ -58,11 +58,11 @@ export const NotificationBadge: React.FC<NotificationBadgeProps> = ({
         accessibilityLabel={`Notifications, ${unreadCount} unread`}
         accessibilityRole="button"
       >
-        <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
+        <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
           <Path
             d="M15 17H20L18.5951 15.5951C18.2141 15.2141 18 14.6973 18 14.1585V11C18 7.68629 15.3137 5 12 5C8.68629 5 6 7.68629 6 11V14.1585C6 14.6973 5.78595 15.2141 5.40493 15.5951L4 17H9M15 17V18C15 19.6569 13.6569 21 12 21C10.3431 21 9 19.6569 9 18V17M15 17H9"
-            stroke="#FFFFFF"
-            strokeWidth={2}
+            stroke="#101226"
+            strokeWidth={1.9}
             strokeLinecap="round"
             strokeLinejoin="round"
           />
@@ -83,11 +83,12 @@ export const NotificationBadge: React.FC<NotificationBadgeProps> = ({
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
-    padding: 6,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: '#F8F9FC',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.25)',
+    borderColor: '#E6E9F0',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -97,18 +98,19 @@ const styles = StyleSheet.create({
     right: -4,
     backgroundColor: '#EF4444',
     borderRadius: 10,
-    minWidth: 18,
-    height: 18,
-    paddingHorizontal: 4,
+    minWidth: 16,
+    height: 16,
+    paddingHorizontal: 3.5,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: '#1E274A',
+    borderColor: '#FFFFFF',
   },
   badgeText: {
     color: '#FFFFFF',
-    fontSize: 9.5,
+    fontSize: 9,
     fontWeight: '800',
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    fontFamily: 'PlusJakartaSans_700Bold',
   },
 });
+

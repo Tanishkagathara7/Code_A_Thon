@@ -47,23 +47,23 @@ export const DefaultTheme: AppTheme = {
   appName: 'App',
   logoText: 'APP',
   colors: {
-    background: '#FAF9F8',      // Warm off-white base
-    surface: '#FFFFFF',         // Pristine card/input background
-    surfaceHover: '#F4F4F5',    // Subtle hover state
-    text: '#09090B',            // Near-black high-contrast primary text
-    mutedText: '#71717A',       // Neutral 500 body muted text
-    subtleText: '#A1A1AA',      // Neutral 400 helper text
-    border: '#E4E4E7',          // Subtle light border
-    borderFocus: '#18181B',     // Focused dark border ring
-    accent: '#18181B',          // Sophisticated near-black primary accent
+    background: '#F8F9FC',      // Web clean canvas background
+    surface: '#FFFFFF',         // Crisp white card background
+    surfaceHover: '#F1F3F9',    // Subtle interactive state
+    text: '#101226',            // High-contrast primary brand text
+    mutedText: '#68728A',       // Neutral 500 body text
+    subtleText: '#94A3B8',      // Neutral 400 helper text
+    border: '#E6E9F0',          // Subtle light border matching web
+    borderFocus: '#5B45F5',     // Focused border ring with brand purple
+    accent: '#5B45F5',          // Pulse brand purple accent
     accentText: '#FFFFFF',
-    error: '#DC2626',
+    error: '#EF4444',
     errorBg: '#FEE2E2',
-    success: '#16A34A',
+    success: '#16B981',
     successBg: '#DCFCE7',
     socialBg: '#FFFFFF',
-    socialBorder: '#E4E4E7',
-    socialText: '#09090B',
+    socialBorder: '#E6E9F0',
+    socialText: '#101226',
   },
   spacing: {
     xs: 4,

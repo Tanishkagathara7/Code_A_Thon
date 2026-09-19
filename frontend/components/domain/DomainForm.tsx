@@ -10,8 +10,8 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { CreateItemPayload, ItemStatus } from '../../types/domain';
+import { appConfig } from '../../config/appConfig';
 
 interface DomainFormProps {
   initialValues?: Partial<CreateItemPayload>;
@@ -22,9 +22,29 @@ interface DomainFormProps {
   onCancel?: () => void;
 }
 
-import { appConfig } from '../../config/appConfig';
-
-const STATUS_OPTIONS = appConfig.statuses as { key: ItemStatus; label: string; bg: string; text: string }[];
+const STATUS_OPTIONS: { key: ItemStatus; label: string; activeBorder: string; activeBg: string; activeText: string }[] = [
+  {
+    key: 'pending',
+    label: 'Triage / Pending',
+    activeBorder: '#F59E0B',
+    activeBg: '#FEF3C7',
+    activeText: '#B45309',
+  },
+  {
+    key: 'in_progress',
+    label: 'In Transit / Active',
+    activeBorder: '#5B45F5',
+    activeBg: '#EDE9FE',
+    activeText: '#5B45F5',
+  },
+  {
+    key: 'completed',
+    label: 'Resolved / Done',
+    activeBorder: '#10B981',
+    activeBg: '#DCFCE7',
+    activeText: '#15803D',
+  },
+];
 
 export const DomainForm: React.FC<DomainFormProps> = ({
   initialValues = {},
@@ -114,7 +134,7 @@ export const DomainForm: React.FC<DomainFormProps> = ({
               titleError ? styles.inputError : null,
             ]}
             placeholder="e.g. Build Hackathon MVP"
-            placeholderTextColor="#A1A1AA"
+            placeholderTextColor="#94A3B8"
             value={title}
             onChangeText={(text) => {
               setTitle(text);
@@ -140,7 +160,7 @@ export const DomainForm: React.FC<DomainFormProps> = ({
               descError ? styles.inputError : null,
             ]}
             placeholder="Provide relevant details or context..."
-            placeholderTextColor="#A1A1AA"
+            placeholderTextColor="#94A3B8"
             value={description}
             onChangeText={(text) => {
               setDescription(text);
@@ -169,8 +189,9 @@ export const DomainForm: React.FC<DomainFormProps> = ({
                   key={opt.key}
                   style={[
                     styles.statusChip,
-                    { backgroundColor: opt.bg },
-                    isSelected ? styles.statusChipSelected : null,
+                    isSelected
+                      ? { backgroundColor: opt.activeBg, borderColor: opt.activeBorder }
+                      : styles.statusChipInactive,
                   ]}
                   onPress={() => setStatus(opt.key)}
                   disabled={isSubmitting}
@@ -181,8 +202,9 @@ export const DomainForm: React.FC<DomainFormProps> = ({
                   <Text
                     style={[
                       styles.statusChipText,
-                      { color: opt.text },
-                      isSelected ? styles.statusChipTextSelected : null,
+                      isSelected
+                        ? { color: opt.activeText, fontWeight: '700' }
+                        : styles.statusChipTextInactive,
                     ]}
                   >
                     {opt.label}
@@ -203,7 +225,7 @@ export const DomainForm: React.FC<DomainFormProps> = ({
               catError ? styles.inputError : null,
             ]}
             placeholder="e.g. Engineering, Design, General"
-            placeholderTextColor="#A1A1AA"
+            placeholderTextColor="#94A3B8"
             value={category}
             onChangeText={(text) => {
               setCategory(text);
@@ -235,15 +257,13 @@ export const DomainForm: React.FC<DomainFormProps> = ({
             style={[styles.submitButton, onCancel ? styles.flex : null]}
             onPress={handleSubmit}
             disabled={isSubmitting}
-            activeOpacity={0.8}
+            activeOpacity={0.85}
           >
-            <LinearGradient colors={['#4F46E5', '#3730A3']} style={styles.gradient}>
-              {isSubmitting ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
-              ) : (
-                <Text style={styles.submitButtonText}>{submitButtonText}</Text>
-              )}
-            </LinearGradient>
+            {isSubmitting ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <Text style={styles.submitButtonText}>{submitButtonText}</Text>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -257,59 +277,73 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
+    backgroundColor: '#F8F9FC',
   },
   serverErrorBox: {
     backgroundColor: '#FEE2E2',
-    borderColor: '#FCA5A5',
+    borderColor: '#EF4444',
     borderWidth: 1,
     padding: 12,
     borderRadius: 12,
     marginBottom: 16,
   },
   serverErrorText: {
-    color: '#991B1B',
-    fontSize: 13.5,
-    fontFamily: 'PlusJakartaSans_500Medium',
+    color: '#EF4444',
+    fontSize: 13,
+    fontWeight: '600',
+    fontFamily: 'PlusJakartaSans_600SemiBold',
   },
   fieldGroup: {
     marginBottom: 20,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#18181B',
+    fontSize: 13.5,
+    fontWeight: '700',
+    color: '#101226',
     marginBottom: 8,
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontFamily: 'PlusJakartaSans_700Bold',
+    letterSpacing: -0.1,
   },
   requiredStar: {
-    color: '#DC2626',
+    color: '#EF4444',
   },
   input: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E4E4E7',
+    borderColor: '#E6E9F0',
     borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 14.5,
-    color: '#09090B',
-    fontFamily: 'PlusJakartaSans_400Regular',
+    paddingVertical: 13,
+    fontSize: 14,
+    color: '#101226',
+    fontFamily: 'PlusJakartaSans_500Medium',
   },
   inputFocused: {
-    borderColor: '#18181B',
+    borderColor: '#5B45F5',
     borderWidth: 1.5,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#5B45F5',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.12,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   multilineInput: {
-    minHeight: 100,
+    minHeight: 110,
   },
   inputError: {
-    borderColor: '#DC2626',
+    borderColor: '#EF4444',
     backgroundColor: '#FEF2F2',
   },
   errorText: {
-    color: '#DC2626',
+    color: '#EF4444',
     fontSize: 12,
-    marginTop: 4,
+    marginTop: 5,
     fontFamily: 'PlusJakartaSans_500Medium',
   },
   chipsRow: {
@@ -319,56 +353,70 @@ const styles = StyleSheet.create({
   },
   statusChip: {
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingVertical: 9,
     borderRadius: 20,
     borderWidth: 1.5,
-    borderColor: 'transparent',
   },
-  statusChipSelected: {
-    borderColor: '#4F46E5',
+  statusChipInactive: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E6E9F0',
   },
   statusChipText: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 12.5,
     fontFamily: 'PlusJakartaSans_600SemiBold',
   },
-  statusChipTextSelected: {
-    fontWeight: '700',
+  statusChipTextInactive: {
+    color: '#68728A',
+    fontWeight: '600',
   },
   actionsContainer: {
     flexDirection: 'row',
     gap: 12,
-    marginTop: 12,
+    marginTop: 16,
+    paddingBottom: 32,
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    height: 48,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E6E9F0',
     borderRadius: 12,
-    paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelButtonText: {
-    color: '#27272A',
-    fontSize: 14.5,
-    fontWeight: '600',
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    color: '#101226',
+    fontSize: 13.5,
+    fontWeight: '700',
+    fontFamily: 'PlusJakartaSans_700Bold',
   },
   submitButton: {
+    height: 48,
+    backgroundColor: '#5B45F5',
     borderRadius: 12,
-    overflow: 'hidden',
-  },
-  gradient: {
-    paddingVertical: 14,
-    paddingHorizontal: 24,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 12,
+    paddingHorizontal: 24,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#5B45F5',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.28,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+      default: {
+        filter: 'drop-shadow(0px 3px 8px rgba(91, 69, 245, 0.28))',
+      },
+    }),
   },
   submitButtonText: {
     color: '#FFFFFF',
-    fontSize: 14.5,
-    fontWeight: '600',
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontSize: 13.5,
+    fontWeight: '700',
+    fontFamily: 'PlusJakartaSans_700Bold',
   },
 });

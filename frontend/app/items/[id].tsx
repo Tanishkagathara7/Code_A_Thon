@@ -5,17 +5,16 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   StatusBar,
   Platform,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { hackathonItemApi } from '../../services/api/hackathonItemApi';
 import { HackathonItem } from '../../types/domain';
 import { LoadingState } from '../../components/domain/LoadingState';
 import { ErrorState } from '../../components/domain/ErrorState';
 import { ConfirmDeleteModal } from '../../components/domain/ConfirmDeleteModal';
+import { AppHeader } from '../../components/navigation/AppHeader';
 
 import { useNetwork } from '../../context/NetworkContext';
 import { useToast } from '../../context/ToastContext';
@@ -78,29 +77,28 @@ export default function ItemDetailScreen() {
   };
 
   const getStatusBadge = (status?: string) => {
-    const matched = appConfig.statuses.find(
-      (s) => s.key.toLowerCase() === status?.toLowerCase()
-    );
-    if (matched) {
-      return { bg: matched.bg, text: matched.text, label: matched.label };
+    switch (status?.toLowerCase()) {
+      case 'completed':
+        return { bg: '#DCFCE7', text: '#15803D', label: 'Resolved / Done' };
+      case 'in_progress':
+        return { bg: '#EDE9FE', text: '#5B45F5', label: 'In Transit / Active' };
+      case 'pending':
+      default:
+        return { bg: '#FEF3C7', text: '#B45309', label: 'Triage / Pending' };
     }
-    return { bg: '#FEF3C7', text: '#B45309', label: status || 'Pending' };
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" />
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
 
-      {/* Header */}
-      <LinearGradient colors={['#1E274A', '#2D3A6B']} style={styles.header}>
-        <View style={styles.headerTop}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Text style={styles.backBtnText}>‹ Back</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>{appConfig.primaryEntityName} Details</Text>
-          <View style={styles.headerSpacer} />
-        </View>
-      </LinearGradient>
+      {/* Clean White Web Header */}
+      <AppHeader
+        title={`${appConfig.primaryEntityName} Details`}
+        subtitle={item?.id ? `ID: ${item.id.slice(0, 8)}...` : undefined}
+        onBack={() => router.back()}
+        backText="Back"
+      />
 
       {/* Body */}
       <View style={styles.body}>
@@ -187,7 +185,7 @@ export default function ItemDetailScreen() {
                   onPress={() => router.push(`/items/edit/${item.id}`)}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.editButtonText}>✏️ Edit {appConfig.primaryEntityName}</Text>
+                  <Text style={styles.editButtonText}>Edit {appConfig.primaryEntityName}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -195,7 +193,7 @@ export default function ItemDetailScreen() {
                   onPress={() => setShowDeleteModal(true)}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.deleteButtonText}>🗑️ Delete</Text>
+                  <Text style={styles.deleteButtonText}>Delete</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -210,71 +208,41 @@ export default function ItemDetailScreen() {
         onConfirm={handleDeleteConfirm}
         onCancel={() => setShowDeleteModal(false)}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  container: {
     flex: 1,
-    backgroundColor: '#1E274A',
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'android' ? 12 : 8,
-    paddingBottom: 16,
-  },
-  headerTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  backBtn: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-  },
-  backBtnText: {
-    color: '#FFFFFF',
-    fontSize: 13.5,
-    fontWeight: '600',
-    fontFamily: 'PlusJakartaSans_600SemiBold',
-  },
-  headerTitle: {
-    fontSize: 19,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    fontFamily: 'PlusJakartaSans_700Bold',
-  },
-  headerSpacer: {
-    width: 60,
+    backgroundColor: '#F8F9FC',
   },
   body: {
     flex: 1,
-    backgroundColor: '#F7F8FC',
+    backgroundColor: '#F8F9FC',
   },
   scrollContent: {
-    padding: 20,
+    padding: 16,
+    paddingBottom: 40,
   },
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 24,
+    borderRadius: 16,
+    padding: 20,
     borderWidth: 1,
-    borderColor: '#E4E4E7',
+    borderColor: '#E6E9F0',
     ...Platform.select({
       ios: {
-        shadowColor: '#18181B',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
+        shadowColor: '#101226',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.04,
+        shadowRadius: 8,
       },
       android: {
-        elevation: 3,
+        elevation: 2,
       },
       default: {
-        filter: 'drop-shadow(0px 4px 12px rgba(24, 24, 27, 0.05))',
+        filter: 'drop-shadow(0px 2px 8px rgba(16, 18, 38, 0.04))',
       },
     }),
   },
@@ -282,115 +250,117 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   categoryBadge: {
-    backgroundColor: '#F4F4F5',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    backgroundColor: '#F8F9FC',
     borderWidth: 1,
-    borderColor: '#E4E4E7',
+    borderColor: '#E6E9F0',
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 12,
   },
   categoryText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#52525B',
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: '#68728A',
+    fontFamily: 'PlusJakartaSans_700Bold',
   },
   statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
     borderRadius: 12,
   },
   statusText: {
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '700',
     fontFamily: 'PlusJakartaSans_700Bold',
   },
   title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#09090B',
-    marginBottom: 20,
-    lineHeight: 28,
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#101226',
     fontFamily: 'PlusJakartaSans_700Bold',
+    letterSpacing: -0.3,
+    marginBottom: 16,
   },
   section: {
-    marginBottom: 20,
+    marginBottom: 18,
   },
   sectionHeading: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '700',
-    color: '#71717A',
+    color: '#68728A',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    marginBottom: 8,
+    marginBottom: 6,
     fontFamily: 'PlusJakartaSans_700Bold',
   },
   descriptionText: {
-    fontSize: 15,
-    color: '#27272A',
+    fontSize: 14,
+    color: '#101226',
     lineHeight: 22,
     fontFamily: 'PlusJakartaSans_400Regular',
   },
   metaBox: {
-    backgroundColor: '#F4F4F5',
+    backgroundColor: '#F8F9FC',
     borderRadius: 12,
-    padding: 14,
+    borderWidth: 1,
+    borderColor: '#E6E9F0',
+    padding: 12,
     gap: 8,
   },
   metaRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
   },
   metaKey: {
-    fontSize: 13,
-    color: '#71717A',
-    fontWeight: '500',
+    fontSize: 12,
+    color: '#68728A',
     fontFamily: 'PlusJakartaSans_500Medium',
   },
   metaVal: {
-    fontSize: 13,
-    color: '#18181B',
+    fontSize: 12,
+    color: '#101226',
     fontWeight: '600',
     fontFamily: 'PlusJakartaSans_600SemiBold',
   },
   actionsRow: {
     flexDirection: 'row',
     gap: 12,
-    marginTop: 12,
-    paddingTop: 20,
+    marginTop: 8,
+    paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#F4F4F5',
+    borderTopColor: '#F1F3F9',
   },
   editButton: {
-    flex: 1,
-    backgroundColor: '#4F46E5',
-    paddingVertical: 14,
+    flex: 2,
+    height: 44,
     borderRadius: 12,
+    backgroundColor: '#5B45F5',
     alignItems: 'center',
     justifyContent: 'center',
   },
   editButtonText: {
     color: '#FFFFFF',
-    fontSize: 14.5,
-    fontWeight: '600',
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontSize: 13,
+    fontWeight: '700',
+    fontFamily: 'PlusJakartaSans_700Bold',
   },
   deleteButton: {
     flex: 1,
-    backgroundColor: '#FEE2E2',
-    paddingVertical: 14,
+    height: 44,
     borderRadius: 12,
+    backgroundColor: '#FEE2E2',
+    borderWidth: 1,
+    borderColor: '#FCA5A5',
     alignItems: 'center',
     justifyContent: 'center',
   },
   deleteButtonText: {
-    color: '#DC2626',
-    fontSize: 14.5,
-    fontWeight: '600',
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    color: '#EF4444',
+    fontSize: 13,
+    fontWeight: '700',
+    fontFamily: 'PlusJakartaSans_700Bold',
   },
 });

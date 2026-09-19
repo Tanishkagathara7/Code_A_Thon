@@ -20,7 +20,7 @@ export const NavHomeIcon: React.FC<NavIconProps> = ({ size = 24, color = '#787E9
   </Svg>
 );
 
-// Shield / Policies Icon with checkmark badge
+// Shield / Incidents Icon with checkmark badge
 export const NavShieldIcon: React.FC<NavIconProps> = ({ size = 26, color = '#787E92', focused }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
     {focused ? (
@@ -58,18 +58,62 @@ export const NavShieldIcon: React.FC<NavIconProps> = ({ size = 26, color = '#787
   </Svg>
 );
 
-// Benefits / Message soundwave icon
-export const NavBenefitsIcon: React.FC<NavIconProps> = ({ size = 24, color = '#787E92' }) => (
+// AI Sparkles Copilot Icon
+export const NavCopilotIcon: React.FC<NavIconProps> = ({ size = 24, color = '#787E92', focused }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    {focused ? (
+      <>
+        <Path
+          d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"
+          fill={color}
+        />
+        <Path
+          d="M19 3L19.8 5.2L22 6L19.8 6.8L19 9L18.2 6.8L16 6L18.2 5.2L19 3Z"
+          fill={color}
+        />
+      </>
+    ) : (
+      <>
+        <Path
+          d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"
+          stroke={color}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <Path
+          d="M19 3L19.8 5.2L22 6L19.8 6.8L19 9L18.2 6.8L16 6L18.2 5.2L19 3Z"
+          stroke={color}
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </>
+    )}
+  </Svg>
+);
+
+export const NavBenefitsIcon = NavCopilotIcon;
+
+// Profile / User Account Icon
+export const NavProfileIcon: React.FC<NavIconProps> = ({ size = 24, color = '#787E92', focused }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Circle cx="12" cy="8" r="4" stroke={color} strokeWidth={focused ? '2.2' : '1.8'} />
     <Path
-      d="M21 11.5C21 16.19 16.97 20 12 20C10.42 20 8.94 19.62 7.65 18.95L3 20L4.25 16.25C3.46 14.88 3 13.25 3 11.5C3 6.81 7.03 3 12 3C16.97 3 21 6.81 21 11.5Z"
+      d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21"
       stroke={color}
-      strokeWidth="1.8"
+      strokeWidth={focused ? '2.2' : '1.8'}
       strokeLinecap="round"
-      strokeLinejoin="round"
     />
+  </Svg>
+);
+
+// Settings Gear Icon
+export const NavSettingsIcon: React.FC<NavIconProps> = ({ size = 24, color = '#787E92' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Circle cx="12" cy="12" r="3" stroke={color} strokeWidth="1.8" />
     <Path
-      d="M9 10V13M12 8V15M15 10V13"
+      d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"
       stroke={color}
       strokeWidth="1.8"
       strokeLinecap="round"
@@ -78,20 +122,37 @@ export const NavBenefitsIcon: React.FC<NavIconProps> = ({ size = 24, color = '#7
   </Svg>
 );
 
-// Cart / Buy shopping trolley icon
-export const NavBuyIcon: React.FC<NavIconProps> = ({ size = 24, color = '#787E92' }) => (
+// Bell / Alerts notification icon
+export const NavBellIcon: React.FC<NavIconProps> = ({ size = 24, color = '#787E92', focused }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-    <Circle cx="9" cy="20" r="1.5" stroke={color} strokeWidth="1.8" />
-    <Circle cx="18" cy="20" r="1.5" stroke={color} strokeWidth="1.8" />
-    <Path
-      d="M3 4H5.5L7.5 15H19L21 7H6"
-      stroke={color}
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
+    {focused ? (
+      <>
+        <Path
+          d="M12 2C8.68629 2 6 4.68629 6 8V12.1585C6 12.6973 5.78595 13.2141 5.40493 13.5951L4 15H20L18.5951 13.5951C18.2141 13.2141 18 12.6973 18 12.1585V8C18 4.68629 15.3137 2 12 2Z"
+          fill={color}
+        />
+        <Path
+          d="M10 19C10 20.1046 10.8954 21 12 21C13.1046 21 14 20.1046 14 19"
+          stroke={color}
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+      </>
+    ) : (
+      <>
+        <Path
+          d="M15 17H20L18.5951 15.5951C18.2141 15.2141 18 14.6973 18 14.1585V11C18 7.68629 15.3137 5 12 5C8.68629 5 6 7.68629 6 11V14.1585C6 14.6973 5.78595 15.2141 5.40493 15.5951L4 17H9M15 17V18C15 19.6569 13.6569 21 12 21C10.3431 21 9 19.6569 9 18V17M15 17H9"
+          stroke={color}
+          strokeWidth="1.9"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </>
+    )}
   </Svg>
 );
+
+export const NavBuyIcon = NavBellIcon;
 
 // Plus Icon for center button
 export const NavPlusIcon: React.FC<{ size?: number; color?: string }> = ({

@@ -10,7 +10,6 @@ import {
   Code2,
   Monitor,
   Smartphone,
-  Sparkles,
 } from 'lucide-react';
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { Highlight } from '@/components/marketing/Highlight';
@@ -375,21 +374,10 @@ export default function MarketingPage() {
         </section>
 
         {/* ========================================================
-            01. PRODUCT STAGE SHOWCASE: OPERATIONAL DASHBOARD & TELEMETRY
+            01.5 PRODUCT STAGE SHOWCASE (DEDICATED SECTION)
            ======================================================== */}
-        <section id="product" className="product-stage-section relative pt-8 sm:pt-12 pb-12 sm:pb-16 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
-          <div className="max-w-6xl mx-auto relative z-10 space-y-8">
-            <div className="product-header max-w-3xl space-y-2">
-              <div className="product-eyebrow font-mono text-xs font-semibold uppercase tracking-wider text-blue-600">
-                {'// 01. OPERATIONAL DASHBOARD & TELEMETRY'}
-              </div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-950">
-                Real-Time Surface. Dual-Platform Sync.
-              </h2>
-              <p className="product-subhead text-sm sm:text-base text-zinc-600 leading-relaxed font-normal">
-                High-density operational telemetry tracking live items, latency metrics, and instant cross-client synchronization.
-              </p>
-            </div>
+        <section id="product" className="product-stage-section relative pt-6 sm:pt-10 pb-8 sm:pb-12 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
+          <div className="max-w-5xl mx-auto relative z-10">
             <div className="hero-product-stage">
               <HeroProductShowcase />
             </div>
@@ -397,25 +385,27 @@ export default function MarketingPage() {
         </section>
 
         {/* ========================================================
-            02. EDITORIAL STATEMENT: ARCHITECTURAL PHILOSOPHY
+            02. EDITORIAL STATEMENT: CINEMATIC CONTRAST
            ======================================================== */}
-        <section className="section-philosophy py-12 sm:py-16 px-4 sm:px-6 border-b border-black/[0.06]">
-          <div className="max-w-6xl mx-auto space-y-4">
-            <div className="philosophy-eyebrow font-mono text-xs font-semibold uppercase tracking-wider text-blue-600">
+        <section className="section-philosophy py-10 sm:py-14 px-4 sm:px-6 border-b border-black/[0.06]">
+          <div className="max-w-5xl mx-auto space-y-5">
+            <div className="philosophy-eyebrow font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
               {'// 02. ARCHITECTURAL PHILOSOPHY'}
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-950 leading-tight">
+            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-zinc-950 leading-tight">
               <span className="philosophy-heading-line block overflow-hidden">
-                BUILT FOR HIGH VELOCITY.
+                <span className="inline-block bg-zinc-950 text-white px-3 sm:px-4 py-1 sm:py-1.5 rounded-sm">
+                  BUILT FOR HIGH VELOCITY.
+                </span>
               </span>
-              <span className="philosophy-heading-line block overflow-hidden mt-1">
+              <span className="philosophy-heading-line block overflow-hidden mt-2 sm:mt-3">
                 ENGINEERED FOR{' '}
                 <span className="philosophy-highlight inline-block">
                   <Highlight variant="green">ZERO DRIFT.</Highlight>
                 </span>
               </span>
             </h2>
-            <p className="philosophy-body text-sm sm:text-base text-zinc-600 leading-relaxed max-w-3xl font-normal">
+            <p className="philosophy-body text-base sm:text-xl text-zinc-600 leading-relaxed max-w-3xl font-normal">
               We rejected the compromise of single-codebase wrappers. Desktop operations demand data density, keyboard efficiency, and batch processing. Mobile operations demand biometric gestures and zero-latency caching. APP gives both clients direct access to an authoritative central engine.
             </p>
           </div>
@@ -425,17 +415,14 @@ export default function MarketingPage() {
             03. PRODUCT EXPERIENCE: BENTO GRID CLIENT PARITY
            ======================================================== */}
         <section id="platform" className="section-parity py-12 sm:py-16 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
-          <div className="max-w-6xl mx-auto space-y-8">
+          <div className="max-w-6xl mx-auto space-y-12">
             <div className="parity-header max-w-3xl space-y-2">
-              <div className="parity-eyebrow font-mono text-xs font-semibold uppercase tracking-wider text-blue-600">
+              <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-zinc-500">
                 {'// 03. CLIENT PURPOSE & PARITY'}
               </div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-950">
+              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
                 Two Dedicated Clients. One Core API.
               </h2>
-              <p className="parity-subhead text-sm sm:text-base text-zinc-600 leading-relaxed font-normal">
-                Desktop operations paired with native mobile speed, both communicating with an authoritative Express & Mongoose core.
-              </p>
             </div>
 
             {/* Asymmetric 2-Column Bento Grid */}
@@ -507,13 +494,13 @@ export default function MarketingPage() {
         <section id="sync" className="sync-section py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
           <div className="max-w-6xl mx-auto space-y-12">
             <div className="sync-header text-left max-w-3xl space-y-2">
-              <div className="sync-eyebrow font-mono text-xs font-semibold uppercase tracking-wider text-blue-600">
+              <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-zinc-500">
                 {'// 04. SYNCHRONIZATION CORRIDOR'}
               </div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-950">
+              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
                 One Backend. Two Clients. Zero Drift.
               </h2>
-              <p className="text-sm sm:text-base text-zinc-600 leading-relaxed font-normal">
+              <p className="text-sm text-zinc-600 leading-relaxed">
                 Watch desktop state changes synchronize with mobile native clients in under 35ms through atomic Mongoose mutations.
               </p>
             </div>
@@ -555,15 +542,12 @@ export default function MarketingPage() {
         <section id="workflow" className="section-workflow relative z-10 py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
           <div className="max-w-6xl mx-auto space-y-8 relative z-10">
             <div className="workflow-header max-w-2xl space-y-2">
-              <div className="workflow-eyebrow font-mono text-xs font-semibold uppercase tracking-wider text-blue-600">
+              <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-zinc-500">
                 {'// 05. INTERACTIVE WORKFLOW'}
               </div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-950">
+              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
                 End-to-End Execution with Real Payloads
               </h2>
-              <p className="text-sm sm:text-base text-zinc-600 leading-relaxed font-normal">
-                Inspect real REST requests dispatched to the shared core backend and test live system state.
-              </p>
             </div>
 
             <InteractiveDemonstrator />
@@ -576,15 +560,14 @@ export default function MarketingPage() {
         <section id="heritage" className="codeathon-section py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
           <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             <div className="codeathon-copy-col lg:col-span-5 space-y-6 flex flex-col justify-center">
-              <div className="space-y-2">
-                <div className="font-mono text-xs font-semibold uppercase tracking-wider text-blue-600">
-                  {'// 06. ARCHITECTURAL HERITAGE'}
-                </div>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-950 leading-tight">
-                  Born Under Hackathon Pressure.
-                </h2>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-amber-50 text-amber-800 border border-amber-200/80 rounded-full text-xs font-semibold shadow-sm w-fit">
+                <Code2 className="w-4 h-4 text-amber-600" />
+                <span>CODE-A-THON HERITAGE</span>
               </div>
-              <p className="text-sm sm:text-base text-zinc-600 leading-relaxed font-normal">
+              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 leading-tight">
+                Born Under Hackathon Pressure.
+              </h2>
+              <p className="text-sm sm:text-base text-zinc-600 leading-relaxed">
                 APP was conceived and built to solve a concrete engineering challenge: how to architect a production-ready, cross-platform system at breakneck speed without introducing architectural drift or sacrificing mobile security.
               </p>
               <p className="text-xs sm:text-sm text-zinc-500 leading-relaxed">
@@ -658,15 +641,13 @@ export default function MarketingPage() {
             </div>
 
             <div className="tanish-copy-col lg:col-span-7 space-y-6 order-1 lg:order-2">
-              <div className="space-y-2">
-                <div className="font-mono text-xs font-semibold uppercase tracking-wider text-blue-600">
-                  {'// 07. ENGINEERING CONTEXT'}
-                </div>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-950 leading-tight">
-                  Engineered with Discipline.{' '}
-                  <Highlight variant="green">Delivered for Speed.</Highlight>
-                </h2>
+              <div className="font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+                {'// 07. ENGINEERING CONTEXT'}
               </div>
+              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 leading-tight">
+                Engineered with Discipline.{' '}
+                <Highlight variant="green">Delivered for Speed.</Highlight>
+              </h2>
               <p className="text-base text-zinc-600 leading-relaxed italic font-normal">
                 &ldquo;A great cross-platform product is not a single codebase stretched across two form factors. It is an authoritative backend and shared data contract powering two unapologetically native client experiences.&rdquo;
               </p>
@@ -698,23 +679,13 @@ export default function MarketingPage() {
            ======================================================== */}
         <section id="faq" className="section-faq py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
           <div className="max-w-4xl mx-auto space-y-10">
-            <div className="faq-header flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-              <div className="space-y-2">
-                <div className="font-mono text-xs font-semibold uppercase tracking-wider text-blue-600">
-                  {'// 09. FREQUENTLY ASKED QUESTIONS'}
-                </div>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-950">
-                  Technical FAQ
-                </h2>
+            <div className="faq-header text-left space-y-2">
+              <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-zinc-500">
+                {'// 09. FREQUENTLY ASKED QUESTIONS'}
               </div>
-              <div className="flex flex-col items-start sm:items-end text-left sm:text-right pb-1">
-                <span className="font-serif italic text-base sm:text-lg text-zinc-700 font-medium">
-                  Good Questions. Better Builders.
-                </span>
-                <span className="text-xs font-mono font-medium text-zinc-500 tracking-wide">
-                  Developer accessibility & architectural clarity
-                </span>
-              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
+                Technical FAQ
+              </h2>
             </div>
 
             <FAQAccordion />
@@ -724,12 +695,8 @@ export default function MarketingPage() {
         {/* ========================================================
             10. FINAL CTA: CINEMATIC BENTO FINALE
            ======================================================== */}
-        <section className="section-cta pt-14 sm:pt-16 pb-8 sm:pb-10 px-4 sm:px-6 border-b border-black/[0.06] relative overflow-hidden">
-          <div className="max-w-4xl mx-auto text-left relative z-10 space-y-6">
-            <div className="cta-badge inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-50 text-blue-700 border border-blue-200/80 rounded-full text-xs font-semibold shadow-sm">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>DEPLOYMENT READY</span>
-            </div>
+        <section className="section-cta py-16 sm:py-20 px-4 sm:px-6 border-b border-black/[0.06] relative overflow-hidden">
+          <div className="max-w-4xl mx-auto text-left relative z-10 space-y-8">
 
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-950 leading-tight">
               <span className="cta-headline-line block overflow-hidden">

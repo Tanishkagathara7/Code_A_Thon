@@ -2,19 +2,15 @@ import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
-  Text,
-  TouchableOpacity,
-  SafeAreaView,
   StatusBar,
-  Platform,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { hackathonItemApi } from '../../../services/api/hackathonItemApi';
 import { HackathonItem, CreateItemPayload } from '../../../types/domain';
 import { DomainForm } from '../../../components/domain/DomainForm';
 import { LoadingState } from '../../../components/domain/LoadingState';
 import { ErrorState } from '../../../components/domain/ErrorState';
+import { AppHeader } from '../../../components/navigation/AppHeader';
 
 import { useNetwork } from '../../../context/NetworkContext';
 import { useToast } from '../../../context/ToastContext';
@@ -79,26 +75,26 @@ export default function ItemEditScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" />
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
 
-      {/* Header */}
-      <LinearGradient colors={['#1E274A', '#2D3A6B']} style={styles.header}>
-        <View style={styles.headerTop}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Text style={styles.backBtnText}>‹ Cancel</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Edit {appConfig.primaryEntityName}</Text>
-          <View style={styles.headerSpacer} />
-        </View>
-      </LinearGradient>
+      {/* Clean White Web Header */}
+      <AppHeader
+        title={`Edit ${appConfig.primaryEntityName}`}
+        subtitle={item?.title ? `Updating "${item.title}"` : 'Modify operational parameters'}
+        onBack={() => router.back()}
+        backText="Cancel"
+      />
 
       {/* Body */}
       <View style={styles.body}>
         {isLoading ? (
           <LoadingState message={`Loading ${appConfig.primaryEntityName.toLowerCase()} details...`} count={1} />
         ) : loadError || !item ? (
-          <ErrorState message={loadError || `${appConfig.primaryEntityName} not found`} onRetry={fetchItem} />
+          <ErrorState
+            message={loadError || 'Unable to retrieve item data.'}
+            onRetry={fetchItem}
+          />
         ) : (
           <DomainForm
             initialValues={{
@@ -107,7 +103,7 @@ export default function ItemEditScreen() {
               status: item.status,
               category: item.category,
             }}
-            submitButtonText={`Update ${appConfig.primaryEntityName}`}
+            submitButtonText={`Save Changes`}
             isSubmitting={isSubmitting}
             serverError={serverError}
             onSubmit={handleSubmit}
@@ -115,48 +111,17 @@ export default function ItemEditScreen() {
           />
         )}
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  container: {
     flex: 1,
-    backgroundColor: '#1E274A',
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'android' ? 12 : 8,
-    paddingBottom: 16,
-  },
-  headerTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  backBtn: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-  },
-  backBtnText: {
-    color: '#FFFFFF',
-    fontSize: 13.5,
-    fontWeight: '600',
-    fontFamily: 'PlusJakartaSans_600SemiBold',
-  },
-  headerTitle: {
-    fontSize: 19,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    fontFamily: 'PlusJakartaSans_700Bold',
-  },
-  headerSpacer: {
-    width: 60,
+    backgroundColor: '#F8F9FC',
   },
   body: {
     flex: 1,
-    backgroundColor: '#F7F8FC',
+    backgroundColor: '#F8F9FC',
   },
 });

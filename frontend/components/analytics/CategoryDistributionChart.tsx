@@ -1,6 +1,5 @@
 import React from 'react';
 import { StyleSheet, View, Text, Platform, DimensionValue } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { CategoryMetric } from '../../types/analytics';
 
 export interface CategoryDistributionChartProps {
@@ -8,14 +7,13 @@ export interface CategoryDistributionChartProps {
   totalCount?: number;
 }
 
-const CATEGORY_COLORS: [string, string][] = [
-  ['#6366F1', '#4F46E5'], // Indigo
-  ['#3B82F6', '#2563EB'], // Blue
-  ['#10B981', '#059669'], // Emerald
-  ['#F59E0B', '#D97706'], // Amber
-  ['#EC4899', '#DB2777'], // Pink
-  ['#8B5CF6', '#7C3AED'], // Purple
-  ['#06B6D4', '#0891B2'], // Cyan
+const CATEGORY_COLORS: string[] = [
+  '#5B45F5', // Pulse Brand Purple
+  '#38BDF8', // Cyan Sky
+  '#10B981', // Emerald
+  '#F59E0B', // Amber
+  '#8B5CF6', // Violet
+  '#EC4899', // Pink
 ];
 
 export const CategoryDistributionChart: React.FC<CategoryDistributionChartProps> = ({
@@ -27,10 +25,11 @@ export const CategoryDistributionChart: React.FC<CategoryDistributionChartProps>
   if (categories.length === 0 || sum === 0) {
     return (
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Category Distribution</Text>
+        <View style={styles.header}>
+          <Text style={styles.cardTitle}>Category Breakdown</Text>
+        </View>
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyIcon}>📊</Text>
-          <Text style={styles.emptyText}>No category distribution data available yet.</Text>
+          <Text style={styles.emptyText}>No incident category data yet</Text>
         </View>
       </View>
     );
@@ -39,21 +38,28 @@ export const CategoryDistributionChart: React.FC<CategoryDistributionChartProps>
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Text style={styles.cardTitle}>Category Distribution</Text>
-        <Text style={styles.totalBadge}>{sum} Total Items</Text>
+        <View>
+          <Text style={styles.cardTitle}>Category Breakdown</Text>
+          <Text style={styles.subtitle}>Distribution of incidents by operational category</Text>
+        </View>
+        <View style={styles.totalBadge}>
+          <Text style={styles.totalBadgeText}>{sum} Total</Text>
+        </View>
       </View>
 
       {/* Progress stack bar visual */}
       <View style={styles.stackBarContainer}>
         {categories.map((cat, idx) => {
-          const pct = Math.max((cat.count / sum) * 100, 2);
-          const colors = CATEGORY_COLORS[idx % CATEGORY_COLORS.length];
+          const pct = Math.max((cat.count / sum) * 100, 3);
+          const color = CATEGORY_COLORS[idx % CATEGORY_COLORS.length];
           const segmentWidth = `${pct}%` as DimensionValue;
           return (
-            <LinearGradient
+            <View
               key={`${cat.category}-${idx}`}
-              colors={colors}
-              style={[styles.stackSegment, { width: segmentWidth }]}
+              style={[
+                styles.stackSegment,
+                { width: segmentWidth, backgroundColor: color },
+              ]}
             />
           );
         })}
@@ -62,14 +68,14 @@ export const CategoryDistributionChart: React.FC<CategoryDistributionChartProps>
       {/* Breakdown detail rows */}
       <View style={styles.listContainer}>
         {categories.map((cat, idx) => {
-          const percentage = ((cat.count / sum) * 100).toFixed(1);
-          const colors = CATEGORY_COLORS[idx % CATEGORY_COLORS.length];
+          const percentage = ((cat.count / sum) * 100).toFixed(0);
+          const color = CATEGORY_COLORS[idx % CATEGORY_COLORS.length];
           const barWidth = `${percentage}%` as DimensionValue;
 
           return (
             <View key={`${cat.category}-${idx}`} style={styles.categoryRow}>
               <View style={styles.categoryInfo}>
-                <View style={[styles.dot, { backgroundColor: colors[0] }]} />
+                <View style={[styles.dot, { backgroundColor: color }]} />
                 <Text style={styles.categoryName} numberOfLines={1}>
                   {cat.category}
                 </Text>
@@ -77,9 +83,11 @@ export const CategoryDistributionChart: React.FC<CategoryDistributionChartProps>
 
               <View style={styles.statInfo}>
                 <View style={styles.barBackground}>
-                  <LinearGradient
-                    colors={colors}
-                    style={[styles.barFill, { width: barWidth }]}
+                  <View
+                    style={[
+                      styles.barFill,
+                      { width: barWidth, backgroundColor: color },
+                    ]}
                   />
                 </View>
                 <Text style={styles.countText}>{cat.count}</Text>
@@ -96,61 +104,80 @@ export const CategoryDistributionChart: React.FC<CategoryDistributionChartProps>
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: 18,
+    padding: 18,
     marginVertical: 10,
     borderWidth: 1,
-    borderColor: '#E4E4E7',
+    borderColor: '#E6E9F0',
     ...Platform.select({
       ios: {
-        shadowColor: '#18181B',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
+        shadowColor: '#101226',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.04,
+        shadowRadius: 6,
       },
       android: {
         elevation: 2,
       },
       default: {
-        filter: 'drop-shadow(0px 4px 10px rgba(24, 24, 27, 0.05))',
+        filter: 'drop-shadow(0px 2px 6px rgba(16, 18, 38, 0.04))',
       },
     }),
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
+    alignItems: 'flex-start',
+    marginBottom: 14,
   },
   cardTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#09090B',
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#101226',
     fontFamily: 'PlusJakartaSans_700Bold',
   },
+  subtitle: {
+    fontSize: 11,
+    color: '#68728A',
+    fontFamily: 'PlusJakartaSans_400Regular',
+    marginTop: 2,
+  },
   totalBadge: {
-    fontSize: 11.5,
-    color: '#6366F1',
-    fontWeight: '600',
-    backgroundColor: '#EEF2FF',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    backgroundColor: '#F8F9FC',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E6E9F0',
+  },
+  totalBadgeText: {
+    fontSize: 10.5,
+    fontWeight: '700',
+    color: '#5B45F5',
+    fontFamily: 'PlusJakartaSans_700Bold',
+  },
+  emptyContainer: {
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 12,
+    color: '#68728A',
+    fontFamily: 'PlusJakartaSans_500Medium',
   },
   stackBarContainer: {
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#F4F4F5',
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#F1F3F9',
     flexDirection: 'row',
     overflow: 'hidden',
-    marginBottom: 18,
+    marginBottom: 14,
   },
   stackSegment: {
     height: '100%',
   },
   listContainer: {
-    gap: 12,
+    gap: 10,
   },
   categoryRow: {
     flexDirection: 'row',
@@ -160,30 +187,30 @@ const styles = StyleSheet.create({
   categoryInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '38%',
     gap: 8,
+    flex: 1,
+    marginRight: 12,
   },
   dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 7,
+    height: 7,
+    borderRadius: 4,
   },
   categoryName: {
-    fontSize: 13,
-    color: '#27272A',
-    fontWeight: '500',
-    fontFamily: 'PlusJakartaSans_500Medium',
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#101226',
+    fontFamily: 'PlusJakartaSans_600SemiBold',
   },
   statInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
     gap: 10,
   },
   barBackground: {
-    flex: 1,
-    height: 6,
-    backgroundColor: '#F4F4F5',
+    width: 60,
+    height: 5,
+    backgroundColor: '#F1F3F9',
     borderRadius: 3,
     overflow: 'hidden',
   },
@@ -192,32 +219,18 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   countText: {
-    fontSize: 12.5,
+    fontSize: 11.5,
     fontWeight: '700',
-    color: '#09090B',
-    width: 24,
-    textAlign: 'right',
+    color: '#101226',
     fontFamily: 'PlusJakartaSans_700Bold',
+    minWidth: 18,
+    textAlign: 'right',
   },
   percentageText: {
-    fontSize: 11.5,
-    color: '#71717A',
-    width: 44,
-    textAlign: 'right',
+    fontSize: 11,
+    color: '#68728A',
     fontFamily: 'PlusJakartaSans_500Medium',
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    paddingVertical: 24,
-  },
-  emptyIcon: {
-    fontSize: 28,
-    marginBottom: 8,
-  },
-  emptyText: {
-    fontSize: 13,
-    color: '#71717A',
-    textAlign: 'center',
-    fontFamily: 'PlusJakartaSans_400Regular',
+    minWidth: 28,
+    textAlign: 'right',
   },
 });

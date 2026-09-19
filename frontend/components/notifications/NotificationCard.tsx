@@ -126,8 +126,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     ...Platform.select({
       ios: {
-        shadowColor: '#1E274A',
-        shadowOffset: { width: 0, height: 3 },
+        shadowColor: '#101226',
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.04,
         shadowRadius: 8,
       },
@@ -135,19 +135,19 @@ const styles = StyleSheet.create({
         elevation: 2,
       },
       default: {
-        filter: 'drop-shadow(0px 3px 8px rgba(30, 39, 74, 0.04))',
+        filter: 'drop-shadow(0px 2px 8px rgba(16, 18, 38, 0.04))',
       },
     }),
   },
   unreadCard: {
     backgroundColor: '#FFFFFF',
-    borderColor: '#C7D2FE',
+    borderColor: '#EDE9FE',
     borderLeftWidth: 4,
-    borderLeftColor: '#4F46E5',
+    borderLeftColor: '#5B45F5',
   },
   readCard: {
-    backgroundColor: '#F9FAFB',
-    borderColor: '#E5E7EB',
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E6E9F0',
   },
   cardHeader: {
     flexDirection: 'row',

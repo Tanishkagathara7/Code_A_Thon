@@ -8,12 +8,9 @@ import {
   TextInput,
   RefreshControl,
   ActivityIndicator,
-  SafeAreaView,
   StatusBar,
-  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { hackathonItemApi } from '../../services/api/hackathonItemApi';
 import { HackathonItem, SortOption } from '../../types/domain';
 import { DomainCard } from '../../components/domain/DomainCard';
@@ -22,6 +19,7 @@ import { ErrorState } from '../../components/domain/ErrorState';
 import { LoadingState } from '../../components/domain/LoadingState';
 import { ConfirmDeleteModal } from '../../components/domain/ConfirmDeleteModal';
 import { FilterBar } from '../../components/domain/FilterBar';
+import { AppHeader } from '../../components/navigation/AppHeader';
 
 import { useNetwork } from '../../context/NetworkContext';
 import { useToast } from '../../context/ToastContext';
@@ -99,38 +97,33 @@ export default function ItemListScreen() {
           sort: selectedSort,
         });
 
-        // Ignore response if a newer search/filter request was fired (race condition protection)
+        // Check if request is still latest
         if (currentRequestId !== requestIdRef.current) {
           return;
         }
 
-        const newItems = response.data || [];
-
-        if (refresh || pageToFetch === 1) {
-          setItems(newItems);
-        } else {
-          setItems((prev) => {
-            const existingIds = new Set(prev.map((i) => i.id));
-            const uniqueIncoming = newItems.filter((i) => !existingIds.has(i.id));
-            return [...prev, ...uniqueIncoming];
-          });
-        }
-
-        setPage(response.pagination?.page || pageToFetch);
-        setTotalPages(response.pagination?.totalPages || 1);
-
-        // Dynamically collect unique categories for filter options
-        if (newItems.length > 0) {
-          const cats = Array.from(
-            new Set(newItems.map((i) => i.category).filter((c): c is string => !!c && c.trim() !== ''))
-          );
-          if (cats.length > 0) {
-            setAvailableCategories((prev) => Array.from(new Set([...prev, ...cats])));
+        if (response.data) {
+          if (pageToFetch === 1) {
+            setItems(response.data);
+          } else {
+            setItems((prev) => [...prev, ...response.data]);
           }
+          setPage(response.pagination?.page || 1);
+          setTotalPages(response.pagination?.totalPages || 1);
+
+          // Extract unique categories dynamically
+          const cats = Array.from(
+            new Set(
+              response.data
+                .map((item) => item.category)
+                .filter((cat): cat is string => !!cat && cat.trim().length > 0)
+            )
+          );
+          setAvailableCategories((prev) => Array.from(new Set([...prev, ...cats])));
         }
       } catch (err: any) {
         if (currentRequestId === requestIdRef.current) {
-          setError(err.message || 'Failed to retrieve items from server.');
+          setError(err.message || 'Failed to load items. Please pull down to retry.');
         }
       } finally {
         if (currentRequestId === requestIdRef.current) {
@@ -144,7 +137,7 @@ export default function ItemListScreen() {
     [debouncedSearch, selectedStatus, selectedCategory, selectedSort]
   );
 
-  // Trigger fetch when query parameters change (resets to page 1)
+  // Fetch when filters change
   useEffect(() => {
     fetchItems(1);
   }, [fetchItems]);
@@ -190,18 +183,16 @@ export default function ItemListScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" />
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
 
-      {/* Header */}
-      <LinearGradient colors={['#1E274A', '#2D3A6B']} style={styles.header}>
-        <View style={styles.headerTop}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Text style={styles.backBtnText}>‹ Back</Text>
-          </TouchableOpacity>
-
-          <Text style={styles.headerTitle}>{appConfig.entityPluralName}</Text>
-
+      {/* Clean White Web Header */}
+      <AppHeader
+        title={appConfig.entityPluralName}
+        subtitle="Operational Incident Repository"
+        onBack={() => router.back()}
+        backText="Back"
+        rightAction={
           <TouchableOpacity
             style={styles.createBtn}
             onPress={() => router.push('/items/create')}
@@ -209,44 +200,57 @@ export default function ItemListScreen() {
           >
             <Text style={styles.createBtnText}>+ Create</Text>
           </TouchableOpacity>
-        </View>
+        }
+      />
 
-        {/* Search Bar */}
+      {/* Search Bar Row */}
+      <View style={styles.searchBarWrapper}>
         <View style={styles.searchBox}>
           <TextInput
             style={styles.searchInput}
             placeholder="Search title, description, or category..."
-            placeholderTextColor="rgba(255, 255, 255, 0.6)"
+            placeholderTextColor="#94A3B8"
             value={searchInput}
             onChangeText={setSearchInput}
             returnKeyType="search"
             clearButtonMode="while-editing"
           />
           {isSearching && (
-            <ActivityIndicator size="small" color="#FFFFFF" style={styles.searchSpinner} />
+            <ActivityIndicator size="small" color="#5B45F5" style={styles.searchSpinner} />
           )}
         </View>
+      </View>
 
-        {/* Reusable Filter Bar */}
-        <FilterBar
-          selectedStatus={selectedStatus}
-          onStatusChange={setSelectedStatus}
-          selectedCategory={selectedCategory}
-          categories={availableCategories}
-          onCategoryChange={setSelectedCategory}
-          selectedSort={selectedSort}
-          onSortChange={setSelectedSort}
-          onClearFilters={handleClearFilters}
-          hasActiveFilters={hasActiveFilters}
-        />
-      </LinearGradient>
+      {/* Reusable Filter Bar */}
+      <FilterBar
+        selectedStatus={selectedStatus}
+        onStatusChange={setSelectedStatus}
+        selectedCategory={selectedCategory}
+        categories={availableCategories}
+        onCategoryChange={setSelectedCategory}
+        selectedSort={selectedSort}
+        onSortChange={setSelectedSort}
+        onClearFilters={handleClearFilters}
+        hasActiveFilters={hasActiveFilters}
+      />
 
-      {/* List / Content */}
+      {/* Main List Body */}
       <View style={styles.body}>
-        {isLoading && !isRefreshing ? (
-          <LoadingState message={`Fetching ${appConfig.entityPluralName.toLowerCase()}...`} count={4} />
-        ) : error ? (
+        {isLoading && items.length === 0 ? (
+          <LoadingState message={`Fetching ${appConfig.entityPluralName.toLowerCase()}...`} count={3} />
+        ) : error && items.length === 0 ? (
           <ErrorState message={error} onRetry={() => fetchItems(1)} />
+        ) : items.length === 0 ? (
+          <EmptyState
+            title={`No ${appConfig.entityPluralName} Found`}
+            description={
+              hasActiveFilters
+                ? 'Try adjusting your filters or search keywords.'
+                : `No items exist yet. Create your first ${appConfig.primaryEntityName.toLowerCase()} to get started.`
+            }
+            actionLabel={hasActiveFilters ? 'Clear Filters' : `Create ${appConfig.primaryEntityName}`}
+            onAction={hasActiveFilters ? handleClearFilters : () => router.push('/items/create')}
+          />
         ) : (
           <FlatList
             data={items}
@@ -266,34 +270,17 @@ export default function ItemListScreen() {
               <RefreshControl
                 refreshing={isRefreshing}
                 onRefresh={handleRefresh}
-                colors={['#4F46E5']}
-                tintColor="#4F46E5"
+                tintColor="#5B45F5"
+                colors={['#5B45F5']}
               />
             }
             onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.3}
-            ListEmptyComponent={
-              hasActiveFilters ? (
-                <EmptyState
-                  title="No items match your search"
-                  description="No items match the selected search keywords or filters. Try adjusting or clearing your filters."
-                  actionLabel="Clear All Filters"
-                  onAction={handleClearFilters}
-                />
-              ) : (
-                <EmptyState
-                  title={`No ${appConfig.entityPluralName.toLowerCase()} found`}
-                  description={`Get started by creating your first ${appConfig.primaryEntityName.toLowerCase()} to see it listed here.`}
-                  actionLabel={`+ Create New ${appConfig.primaryEntityName}`}
-                  onAction={() => router.push('/items/create')}
-                />
-              )
-            }
+            onEndReachedThreshold={0.4}
             ListFooterComponent={
               isLoadingMore ? (
-                <View style={styles.footerLoader}>
-                  <ActivityIndicator size="small" color="#4F46E5" />
-                  <Text style={styles.footerLoaderText}>Loading more items...</Text>
+                <View style={styles.loadMoreFooter}>
+                  <ActivityIndicator size="small" color="#5B45F5" />
+                  <Text style={styles.loadMoreText}>Loading more...</Text>
                 </View>
               ) : null
             }
@@ -301,99 +288,80 @@ export default function ItemListScreen() {
         )}
       </View>
 
-      {/* Confirmation Modal */}
+      {/* Confirm Delete Modal */}
       <ConfirmDeleteModal
         visible={!!deleteTarget}
+        title={`Delete ${appConfig.primaryEntityName}`}
         itemTitle={deleteTarget?.title}
         isDeleting={isDeleting}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDeleteTarget(null)}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  container: {
     flex: 1,
-    backgroundColor: '#1E274A',
-  },
-  header: {
-    paddingHorizontal: 16,
-    paddingTop: Platform.OS === 'android' ? 12 : 8,
-    paddingBottom: 8,
-  },
-  headerTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  backBtn: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-  },
-  backBtnText: {
-    color: '#FFFFFF',
-    fontSize: 13.5,
-    fontWeight: '600',
-    fontFamily: 'PlusJakartaSans_600SemiBold',
-  },
-  headerTitle: {
-    fontSize: 19,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    fontFamily: 'PlusJakartaSans_700Bold',
+    backgroundColor: '#F8F9FC',
   },
   createBtn: {
-    paddingVertical: 6,
+    paddingVertical: 7,
     paddingHorizontal: 14,
-    borderRadius: 16,
-    backgroundColor: '#6366F1',
+    borderRadius: 10,
+    backgroundColor: '#5B45F5',
   },
   createBtnText: {
     color: '#FFFFFF',
-    fontSize: 13.5,
+    fontSize: 12.5,
     fontWeight: '700',
     fontFamily: 'PlusJakartaSans_700Bold',
   },
+  searchBarWrapper: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E6E9F0',
+  },
   searchBox: {
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: Platform.OS === 'ios' ? 10 : 4,
-    marginBottom: 6,
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#F8F9FC',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E6E9F0',
+    paddingHorizontal: 14,
+    height: 42,
   },
   searchInput: {
     flex: 1,
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 13.5,
+    color: '#101226',
+    fontFamily: 'PlusJakartaSans_500Medium',
   },
   searchSpinner: {
     marginLeft: 8,
   },
   body: {
     flex: 1,
-    backgroundColor: '#F7F8FC',
+    backgroundColor: '#F8F9FC',
   },
   listContent: {
     padding: 16,
+    paddingBottom: 40,
   },
-  footerLoader: {
-    paddingVertical: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+  loadMoreFooter: {
     flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 8,
+    paddingVertical: 16,
   },
-  footerLoaderText: {
-    fontSize: 13,
-    color: '#71717A',
+  loadMoreText: {
+    fontSize: 12.5,
+    color: '#68728A',
     fontFamily: 'PlusJakartaSans_500Medium',
   },
 });

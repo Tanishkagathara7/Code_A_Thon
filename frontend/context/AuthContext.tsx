@@ -10,6 +10,7 @@ export interface User {
   name: string;
   avatarUrl?: string;
   provider?: 'email' | 'google' | 'github';
+  role?: string;
 }
 
 interface AuthContextType {

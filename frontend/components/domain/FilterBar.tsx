@@ -6,10 +6,10 @@ import {
   TouchableOpacity,
   ScrollView,
   Modal,
-  FlatList,
   Pressable,
 } from 'react-native';
 import { SortOption } from '../../types/domain';
+import { appConfig } from '../../config/appConfig';
 
 export interface FilterBarProps {
   selectedStatus?: string;
@@ -22,8 +22,6 @@ export interface FilterBarProps {
   onClearFilters: () => void;
   hasActiveFilters: boolean;
 }
-
-import { appConfig } from '../../config/appConfig';
 
 const STATUS_OPTIONS = [
   { label: 'All Status', value: undefined },
@@ -97,7 +95,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           );
         })}
 
-        {/* Category Filter Trigger (if categories available or selected) */}
+        {/* Category Filter Trigger */}
         {(categories.length > 0 || selectedCategory) && (
           <TouchableOpacity
             style={[styles.chip, selectedCategory ? styles.activeChip : null]}
@@ -214,9 +212,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 8,
+    paddingVertical: 10,
+    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    borderBottomColor: '#E6E9F0',
   },
   scrollContent: {
     paddingHorizontal: 16,
@@ -227,40 +226,41 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    backgroundColor: '#F8F9FC',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
+    borderColor: '#E6E9F0',
   },
   activeChip: {
-    backgroundColor: '#6366F1',
-    borderColor: '#818CF8',
+    backgroundColor: '#EDE9FE',
+    borderColor: '#5B45F5',
   },
   chipText: {
-    fontSize: 12.5,
+    fontSize: 12,
     fontWeight: '600',
-    color: 'rgba(255, 255, 255, 0.85)',
+    color: '#68728A',
     fontFamily: 'PlusJakartaSans_600SemiBold',
   },
   activeChipText: {
-    color: '#FFFFFF',
+    color: '#5B45F5',
+    fontWeight: '700',
   },
   clearBtn: {
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 20,
-    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+    backgroundColor: '#FEE2E2',
     borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.4)',
+    borderColor: '#FCA5A5',
   },
   clearBtnText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#F87171',
+    color: '#EF4444',
     fontFamily: 'PlusJakartaSans_700Bold',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(16, 18, 38, 0.45)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -268,38 +268,42 @@ const styles = StyleSheet.create({
   modalContent: {
     width: '100%',
     maxWidth: 320,
-    backgroundColor: '#1E274A',
-    borderRadius: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
     padding: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
+    borderColor: '#E6E9F0',
   },
   modalTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 16,
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#101226',
+    marginBottom: 14,
     fontFamily: 'PlusJakartaSans_700Bold',
     textAlign: 'center',
   },
   modalOption: {
-    paddingVertical: 12,
+    paddingVertical: 11,
     paddingHorizontal: 16,
     borderRadius: 10,
     marginBottom: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: '#F8F9FC',
+    borderWidth: 1,
+    borderColor: '#E6E9F0',
   },
   modalOptionSelected: {
-    backgroundColor: '#6366F1',
+    backgroundColor: '#EDE9FE',
+    borderColor: '#5B45F5',
   },
   modalOptionText: {
-    fontSize: 14,
-    color: '#CBD5E1',
+    fontSize: 13.5,
+    color: '#101226',
     fontWeight: '600',
     fontFamily: 'PlusJakartaSans_600SemiBold',
     textAlign: 'center',
   },
   modalOptionTextSelected: {
-    color: '#FFFFFF',
+    color: '#5B45F5',
+    fontWeight: '800',
   },
 });
