@@ -67,14 +67,14 @@ export const IncidentTrendChart: React.FC<IncidentTrendChartProps> = ({
       {/* Top Header Row */}
       <div className="flex items-start justify-between gap-4 pb-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-[#EDE9FE] text-[#5B45F5] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 12H6L9 4L15 20L18 12H21" stroke="#5B45F5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 12H6L9 4L15 20L18 12H21" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
           <div>
-            <h3 className="text-sm font-bold text-[#101226]">Incident Activity</h3>
-            <p className="text-xs text-[#68728A]">Real-time incident trends across all platforms</p>
+            <h3 className="text-sm font-bold text-[#101226]">Billing & Invoicing Activity</h3>
+            <p className="text-xs text-[#68728A]">Real-time invoice generation and counter bill trends</p>
           </div>
         </div>
 
@@ -86,7 +86,7 @@ export const IncidentTrendChart: React.FC<IncidentTrendChartProps> = ({
               onClick={() => setRange(item)}
               className={`px-3 py-1 rounded-lg transition-all ${
                 range === item
-                  ? 'bg-[#5B45F5] text-white shadow-xs'
+                  ? 'bg-emerald-600 text-white shadow-xs'
                   : 'text-[#68728A] hover:text-[#101226]'
               }`}
             >
@@ -100,7 +100,7 @@ export const IncidentTrendChart: React.FC<IncidentTrendChartProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
         {/* Window Total */}
         <div className="flex items-center gap-3 p-3 rounded-xl bg-[#F8F9FC] border border-[#E6E9F0]">
-          <div className="w-8 h-8 rounded-lg bg-[#FEE2E2] text-[#EF4444] flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
             <Calendar className="w-4 h-4" />
           </div>
           <div>
@@ -108,7 +108,7 @@ export const IncidentTrendChart: React.FC<IncidentTrendChartProps> = ({
               WINDOW TOTAL
             </span>
             <span className="text-xs font-bold text-[#101226]">
-              <strong className="text-sm font-black">{windowTotal}</strong> incidents
+              <strong className="text-sm font-black">{windowTotal}</strong> invoices
             </span>
           </div>
         </div>
@@ -138,7 +138,7 @@ export const IncidentTrendChart: React.FC<IncidentTrendChartProps> = ({
               PEAK HOUR
             </span>
             <span className="text-xs font-bold text-[#101226]">
-              <strong className="text-sm font-black">{peakHourIncidents}</strong> incidents <span className="text-[10px] text-[#68728A] font-normal">{hasData ? 'Today' : 'No peak data'}</span>
+              <strong className="text-sm font-black">{peakHourIncidents}</strong> bills <span className="text-[10px] text-[#68728A] font-normal">{hasData ? 'Today' : 'No peak data'}</span>
             </span>
           </div>
         </div>
@@ -148,15 +148,15 @@ export const IncidentTrendChart: React.FC<IncidentTrendChartProps> = ({
       <div className="flex items-center justify-center gap-6 pb-2 text-xs">
         <div className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-[#8B5CF6]" />
-          <span className="text-[#68728A] font-medium text-xs">New</span>
+          <span className="text-[#68728A] font-medium text-xs">Tax Invoices</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-[#38BDF8]" />
-          <span className="text-[#68728A] font-medium text-xs">Active</span>
+          <span className="text-[#68728A] font-medium text-xs">Credit / Due</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-[#10B981]" />
-          <span className="text-[#68728A] font-medium text-xs">Resolved</span>
+          <span className="text-[#68728A] font-medium text-xs">Paid in Full</span>
         </div>
       </div>
 

@@ -262,7 +262,7 @@ export default function HomeScreen() {
           <MobileInteractivePosDesk />
 
           {/* ========================================================
-              4. LIVE RECENT INVOICES & BILLS FEED
+              4. LIVE RECENT BILLS & INVOICE FEED
              ======================================================== */}
           <DashboardRecentIncidents
             items={recentItems}
@@ -270,14 +270,14 @@ export default function HomeScreen() {
           />
 
           {/* ========================================================
-              5. INVOICE VOLUME TREND CHART
+              5. BILLING & INVOICING VOLUME TREND CHART
              ======================================================== */}
           {analyticsData?.activity && (
             <ActivityTrendChart activity={analyticsData.activity} />
           )}
 
           {/* ========================================================
-              6. CATEGORY & PLACE OF SUPPLY BREAKDOWN
+              6. GST TAX SLABS & SUPPLY BREAKDOWN
              ======================================================== */}
           {analyticsData?.categories && (
             <CategoryDistributionChart

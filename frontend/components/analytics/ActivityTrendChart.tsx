@@ -10,7 +10,7 @@ export const ActivityTrendChart: React.FC<ActivityTrendChartProps> = ({ activity
   if (!activity || activity.length === 0) {
     return (
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Incident Activity Trend</Text>
+        <Text style={styles.cardTitle}>Billing & Invoicing Volume Trend</Text>
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>No recent activity logged yet.</Text>
         </View>

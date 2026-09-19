@@ -41,8 +41,8 @@ export const CategoryBreakdownCard: React.FC<CategoryBreakdownCardProps> = ({
             <Smile className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-[#101226]">Category Breakdown</h3>
-            <p className="text-xs text-[#68728A]">Distribution of incidents by category</p>
+            <h3 className="text-sm font-bold text-[#101226]">GST Slabs & Supply Breakdown</h3>
+            <p className="text-xs text-[#68728A]">Distribution of invoices by tax slab & state</p>
           </div>
         </div>
 
@@ -62,7 +62,7 @@ export const CategoryBreakdownCard: React.FC<CategoryBreakdownCardProps> = ({
             <AlertCircle className="w-5 h-5 text-[#94A3B8]" />
           </div>
           <span className="text-2xl font-black text-[#101226]">0</span>
-          <p className="text-xs text-[#68728A]">No incident category data yet</p>
+          <p className="text-xs text-[#68728A]">No billing category data yet</p>
         </div>
       ) : (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-2">
@@ -98,7 +98,7 @@ export const CategoryBreakdownCard: React.FC<CategoryBreakdownCardProps> = ({
                 {totalIncidents}
               </span>
               <span className="text-[11px] font-medium text-[#68728A] mt-0.5">
-                Incidents
+                Invoices
               </span>
             </div>
           </div>

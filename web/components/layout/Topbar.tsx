@@ -22,9 +22,9 @@ export const Topbar: React.FC<TopbarProps> = ({
 
   const getBreadcrumb = () => {
     if (pathname.startsWith('/dashboard')) return { title: 'Command Center', section: 'Operations' };
-    if (pathname.startsWith('/items/new')) return { title: `Log ${domainConfig.domain.primaryEntityName}`, section: 'Incident Hub' };
-    if (pathname.startsWith('/items')) return { title: `${domainConfig.domain.entityPluralName} Triage`, section: 'Incident Hub' };
-    if (pathname.startsWith('/ai-assistant')) return { title: 'Pulse AI Copilot', section: 'Intelligence' };
+    if (pathname.startsWith('/items/new')) return { title: 'New Tax Invoice', section: 'GST Billing' };
+    if (pathname.startsWith('/items')) return { title: 'Bills & Invoices Ledger', section: 'GST Billing' };
+    if (pathname.startsWith('/ai-assistant')) return { title: 'AI Tax Assistant', section: 'Intelligence' };
     if (pathname.startsWith('/files')) return { title: 'Assets & Evidence', section: 'Files & Media' };
     if (pathname.startsWith('/notifications')) return { title: 'Operational Alerts', section: 'Feed' };
     if (pathname.startsWith('/settings')) return { title: 'Settings & Profile', section: 'Account' };

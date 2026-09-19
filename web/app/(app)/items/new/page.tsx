@@ -82,35 +82,25 @@ export default function CreateBillPage() {
   // Shop / Business Profile
   const business = DEFAULT_BUSINESS;
 
-  // Step 1: Customer / Party State
-  const [selectedPartyPreset, setSelectedPartyPreset] = useState<string>('preset_0');
-  const [partyName, setPartyName] = useState(PRESET_PARTIES[0].name);
-  const [partyMobile, setPartyMobile] = useState(PRESET_PARTIES[0].mobile);
-  const [partyState, setPartyState] = useState(PRESET_PARTIES[0].state);
-  const [partyGstin, setPartyGstin] = useState(PRESET_PARTIES[0].gstin || '');
-  const [partyAddress, setPartyAddress] = useState(PRESET_PARTIES[0].address || '');
+  // Step 1: Customer / Party State (Default to empty Custom Party)
+  const [selectedPartyPreset, setSelectedPartyPreset] = useState<string>('custom');
+  const [partyName, setPartyName] = useState('');
+  const [partyMobile, setPartyMobile] = useState('');
+  const [partyState, setPartyState] = useState(business.state || 'Gujarat');
+  const [partyGstin, setPartyGstin] = useState('');
+  const [partyAddress, setPartyAddress] = useState('');
 
-  // Step 2: Line Items
+  // Step 2: Line Items (Default to 1 blank item row)
   const [items, setItems] = useState<InvoiceItemLine[]>([
     {
       id: 'item_1',
-      name: 'Basmati Rice (25kg Premium Bag)',
-      hsn: '1006',
-      qty: 2,
-      rate: 1850,
-      gstRate: 5,
-      taxableAmount: 3700,
-      totalAmount: 3885,
-    },
-    {
-      id: 'item_2',
-      name: 'Cold-Pressed Groundnut Oil (15L Tin)',
-      hsn: '1508',
+      name: '',
+      hsn: '',
       qty: 1,
-      rate: 2750,
-      gstRate: 5,
-      taxableAmount: 2750,
-      totalAmount: 2887.5,
+      rate: 0,
+      gstRate: 18,
+      taxableAmount: 0,
+      totalAmount: 0,
     },
   ]);
 
@@ -181,13 +171,13 @@ export default function CreateBillPage() {
   const addLineItem = (template?: typeof DEFAULT_CATALOG[0]) => {
     const newItem: InvoiceItemLine = {
       id: `item_${Date.now()}`,
-      name: template?.name || 'New Retail Item',
-      hsn: template?.hsn || '9983',
+      name: template?.name || '',
+      hsn: template?.hsn || '',
       qty: 1,
-      rate: template?.rate || 100,
+      rate: template?.rate || 0,
       gstRate: template?.gstRate ?? 18,
-      taxableAmount: template?.rate || 100,
-      totalAmount: (template?.rate || 100) * (1 + (template?.gstRate ?? 18) / 100),
+      taxableAmount: template?.rate || 0,
+      totalAmount: template ? template.rate * (1 + template.gstRate / 100) : 0,
     };
     setItems((prev) => [...prev, newItem]);
   };
@@ -278,8 +268,13 @@ Verify HSN codes, correct intra/inter-state tax assignment, and provide a 2-sent
       toast('Customer / Party name is required', 'error');
       return;
     }
-    if (items.length === 0) {
-      toast('Add at least one item to generate invoice', 'error');
+    if (items.length === 0 || items.every((i) => !i.name.trim())) {
+      toast('Please enter at least one item description', 'error');
+      return;
+    }
+    const hasZeroRate = items.some((i) => i.name.trim() && (Number(i.rate) <= 0));
+    if (hasZeroRate) {
+      toast('Item rate must be greater than 0', 'error');
       return;
     }
 
@@ -405,13 +400,13 @@ Verify HSN codes, correct intra/inter-state tax assignment, and provide a 2-sent
                 onChange={(e) => handlePartyPresetChange(e.target.value)}
                 className="text-xs px-3 py-1.5 bg-zinc-50 border border-zinc-300 rounded-lg text-zinc-800 focus:outline-none focus:ring-1 focus:ring-zinc-900"
               >
+                <option value="custom">+ New Custom Party (Blank)</option>
+                <option value="walkin">Walk-in Retail Cash Customer</option>
                 {PRESET_PARTIES.map((p, idx) => (
                   <option key={idx} value={`preset_${idx}`}>
                     {p.name} ({p.state})
                   </option>
                 ))}
-                <option value="walkin">Walk-in Retail Cash Customer</option>
-                <option value="custom">+ New Custom Party</option>
               </select>
             </div>
           </div>
@@ -606,8 +601,9 @@ Verify HSN codes, correct intra/inter-state tax assignment, and provide a 2-sent
                           type="number"
                           min="0"
                           step="0.01"
-                          value={item.rate}
-                          onChange={(e) => updateLineItem(item.id, 'rate', parseFloat(e.target.value) || 0)}
+                          value={item.rate === 0 ? '' : item.rate}
+                          placeholder="0.00"
+                          onChange={(e) => updateLineItem(item.id, 'rate', e.target.value === '' ? 0 : parseFloat(e.target.value) || 0)}
                           className="w-full px-2.5 py-1.5 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-bold text-right focus:outline-none focus:bg-white focus:ring-1 focus:ring-zinc-900"
                         />
                       </td>

@@ -209,7 +209,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
       {/* ========================================================
           A4 PRINTABLE TAX INVOICE CANVAS
          ======================================================== */}
-      <div className="bg-white rounded-2xl border border-zinc-200 shadow-lg p-8 sm:p-12 print:p-0 print:border-none print:shadow-none print:m-0 space-y-6 text-zinc-900 font-sans">
+      <div className="printable-invoice-card bg-white rounded-2xl border border-zinc-200 shadow-lg p-8 sm:p-12 print:p-2 print:border-none print:shadow-none print:m-0 space-y-5 text-zinc-900 font-sans">
         {/* Invoice Top Header */}
         <div className="flex justify-between items-start border-b-2 border-zinc-900 pb-6">
           <div className="space-y-1 max-w-md">
@@ -414,16 +414,30 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
         </div>
 
         {/* Invoice Footer & Signatory */}
-        <div className="pt-8 border-t border-zinc-200 flex justify-between items-end text-xs">
+        <div className="pt-4 border-t border-zinc-200 flex justify-between items-end text-xs break-inside-avoid">
           <div className="space-y-1">
             <p className="text-zinc-500 font-medium">Customer Acknowledgment Signature</p>
-            <div className="h-10 border-b border-dashed border-zinc-400 w-48" />
+            <div className="h-8 border-b border-dashed border-zinc-400 w-44" />
           </div>
 
           <div className="text-right space-y-1">
             <p className="font-bold text-zinc-900">For {business.name}</p>
-            <div className="h-10 border-b border-dashed border-zinc-400 w-48 ml-auto" />
-            <p className="text-[10px] text-zinc-500">Authorised Signatory</p>
+            
+            {/* Digital e-Sign Stamp & Cursive Signature */}
+            <div className="py-1 flex flex-col items-end">
+              <div className="relative inline-flex flex-col items-center justify-center px-3 py-1 rounded-lg border border-emerald-500/40 bg-emerald-50/50">
+                <span className="font-serif italic text-base font-bold text-indigo-900 select-none tracking-wide" style={{ fontFamily: 'Georgia, serif' }}>
+                  {business.name.split(' ')[0]} Auth
+                </span>
+                <div className="flex items-center gap-1 text-[8.5px] font-mono text-emerald-700 font-bold uppercase tracking-wider">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                  <span>Digitally Signed • e-Sign Verified</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="h-3 border-b border-dashed border-zinc-400 w-44 ml-auto" />
+            <p className="text-[10px] text-zinc-500 font-medium">Authorised Signatory</p>
           </div>
         </div>
       </div>

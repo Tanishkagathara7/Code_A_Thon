@@ -669,5 +669,78 @@ html.lenis, html.lenis body {
   animation: pulseCriticalPing 1.5s infinite cubic-bezier(0.4, 0, 0.6, 1);
 }
 
+/* =========================================================================
+   STATUTORY A4 GST INVOICE PRINT SPECIFICATION
+   Ensures browser Print to PDF exports clean, un-clipped invoices.
+   ========================================================================= */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm 10mm 8mm 10mm;
+  }
 
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
 
+  /* Hide app frame, sidebar, topbar, background effects, buttons, and popovers */
+  header,
+  aside,
+  nav,
+  .print\:hidden,
+  button,
+  [role="dialog"] {
+    display: none !important;
+  }
+
+  /* Reset outer containers so they don't clip height or force overflow */
+  html,
+  body,
+  #__next,
+  main,
+  div[class*="h-screen"],
+  div[class*="overflow-hidden"],
+  div[class*="overflow-y-auto"] {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    display: block !important;
+    background: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Printable invoice card formatting */
+  .printable-invoice-card {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Prevent table breaks across pages */
+  table {
+    page-break-inside: auto !important;
+  }
+
+  tr {
+    page-break-inside: avoid !important;
+    page-break-after: auto !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tfoot {
+    display: table-footer-group !important;
+  }
+}

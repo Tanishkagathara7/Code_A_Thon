@@ -78,14 +78,14 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-[#101226]">Pulse AI Copilot</h3>
+                <h3 className="text-sm font-bold text-[#101226]">GST AI Copilot</h3>
                 <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#F0FDF4] border border-[#DCFCE7] text-[10px] font-bold text-[#16A34A]">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A]" />
                   Online
                 </span>
               </div>
               <p className="text-xs text-[#68728A] mt-0.5">
-                Turn incident data into clear operational actions.
+                Statutory GST audit, tax slab guidance & party khata advisory.
               </p>
             </div>
           </div>
@@ -97,42 +97,42 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
             type="button"
             onClick={() =>
               runCopilot(
-                `Summarize all active incident data: ${totalIncidents} total incidents, ${activeIncidents} active/in-flight, ${resolvedIncidents} resolved. Recent events: ${recentTitles.join(', ') || 'API latency spike, Login failure on mobile, Sync error'}. Provide brief action points.`
+                `Summarize today's GST billing performance: ${totalIncidents} total invoices generated, ${activeIncidents} credit/due accounts pending collection, ${resolvedIncidents} paid in full. Recent invoices: ${recentTitles.join(', ') || 'Basmati Rice 25kg, Refined Oil 15L'}. Provide immediate financial insights.`
               )
             }
             disabled={loading}
             className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#F8F9FC] hover:bg-[#EEF2F6] border border-[#E6E9F0] text-xs font-semibold text-[#101226] transition-colors text-left cursor-pointer"
           >
             <FileText className="w-3.5 h-3.5 text-[#5B45F5] shrink-0" />
-            <span className="truncate">Summarize incidents</span>
+            <span className="truncate">Summarize sales</span>
           </button>
 
           <button
             type="button"
             onClick={() =>
               runCopilot(
-                `Find recurring issues and failure patterns among recent incidents: ${recentTitles.join(', ') || 'API latency spike, Login failure on mobile, Sync error'}. Recommend preventative containment.`
+                `Analyze GST tax rates (5%, 12%, 18%) and HSN compliance among recent bills: ${recentTitles.join(', ') || 'Basmati Rice 25kg, Refined Oil 15L, Electrical LED Tube'}. Advise on CGST/SGST vs IGST audit risks.`
               )
             }
             disabled={loading}
             className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#F8F9FC] hover:bg-[#EEF2F6] border border-[#E6E9F0] text-xs font-semibold text-[#101226] transition-colors text-left cursor-pointer"
           >
             <Search className="w-3.5 h-3.5 text-[#5B45F5] shrink-0" />
-            <span className="truncate">Find recurring issues</span>
+            <span className="truncate">Tax & HSN audit</span>
           </button>
 
           <button
             type="button"
             onClick={() =>
               runCopilot(
-                `Draft an executive operational status update for stakeholders regarding current active incidents (${activeIncidents} in-flight out of ${totalIncidents} total).`
+                `Draft a credit collection reminder notice and payment ledger follow-up for customers with outstanding khata dues (${activeIncidents} unpaid bills out of ${totalIncidents} total).`
               )
             }
             disabled={loading}
             className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#F8F9FC] hover:bg-[#EEF2F6] border border-[#E6E9F0] text-xs font-semibold text-[#101226] transition-colors text-left cursor-pointer"
           >
             <MessageSquare className="w-3.5 h-3.5 text-[#5B45F5] shrink-0" />
-            <span className="truncate">Draft status update</span>
+            <span className="truncate">Khata reminder</span>
           </button>
         </div>
 
@@ -175,7 +175,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
             type="text"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Ask Pulse AI anything..."
+            placeholder="Ask GST Copilot about taxes, HSN, or ledgers..."
             className="w-full bg-[#F8F9FC] border border-[#E6E9F0] text-[#101226] placeholder:text-[#68728A] px-4 py-2.5 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#5B45F5]/20 focus:border-[#5B45F5] font-sans transition-all"
           />
         </div>
@@ -184,7 +184,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
           type="submit"
           disabled={loading || !prompt.trim()}
           className="w-9 h-9 rounded-xl bg-[#5B45F5] hover:bg-[#4834df] text-white flex items-center justify-center transition-all disabled:opacity-40 cursor-pointer shrink-0 shadow-xs"
-          title="Send to Pulse AI"
+          title="Send to GST Copilot"
         >
           {loading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
