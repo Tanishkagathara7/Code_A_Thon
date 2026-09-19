@@ -10,15 +10,29 @@ export class CustomerController {
         return res.status(401).json({ success: false, error: 'Unauthorized' });
       }
 
-      const { name, mobile, state } = req.body || {};
-      if (!name || typeof name !== 'string' || !name.trim()) {
-        return res.status(400).json({ success: false, error: 'Customer name is required' });
+      const { name, mobile, state, email, gstin } = req.body || {};
+      if (!name || typeof name !== 'string' || name.trim().length < 2) {
+        return res.status(400).json({ success: false, error: 'Customer name is required (minimum 2 characters)' });
       }
-      if (!mobile || typeof mobile !== 'string' || !mobile.trim()) {
+      if (!mobile || typeof mobile !== 'string') {
         return res.status(400).json({ success: false, error: 'Mobile number is required' });
+      }
+      const cleanedMobile = mobile.replace(/[\s\-+]/g, '');
+      if (!/^[6-9]\d{9}$/.test(cleanedMobile.slice(-10))) {
+        return res.status(400).json({ success: false, error: 'Valid 10-digit mobile number is required' });
       }
       if (!state || typeof state !== 'string' || !state.trim()) {
         return res.status(400).json({ success: false, error: 'State is required for GST determination' });
+      }
+      if (email && typeof email === 'string' && email.trim()) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+          return res.status(400).json({ success: false, error: 'Valid email address is required' });
+        }
+      }
+      if (gstin && typeof gstin === 'string' && gstin.trim()) {
+        if (!/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(gstin.trim().toUpperCase())) {
+          return res.status(400).json({ success: false, error: 'Invalid 15-character GSTIN format' });
+        }
       }
 
       const customer = await CustomerService.create(req.body, userId);
@@ -84,6 +98,30 @@ export class CustomerController {
       const userId = req.user?.id;
       if (!userId) {
         return res.status(401).json({ success: false, error: 'Unauthorized' });
+      }
+
+      const { name, mobile, email, gstin } = req.body || {};
+      if (name !== undefined && (typeof name !== 'string' || name.trim().length < 2)) {
+        return res.status(400).json({ success: false, error: 'Customer name must be at least 2 characters' });
+      }
+      if (mobile !== undefined) {
+        if (typeof mobile !== 'string') {
+          return res.status(400).json({ success: false, error: 'Mobile number must be a string' });
+        }
+        const cleanedMobile = mobile.replace(/[\s\-+]/g, '');
+        if (!/^[6-9]\d{9}$/.test(cleanedMobile.slice(-10))) {
+          return res.status(400).json({ success: false, error: 'Valid 10-digit mobile number is required' });
+        }
+      }
+      if (email && typeof email === 'string' && email.trim()) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+          return res.status(400).json({ success: false, error: 'Valid email address is required' });
+        }
+      }
+      if (gstin && typeof gstin === 'string' && gstin.trim()) {
+        if (!/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(gstin.trim().toUpperCase())) {
+          return res.status(400).json({ success: false, error: 'Invalid 15-character GSTIN format' });
+        }
       }
 
       const updated = await CustomerService.update(req.params.id, userId, req.body);

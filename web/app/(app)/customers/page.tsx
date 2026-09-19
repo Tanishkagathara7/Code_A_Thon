@@ -123,19 +123,58 @@ export default function CustomersPage() {
 
   const handleSaveCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim()) {
+    const trimmedName = formData.name.trim();
+    const trimmedMobile = formData.mobile.trim();
+    const trimmedEmail = formData.email.trim();
+    const trimmedGstin = formData.gstin.trim().toUpperCase();
+    const trimmedPincode = formData.pincode.trim();
+
+    if (!trimmedName) {
       toast('Customer / Party name is required', 'error');
       return;
     }
-    if (!formData.mobile.trim()) {
-      toast('Contact mobile number is required', 'error');
+    if (trimmedName.length < 2) {
+      toast('Party name must be at least 2 characters long', 'error');
       return;
     }
 
-    if (formData.gstin.trim()) {
+    if (!trimmedMobile) {
+      toast('Contact mobile number is required', 'error');
+      return;
+    }
+    const mobileCleaned = trimmedMobile.replace(/[\s\-+]/g, '');
+    const mobileRegex = /^[6-9]\d{9}$/;
+    if (!mobileRegex.test(mobileCleaned.slice(-10))) {
+      toast('Please enter a valid 10-digit Indian mobile number (starting with 6, 7, 8, or 9)', 'error');
+      return;
+    }
+
+    if (trimmedEmail) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(trimmedEmail)) {
+        toast('Please enter a valid email address (e.g. name@domain.com)', 'error');
+        return;
+      }
+    }
+
+    if (formData.customerType === 'business' && trimmedGstin) {
       const gstinRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
-      if (!gstinRegex.test(formData.gstin.trim().toUpperCase())) {
+      if (!gstinRegex.test(trimmedGstin)) {
+        toast('Invalid 15-character statutory GSTIN format (e.g. 24AABCR1234F1Z9)', 'error');
+        return;
+      }
+    } else if (trimmedGstin) {
+      const gstinRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+      if (!gstinRegex.test(trimmedGstin)) {
         toast('Invalid 15-character GSTIN format (e.g. 24AABCR1234F1Z9)', 'error');
+        return;
+      }
+    }
+
+    if (trimmedPincode) {
+      const pincodeRegex = /^[1-9][0-9]{5}$/;
+      if (!pincodeRegex.test(trimmedPincode)) {
+        toast('Postal code must be a valid 6-digit Indian PIN code (e.g. 360003)', 'error');
         return;
       }
     }

@@ -10,12 +10,32 @@ export class ProductController {
         return res.status(401).json({ success: false, error: 'Unauthorized' });
       }
 
-      const { name, sellingPrice } = req.body || {};
-      if (!name || typeof name !== 'string' || !name.trim()) {
-        return res.status(400).json({ success: false, error: 'Product name is required' });
+      const { name, sellingPrice, purchasePrice, hsnCode, gstRate, openingStock, minStockAlert } = req.body || {};
+      if (!name || typeof name !== 'string' || name.trim().length < 2) {
+        return res.status(400).json({ success: false, error: 'Product name is required (minimum 2 characters)' });
       }
-      if (sellingPrice === undefined || isNaN(Number(sellingPrice)) || Number(sellingPrice) < 0) {
-        return res.status(400).json({ success: false, error: 'Valid selling price (>= 0) is required' });
+      if (sellingPrice === undefined || isNaN(Number(sellingPrice)) || Number(sellingPrice) <= 0) {
+        return res.status(400).json({ success: false, error: 'Valid selling price greater than 0 is required' });
+      }
+      if (purchasePrice !== undefined && (isNaN(Number(purchasePrice)) || Number(purchasePrice) < 0)) {
+        return res.status(400).json({ success: false, error: 'Purchase price cannot be negative' });
+      }
+      if (openingStock !== undefined && (isNaN(Number(openingStock)) || Number(openingStock) < 0)) {
+        return res.status(400).json({ success: false, error: 'Opening stock cannot be negative' });
+      }
+      if (minStockAlert !== undefined && (isNaN(Number(minStockAlert)) || Number(minStockAlert) < 0)) {
+        return res.status(400).json({ success: false, error: 'Minimum stock alert quantity cannot be negative' });
+      }
+      if (hsnCode && typeof hsnCode === 'string' && hsnCode.trim()) {
+        if (!/^[0-9]{2,8}$/.test(hsnCode.trim())) {
+          return res.status(400).json({ success: false, error: 'HSN/SAC code must be between 2 and 8 digits' });
+        }
+      }
+      if (gstRate !== undefined) {
+        const validGstRates = [0, 5, 12, 18, 28];
+        if (!validGstRates.includes(Number(gstRate))) {
+          return res.status(400).json({ success: false, error: 'GST rate must be one of: 0, 5, 12, 18, 28' });
+        }
       }
 
       const product = await ProductService.create(req.body, userId);
@@ -105,6 +125,31 @@ export class ProductController {
       const userId = req.user?.id;
       if (!userId) {
         return res.status(401).json({ success: false, error: 'Unauthorized' });
+      }
+
+      const { name, sellingPrice, purchasePrice, hsnCode, gstRate, minStockAlert } = req.body || {};
+      if (name !== undefined && (typeof name !== 'string' || name.trim().length < 2)) {
+        return res.status(400).json({ success: false, error: 'Product name must be at least 2 characters' });
+      }
+      if (sellingPrice !== undefined && (isNaN(Number(sellingPrice)) || Number(sellingPrice) <= 0)) {
+        return res.status(400).json({ success: false, error: 'Valid selling price greater than 0 is required' });
+      }
+      if (purchasePrice !== undefined && (isNaN(Number(purchasePrice)) || Number(purchasePrice) < 0)) {
+        return res.status(400).json({ success: false, error: 'Purchase price cannot be negative' });
+      }
+      if (minStockAlert !== undefined && (isNaN(Number(minStockAlert)) || Number(minStockAlert) < 0)) {
+        return res.status(400).json({ success: false, error: 'Minimum stock alert quantity cannot be negative' });
+      }
+      if (hsnCode && typeof hsnCode === 'string' && hsnCode.trim()) {
+        if (!/^[0-9]{2,8}$/.test(hsnCode.trim())) {
+          return res.status(400).json({ success: false, error: 'HSN/SAC code must be between 2 and 8 digits' });
+        }
+      }
+      if (gstRate !== undefined) {
+        const validGstRates = [0, 5, 12, 18, 28];
+        if (!validGstRates.includes(Number(gstRate))) {
+          return res.status(400).json({ success: false, error: 'GST rate must be one of: 0, 5, 12, 18, 28' });
+        }
       }
 
       const updated = await ProductService.update(req.params.id, userId, req.body);

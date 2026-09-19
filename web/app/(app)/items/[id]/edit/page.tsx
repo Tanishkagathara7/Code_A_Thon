@@ -367,17 +367,47 @@ Verify HSN codes, correct intra/inter-state tax assignment, and provide a 2-sent
   // Submit and Update Bill
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!partyName.trim()) {
+    const trimmedParty = partyName.trim();
+    if (!trimmedParty) {
       toast('Customer / Party name is required', 'error');
       return;
     }
+    if (trimmedParty.length < 2) {
+      toast('Party name must be at least 2 characters long', 'error');
+      return;
+    }
+
+    if (partyMobile.trim()) {
+      const mobileCleaned = partyMobile.trim().replace(/[\s\-+]/g, '');
+      const mobileRegex = /^[6-9]\d{9}$/;
+      if (!mobileRegex.test(mobileCleaned.slice(-10))) {
+        toast('Please enter a valid 10-digit mobile number for the party', 'error');
+        return;
+      }
+    }
+
+    if (partyGstin.trim()) {
+      const gstinRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+      if (!gstinRegex.test(partyGstin.trim().toUpperCase())) {
+        toast('Invalid 15-character GSTIN format (e.g. 24AABCR1234F1Z9)', 'error');
+        return;
+      }
+    }
+
     if (items.length === 0 || items.every((i) => !i.name.trim())) {
       toast('Please enter at least one item description', 'error');
       return;
     }
-    const hasZeroRate = items.some((i) => i.name.trim() && Number(i.rate) <= 0);
+
+    const invalidQty = items.some((i) => i.name.trim() && (isNaN(Number(i.qty)) || Number(i.qty) <= 0));
+    if (invalidQty) {
+      toast('Item quantity must be greater than 0', 'error');
+      return;
+    }
+
+    const hasZeroRate = items.some((i) => i.name.trim() && (isNaN(Number(i.rate)) || Number(i.rate) <= 0));
     if (hasZeroRate) {
-      toast('Item rate must be greater than 0', 'error');
+      toast('Item rate must be greater than ₹0', 'error');
       return;
     }
 

@@ -206,13 +206,47 @@ export default function ProductsPage() {
   // Submit Product Add / Edit
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim()) {
+    const trimmedName = formData.name.trim();
+    const trimmedHsn = formData.hsnCode.trim();
+
+    if (!trimmedName) {
       toast('Product name is required', 'error');
       return;
     }
+    if (trimmedName.length < 2) {
+      toast('Product name must be at least 2 characters long', 'error');
+      return;
+    }
+
+    if (trimmedHsn) {
+      const hsnRegex = /^[0-9]{2,8}$/;
+      if (!hsnRegex.test(trimmedHsn)) {
+        toast('HSN/SAC code must be between 2 and 8 numerical digits (e.g. 1006 or 8517)', 'error');
+        return;
+      }
+    }
+
     const priceNum = Number(formData.sellingPrice);
-    if (isNaN(priceNum) || priceNum < 0) {
-      toast('Please enter a valid selling price', 'error');
+    if (isNaN(priceNum) || priceNum <= 0) {
+      toast('Please enter a valid selling price greater than ₹0', 'error');
+      return;
+    }
+
+    const purchaseNum = formData.purchasePrice ? Number(formData.purchasePrice) : 0;
+    if (isNaN(purchaseNum) || purchaseNum < 0) {
+      toast('Purchase price cannot be negative', 'error');
+      return;
+    }
+
+    const openingStockNum = Number(formData.openingStock) || 0;
+    if (isNaN(openingStockNum) || openingStockNum < 0) {
+      toast('Opening stock cannot be negative', 'error');
+      return;
+    }
+
+    const minAlertNum = Number(formData.minStockAlert) || 0;
+    if (isNaN(minAlertNum) || minAlertNum < 0) {
+      toast('Minimum stock alert quantity cannot be negative', 'error');
       return;
     }
 
