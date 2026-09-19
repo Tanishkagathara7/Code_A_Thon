@@ -18,8 +18,8 @@ export class CustomerController {
         return res.status(400).json({ success: false, error: 'Mobile number is required' });
       }
       const cleanedMobile = mobile.replace(/[\s\-+]/g, '');
-      if (!/^[6-9]\d{9}$/.test(cleanedMobile.slice(-10))) {
-        return res.status(400).json({ success: false, error: 'Valid 10-digit mobile number is required' });
+      if (!/^[6-9]\d{9}$/.test(cleanedMobile)) {
+        return res.status(400).json({ success: false, error: 'Valid 10-digit Indian mobile number (e.g. 9825123456) is required' });
       }
       if (!state || typeof state !== 'string' || !state.trim()) {
         return res.status(400).json({ success: false, error: 'State is required for GST determination' });
@@ -109,8 +109,8 @@ export class CustomerController {
           return res.status(400).json({ success: false, error: 'Mobile number must be a string' });
         }
         const cleanedMobile = mobile.replace(/[\s\-+]/g, '');
-        if (!/^[6-9]\d{9}$/.test(cleanedMobile.slice(-10))) {
-          return res.status(400).json({ success: false, error: 'Valid 10-digit mobile number is required' });
+        if (!/^[6-9]\d{9}$/.test(cleanedMobile)) {
+          return res.status(400).json({ success: false, error: 'Valid 10-digit Indian mobile number (e.g. 9825123456) is required' });
         }
       }
       if (email && typeof email === 'string' && email.trim()) {

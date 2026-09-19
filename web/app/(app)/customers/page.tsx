@@ -144,8 +144,8 @@ export default function CustomersPage() {
     }
     const mobileCleaned = trimmedMobile.replace(/[\s\-+]/g, '');
     const mobileRegex = /^[6-9]\d{9}$/;
-    if (!mobileRegex.test(mobileCleaned.slice(-10))) {
-      toast('Please enter a valid 10-digit Indian mobile number (starting with 6, 7, 8, or 9)', 'error');
+    if (!mobileRegex.test(mobileCleaned)) {
+      toast('Please enter a valid 10-digit Indian mobile number (e.g. 9825123456 starting with 6, 7, 8, or 9)', 'error');
       return;
     }
 
@@ -465,10 +465,11 @@ export default function CustomersPage() {
                     </label>
                     <input
                       type="tel"
+                      maxLength={10}
                       required
                       placeholder="e.g. 9825123456"
                       value={formData.mobile}
-                      onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                      onChange={(e) => setFormData({ ...formData, mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                       className="w-full px-3 py-2 text-xs rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-mono shadow-xs"
                     />
                   </div>

@@ -15,6 +15,14 @@ export class CustomerService {
   static async create(data: Partial<ICustomer>, userId: string): Promise<ICustomer> {
     const ownerObjectId = new mongoose.Types.ObjectId(userId);
 
+    if (data.mobile) {
+      const cleanedMobile = String(data.mobile).trim().replace(/[\s\-+]/g, '');
+      if (!/^[6-9]\d{9}$/.test(cleanedMobile)) {
+        throw new Error('Valid 10-digit Indian mobile number (e.g. 9825123456) is required');
+      }
+      data.mobile = cleanedMobile;
+    }
+
     // Optional GSTIN format validation
     if (data.gstin && data.gstin.trim()) {
       const gstinRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
@@ -148,6 +156,14 @@ export class CustomerService {
 
   static async update(id: string, userId: string, data: Partial<ICustomer>): Promise<ICustomer | null> {
     const ownerObjectId = new mongoose.Types.ObjectId(userId);
+
+    if (data.mobile !== undefined) {
+      const cleanedMobile = String(data.mobile).trim().replace(/[\s\-+]/g, '');
+      if (!/^[6-9]\d{9}$/.test(cleanedMobile)) {
+        throw new Error('Valid 10-digit Indian mobile number (e.g. 9825123456) is required');
+      }
+      data.mobile = cleanedMobile;
+    }
 
     if (data.gstin && data.gstin.trim()) {
       const gstinRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;

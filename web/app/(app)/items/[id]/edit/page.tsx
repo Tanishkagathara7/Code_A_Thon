@@ -380,8 +380,8 @@ Verify HSN codes, correct intra/inter-state tax assignment, and provide a 2-sent
     if (partyMobile.trim()) {
       const mobileCleaned = partyMobile.trim().replace(/[\s\-+]/g, '');
       const mobileRegex = /^[6-9]\d{9}$/;
-      if (!mobileRegex.test(mobileCleaned.slice(-10))) {
-        toast('Please enter a valid 10-digit mobile number for the party', 'error');
+      if (!mobileRegex.test(mobileCleaned)) {
+        toast('Please enter a valid 10-digit Indian mobile number (e.g. 9825123456 starting with 6, 7, 8, or 9)', 'error');
         return;
       }
     }
@@ -591,11 +591,12 @@ Verify HSN codes, correct intra/inter-state tax assignment, and provide a 2-sent
               </label>
               <input
                 type="tel"
+                maxLength={10}
                 value={partyMobile}
-                onChange={(e) => setPartyMobile(e.target.value)}
+                onChange={(e) => setPartyMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
                 placeholder="10-digit mobile"
                 required
-                className="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all"
+                className="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-mono focus:outline-none focus:bg-white focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all"
               />
             </div>
 
