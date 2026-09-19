@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { aiApi } from '@/lib/api/domain';
 import { useToast } from '@/lib/context/ToastContext';
+import { MarkdownView } from '@/components/ui/MarkdownView';
 
 interface CopilotDrawerProps {
   totalIncidents?: number;
@@ -161,8 +162,8 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
                 <span>{copied ? 'Copied' : 'Copy'}</span>
               </button>
             </div>
-            <div className="max-h-36 overflow-y-auto pr-1 whitespace-pre-wrap leading-relaxed text-xs text-[#334155]">
-              {response}
+            <div className="max-h-56 overflow-y-auto pr-1 leading-relaxed text-xs text-[#334155]">
+              <MarkdownView content={response} />
             </div>
           </div>
         )}

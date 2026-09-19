@@ -43,13 +43,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const effectiveUnread = unreadNotifications !== undefined ? unreadNotifications : contextUnreadCount;
 
-  const navigation = [
+  const navigation: Array<{
+    name: string;
+    href: string;
+    icon: any;
+    badge?: number | string;
+  }> = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Create Bill', href: '/items/new', icon: Sparkles },
     { name: 'Bills & Invoices', href: '/items', icon: Layers },
     { name: 'AI Tax Assistant', href: '/ai-assistant', icon: Bot },
     { name: 'Sales Analytics', href: '/dashboard/analytics', icon: Activity },
-    { name: 'Notifications', href: '/notifications', icon: Bell, badge: effectiveUnread > 0 ? effectiveUnread : undefined },
     { name: 'Settings & Profile', href: '/settings', icon: Settings },
   ];
 

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Sparkles, Loader2, Copy, Check, Terminal, FileText, BrainCircuit } from 'lucide-react';
 import { aiApi } from '@/lib/api/domain';
 import { useToast } from '@/lib/context/ToastContext';
+import { MarkdownView } from '@/components/ui/MarkdownView';
 
 export default function AIAssistantPage() {
   const [prompt, setPrompt] = useState('');
@@ -183,8 +184,8 @@ export default function AIAssistantPage() {
               <span>{copied ? 'Copied' : 'Copy'}</span>
             </button>
           </div>
-          <div className="text-sm text-zinc-800 whitespace-pre-wrap leading-relaxed">
-            {result}
+          <div className="pt-1">
+            <MarkdownView content={result} />
           </div>
         </div>
       )}

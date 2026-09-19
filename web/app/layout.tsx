@@ -68,6 +68,14 @@ export const metadata: Metadata = {
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || '423TOdzNOU6tqw9PWuWdOGwo4jd4ct4swpfOUHjjeBA',
   },
+  icons: {
+    icon: [
+      { url: '/favicon.ico?v=2', sizes: 'any' },
+      { url: '/icon.png?v=2', type: 'image/png', sizes: '32x32' },
+    ],
+    shortcut: '/favicon.ico?v=2',
+    apple: '/icon.png?v=2',
+  },
 };
 
 export default function RootLayout({

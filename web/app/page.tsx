@@ -16,6 +16,7 @@ import { Highlight } from '@/components/marketing/Highlight';
 import { InteractiveDemonstrator } from '@/components/marketing/InteractiveDemonstrator';
 import { ArchitectureDiagram } from '@/components/marketing/ArchitectureDiagram';
 import { HeroProductShowcase } from '@/components/marketing/HeroProductShowcase';
+import { InteractiveHeroDashboard } from '@/components/marketing/InteractiveHeroDashboard';
 import { FAQAccordion } from '@/components/marketing/FAQAccordion';
 import { MarketingFooter } from '@/components/marketing/MarketingFooter';
 import { SmoothScrollProvider } from '@/components/marketing/SmoothScrollProvider';
@@ -339,12 +340,17 @@ export default function MarketingPage() {
         </section>
 
         {/* ========================================================
-            01.5 PRODUCT STAGE SHOWCASE (DEDICATED SECTION)
+            01. PRODUCT DASHBOARD SHOWCASE
            ======================================================== */}
         <section id="product" className="product-stage-section relative pt-6 sm:pt-10 pb-8 sm:pb-12 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
-          <div className="max-w-5xl mx-auto relative z-10">
+          <div className="max-w-6xl mx-auto relative z-10 space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+                {'// 01. INTERACTIVE GST DASHBOARD'}
+              </span>
+            </div>
             <div className="hero-product-stage">
-              <HeroProductShowcase />
+              <InteractiveHeroDashboard />
             </div>
           </div>
         </section>
@@ -353,7 +359,7 @@ export default function MarketingPage() {
             02. EDITORIAL STATEMENT: CINEMATIC CONTRAST
            ======================================================== */}
         <section className="section-philosophy py-10 sm:py-14 px-4 sm:px-6 border-b border-black/[0.06]">
-          <div className="max-w-5xl mx-auto space-y-5">
+          <div className="max-w-6xl mx-auto space-y-5">
             <div className="philosophy-eyebrow font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
               {'// 02. ARCHITECTURAL PHILOSOPHY'}
             </div>

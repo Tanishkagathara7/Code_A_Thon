@@ -11,6 +11,7 @@ import {
 import Svg, { Path } from 'react-native-svg';
 import { aiApi } from '../../services/api/aiApi';
 import { useToast } from '../../context/ToastContext';
+import { MobileMarkdownView } from './MobileMarkdownView';
 
 interface MobileCopilotCardProps {
   totalIncidents?: number;
@@ -165,7 +166,7 @@ export const MobileCopilotCard: React.FC<MobileCopilotCardProps> = ({
               <Text style={styles.copyButtonText}>{copied ? '✓ Copied' : 'Copy'}</Text>
             </TouchableOpacity>
           </View>
-          <Text style={styles.responseText}>{response}</Text>
+          <MobileMarkdownView content={response} />
         </View>
       )}
 
