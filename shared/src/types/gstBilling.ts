@@ -11,8 +11,11 @@ export interface Party {
 
 export interface InvoiceItemLine {
   id: string;
+  productId?: string;
   name: string;
   hsn: string;
+  unit?: string;
+  availableStock?: number;
   qty: number;
   rate: number;
   gstRate: number; // e.g., 0, 5, 12, 18, 28
@@ -25,6 +28,7 @@ export interface InvoiceItemLine {
   igstAmount?: number;
   totalAmount: number;
 }
+
 
 export interface BusinessDetails {
   name: string;
@@ -89,6 +93,83 @@ export const INDIAN_STATES: { name: string; code: string }[] = [
 
 export const GST_SLABS = [0, 5, 12, 18, 28] as const;
 
+export interface ProductItem {
+  id?: string;
+  _id?: string;
+  name: string;
+  sku?: string;
+  hsnCode: string;
+  category: string;
+  brand?: string;
+  description?: string;
+  unit: 'piece' | 'kg' | 'gram' | 'litre' | 'metre' | 'box' | 'pack' | string;
+  purchasePrice?: number;
+  sellingPrice: number;
+  isTaxInclusive?: boolean;
+  gstApplicability: 'taxable' | 'exempt' | 'non_gst';
+  gstRate: number; // 0, 5, 12, 18, 28
+  currentStock: number;
+  openingStock: number;
+  minStockAlert: number;
+  trackInventory: boolean;
+  stockStatus?: 'in_stock' | 'low_stock' | 'out_of_stock';
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface StockHistoryItem {
+  _id?: string;
+  product: string;
+  operationType: 'initial' | 'purchase_increase' | 'sale_deduction' | 'manual_increase' | 'manual_decrease' | 'damage' | 'return';
+  previousQuantity: number;
+  quantityDelta: number;
+  newQuantity: number;
+  reason: string;
+  referenceInvoiceNo?: string;
+  createdAt: string;
+}
+
+export interface CustomerRecord {
+  id?: string;
+  _id?: string;
+  name: string;
+  mobile: string;
+  email?: string;
+  customerType: 'individual' | 'business';
+  gstin?: string;
+  businessName?: string;
+  address?: string;
+  city?: string;
+  state: string;
+  stateCode?: string;
+  pincode?: string;
+  notes?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CustomerProfileData {
+  customer: CustomerRecord;
+  stats: {
+    totalInvoices: number;
+    totalBilled: number;
+    totalTax: number;
+    pendingBalance: number;
+  };
+  invoices: Array<{
+    id: string;
+    invoiceNo: string;
+    title: string;
+    date: string;
+    status: string;
+    paymentStatus: string;
+    grandTotal: number;
+    itemsCount: number;
+    isInterState: boolean;
+  }>;
+}
+
 export const DEFAULT_BUSINESS: BusinessDetails = {
   name: 'VyaaparGST Retail Enterprises',
   legalName: 'VyaaparGST Solutions Pvt Ltd',
@@ -99,3 +180,4 @@ export const DEFAULT_BUSINESS: BusinessDetails = {
   phone: '+91 98765 43210',
   email: 'billing@vyaapargst.in',
 };
+

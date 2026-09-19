@@ -361,3 +361,364 @@ export const notificationsApi = {
     }
   },
 };
+
+// ==========================================
+// PRODUCTS API
+// ==========================================
+function getStoredProducts(): any[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem('vyaapar_products_guest');
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+function saveStoredProducts(prods: any[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem('vyaapar_products_guest', JSON.stringify(prods));
+  } catch {}
+}
+
+export const productsApi = {
+  async getProducts(params: Record<string, any> = {}): Promise<{ success: boolean; data: any[]; pagination: any }> {
+    if (isGuestSession()) {
+      let items = getStoredProducts();
+      if (items.length === 0) {
+        // Default initial items
+        items = [
+          {
+            id: 'prod_1',
+            name: 'Basmati Rice Premium (25kg Bag)',
+            sku: 'RICE-BAS-25',
+            hsnCode: '1006',
+            category: 'Grains & Pulses',
+            unit: 'pack',
+            purchasePrice: 1550,
+            sellingPrice: 1850,
+            gstApplicability: 'taxable',
+            gstRate: 5,
+            currentStock: 48,
+            openingStock: 50,
+            minStockAlert: 10,
+            trackInventory: true,
+            stockStatus: 'in_stock',
+          },
+          {
+            id: 'prod_2',
+            name: 'Cold-Pressed Groundnut Oil (15L Tin)',
+            sku: 'OIL-GND-15L',
+            hsnCode: '1508',
+            category: 'Edible Oils',
+            unit: 'tin',
+            purchasePrice: 2400,
+            sellingPrice: 2750,
+            gstApplicability: 'taxable',
+            gstRate: 5,
+            currentStock: 22,
+            openingStock: 25,
+            minStockAlert: 8,
+            trackInventory: true,
+            stockStatus: 'in_stock',
+          },
+          {
+            id: 'prod_3',
+            name: 'Refined Wheat Flour (Maida 50kg)',
+            sku: 'FLOUR-MAIDA-50',
+            hsnCode: '1101',
+            category: 'Grains & Pulses',
+            unit: 'pack',
+            purchasePrice: 1400,
+            sellingPrice: 1650,
+            gstApplicability: 'taxable',
+            gstRate: 5,
+            currentStock: 4,
+            openingStock: 20,
+            minStockAlert: 6,
+            trackInventory: true,
+            stockStatus: 'low_stock',
+          },
+          {
+            id: 'prod_4',
+            name: 'Electrical LED Tube 20W (Pack of 10)',
+            sku: 'ELEC-LED-20W',
+            hsnCode: '8539',
+            category: 'Electrical & Hardware',
+            unit: 'box',
+            purchasePrice: 1100,
+            sellingPrice: 1450,
+            gstApplicability: 'taxable',
+            gstRate: 18,
+            currentStock: 0,
+            openingStock: 15,
+            minStockAlert: 5,
+            trackInventory: true,
+            stockStatus: 'out_of_stock',
+          },
+        ];
+        saveStoredProducts(items);
+      }
+
+      if (params.search) {
+        const q = params.search.toLowerCase();
+        items = items.filter((p) => p.name.toLowerCase().includes(q) || (p.sku && p.sku.toLowerCase().includes(q)));
+      }
+      if (params.category) {
+        items = items.filter((p) => p.category === params.category);
+      }
+      if (params.stockStatus) {
+        items = items.filter((p) => p.stockStatus === params.stockStatus);
+      }
+
+      return {
+        success: true,
+        data: items,
+        pagination: { total: items.length, page: params.page || 1, limit: 20, totalPages: 1 },
+      };
+    }
+
+    return apiClient.get('/products', params);
+  },
+
+  async getSummary(): Promise<{ success: boolean; data: any }> {
+    if (isGuestSession()) {
+      const prods = getStoredProducts();
+      return {
+        success: true,
+        data: {
+          totalProducts: prods.length,
+          lowStockCount: prods.filter((p) => p.stockStatus === 'low_stock').length,
+          outOfStockCount: prods.filter((p) => p.stockStatus === 'out_of_stock').length,
+          totalInventoryValue: prods.reduce((acc, p) => acc + (p.currentStock || 0) * (p.sellingPrice || 0), 0),
+        },
+      };
+    }
+    return apiClient.get('/products/summary');
+  },
+
+  async getProduct(id: string): Promise<{ success: boolean; data: any }> {
+    if (isGuestSession()) {
+      const prods = getStoredProducts();
+      const p = prods.find((x) => x.id === id || x._id === id);
+      return { success: true, data: p };
+    }
+    return apiClient.get(`/products/${id}`);
+  },
+
+  async createProduct(payload: any): Promise<{ success: boolean; data: any }> {
+    if (isGuestSession()) {
+      const prods = getStoredProducts();
+      const newProd = {
+        ...payload,
+        id: `prod_${Date.now()}`,
+        currentStock: payload.openingStock || 0,
+        stockStatus: (payload.openingStock || 0) <= 0 ? 'out_of_stock' : (payload.openingStock || 0) <= (payload.minStockAlert || 5) ? 'low_stock' : 'in_stock',
+        createdAt: new Date().toISOString(),
+      };
+      prods.unshift(newProd);
+      saveStoredProducts(prods);
+      return { success: true, data: newProd };
+    }
+    return apiClient.post('/products', payload);
+  },
+
+  async updateProduct(id: string, payload: any): Promise<{ success: boolean; data: any }> {
+    if (isGuestSession()) {
+      const prods = getStoredProducts();
+      const idx = prods.findIndex((x) => x.id === id || x._id === id);
+      if (idx >= 0) {
+        prods[idx] = { ...prods[idx], ...payload };
+        saveStoredProducts(prods);
+        return { success: true, data: prods[idx] };
+      }
+    }
+    return apiClient.put(`/products/${id}`, payload);
+  },
+
+  async deleteProduct(id: string): Promise<{ success: boolean }> {
+    if (isGuestSession()) {
+      let prods = getStoredProducts();
+      prods = prods.filter((x) => x.id !== id && x._id !== id);
+      saveStoredProducts(prods);
+      return { success: true };
+    }
+    return apiClient.delete(`/products/${id}`);
+  },
+
+  async adjustStock(id: string, operation: 'increase' | 'decrease', quantity: number, reason: string): Promise<any> {
+    if (isGuestSession()) {
+      const prods = getStoredProducts();
+      const p = prods.find((x) => x.id === id || x._id === id);
+      if (p) {
+        const delta = operation === 'increase' ? quantity : -quantity;
+        p.currentStock = Math.max(0, (p.currentStock || 0) + delta);
+        p.stockStatus = p.currentStock <= 0 ? 'out_of_stock' : p.currentStock <= (p.minStockAlert || 5) ? 'low_stock' : 'in_stock';
+        saveStoredProducts(prods);
+      }
+      return { success: true, data: p };
+    }
+    return apiClient.post(`/products/${id}/adjust-stock`, { operation, quantity, reason });
+  },
+
+  async getStockHistory(id: string): Promise<{ success: boolean; data: any[] }> {
+    if (isGuestSession()) {
+      return { success: true, data: [] };
+    }
+    return apiClient.get(`/products/${id}/stock-history`);
+  },
+};
+
+// ==========================================
+// CUSTOMERS API
+// ==========================================
+function getStoredCustomers(): any[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem('vyaapar_customers_guest');
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+function saveStoredCustomers(custs: any[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem('vyaapar_customers_guest', JSON.stringify(custs));
+  } catch {}
+}
+
+export const customersApi = {
+  async getCustomers(params: Record<string, any> = {}): Promise<{ success: boolean; data: any[]; pagination: any }> {
+    if (isGuestSession()) {
+      let custs = getStoredCustomers();
+      if (custs.length === 0) {
+        custs = [
+          {
+            id: 'cust_1',
+            name: 'Rajesh Traders',
+            mobile: '9825123456',
+            email: 'rajesh.traders@gmail.com',
+            customerType: 'business',
+            state: 'Gujarat',
+            stateCode: '24',
+            gstin: '24AABCR1234F1Z9',
+            businessName: 'Rajesh Commercial Trading Co',
+            address: 'Shop 12, APMC Market Yard',
+            city: 'Rajkot',
+          },
+          {
+            id: 'cust_2',
+            name: 'Shreeji Electronics & Hardware',
+            mobile: '9712345678',
+            email: 'shreeji.electricals@yahoo.co.in',
+            customerType: 'business',
+            state: 'Gujarat',
+            stateCode: '24',
+            gstin: '24AAFPS9876G1Z2',
+            businessName: 'Shreeji Electricals Wholesale',
+            address: '45 Ring Road Circle',
+            city: 'Surat',
+          },
+          {
+            id: 'cust_3',
+            name: 'Mumbai Textile Syndicate',
+            mobile: '9820011223',
+            email: 'accounts@mumbaitextiles.org',
+            customerType: 'business',
+            state: 'Maharashtra',
+            stateCode: '27',
+            gstin: '27AABCM5678J1Z4',
+            businessName: 'Mumbai Textile Syndicate LLP',
+            address: 'Kalbadevi Wholesale Bazaar',
+            city: 'Mumbai',
+          },
+          {
+            id: 'cust_4',
+            name: 'Bangalore General Provisions',
+            mobile: '9448099887',
+            customerType: 'business',
+            state: 'Karnataka',
+            stateCode: '29',
+            gstin: '29AABCB4321K1Z1',
+            address: 'Chickpet Commercial Area',
+            city: 'Bengaluru',
+          },
+        ];
+        saveStoredCustomers(custs);
+      }
+
+      if (params.search) {
+        const q = params.search.toLowerCase();
+        custs = custs.filter((c) => c.name.toLowerCase().includes(q) || c.mobile.includes(q) || (c.gstin && c.gstin.toLowerCase().includes(q)));
+      }
+
+      return {
+        success: true,
+        data: custs,
+        pagination: { total: custs.length, page: params.page || 1, limit: 20, totalPages: 1 },
+      };
+    }
+
+    return apiClient.get('/customers', params);
+  },
+
+  async getCustomer(id: string): Promise<{ success: boolean; data: any }> {
+    if (isGuestSession()) {
+      const custs = getStoredCustomers();
+      const c = custs.find((x) => x.id === id || x._id === id);
+      return {
+        success: true,
+        data: {
+          customer: c,
+          stats: { totalInvoices: 2, totalBilled: 12450, totalTax: 1245, pendingBalance: 0 },
+          invoices: [],
+        },
+      };
+    }
+    return apiClient.get(`/customers/${id}`);
+  },
+
+  async createCustomer(payload: any): Promise<{ success: boolean; data: any }> {
+    if (isGuestSession()) {
+      const custs = getStoredCustomers();
+      const newCust = {
+        ...payload,
+        id: `cust_${Date.now()}`,
+        createdAt: new Date().toISOString(),
+      };
+      custs.unshift(newCust);
+      saveStoredCustomers(custs);
+      return { success: true, data: newCust };
+    }
+    return apiClient.post('/customers', payload);
+  },
+
+  async updateCustomer(id: string, payload: any): Promise<{ success: boolean; data: any }> {
+    if (isGuestSession()) {
+      const custs = getStoredCustomers();
+      const idx = custs.findIndex((x) => x.id === id || x._id === id);
+      if (idx >= 0) {
+        custs[idx] = { ...custs[idx], ...payload };
+        saveStoredCustomers(custs);
+        return { success: true, data: custs[idx] };
+      }
+    }
+    return apiClient.put(`/customers/${id}`, payload);
+  },
+
+  async deleteCustomer(id: string): Promise<{ success: boolean }> {
+    if (isGuestSession()) {
+      let custs = getStoredCustomers();
+      custs = custs.filter((x) => x.id !== id && x._id !== id);
+      saveStoredCustomers(custs);
+      return { success: true };
+    }
+    return apiClient.delete(`/customers/${id}`);
+  },
+};
+

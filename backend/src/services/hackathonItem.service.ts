@@ -1,4 +1,6 @@
 import { HackathonItem, IHackathonItem, HackathonItemStatus } from '../models/HackathonItem';
+import { Product } from '../models/Product';
+import { StockHistory } from '../models/StockHistory';
 import mongoose from 'mongoose';
 
 export interface CreateItemInput {
@@ -42,11 +44,46 @@ export interface PaginatedItemsResponse {
 
 export class HackathonItemService {
   /**
-   * Create a new item owned by the authenticated user.
+   * Create a new item (invoice) owned by the authenticated user.
+   * Atomically decrements stock and logs history for catalog products sold.
    */
   static async create(input: CreateItemInput, userId: string): Promise<IHackathonItem> {
     if (!userId) {
       throw new Error('User ID is required');
+    }
+
+    const ownerObjectId = new mongoose.Types.ObjectId(userId);
+    const invoiceNo = input.attributes?.invoiceNo || input.title;
+
+    // Check if line items reference tracked products in catalog
+    const lineItems = input.attributes?.items;
+    if (Array.isArray(lineItems) && lineItems.length > 0) {
+      for (const line of lineItems) {
+        const productId = line.productId || line.id;
+        const qty = Number(line.qty) || 0;
+
+        if (productId && mongoose.Types.ObjectId.isValid(productId) && qty > 0) {
+          const product = await Product.findOne({ _id: productId, owner: ownerObjectId });
+          if (product && product.trackInventory) {
+            const previousQuantity = product.currentStock;
+            const newQuantity = previousQuantity - qty;
+
+            product.currentStock = newQuantity;
+            await product.save();
+
+            await StockHistory.create({
+              product: product._id,
+              owner: ownerObjectId,
+              operationType: 'sale_deduction',
+              previousQuantity,
+              quantityDelta: -qty,
+              newQuantity,
+              reason: `Sale deduction for Invoice ${invoiceNo}`,
+              referenceInvoiceNo: invoiceNo,
+            });
+          }
+        }
+      }
     }
 
     const item = new HackathonItem({
@@ -56,11 +93,12 @@ export class HackathonItemService {
       category: input.category,
       priority: input.priority || 'medium',
       attributes: input.attributes || {},
-      owner: new mongoose.Types.ObjectId(userId),
+      owner: ownerObjectId,
     });
 
     return await item.save();
   }
+
 
   /**
    * Get all items belonging to the authenticated user with search, filtering, sorting, and pagination.

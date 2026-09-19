@@ -378,8 +378,11 @@ export const defaultProductSpec: CompleteProductSpec = {
     { id: 'nav-dashboard', name: 'Dashboard', href: '/dashboard', iconName: 'LayoutDashboard', description: 'Real-time sales, tax collected, and bill volume' },
     { id: 'nav-new-bill', name: 'Create Bill', href: '/items/new', iconName: 'Plus', description: 'Fast GST invoice counter' },
     { id: 'nav-bills', name: 'Bill History', href: '/items', iconName: 'Layers', description: 'Search and download past invoices' },
+    { id: 'nav-products', name: 'Products & Stock', href: '/products', iconName: 'Package', description: 'Item inventory, GST slabs, and stock tracking' },
+    { id: 'nav-customers', name: 'Customers (Parties)', href: '/customers', iconName: 'Users', description: 'Buyer directory, GSTIN ledger, and transaction khata' },
     { id: 'nav-settings', name: 'Shop Settings', href: '/settings', iconName: 'Settings', description: 'Business profile, GSTIN, and tax rules' },
   ],
+
   roleDashboards: [
     {
       roleId: 'shop_owner',

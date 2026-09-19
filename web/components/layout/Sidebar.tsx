@@ -16,8 +16,11 @@ import {
   LogOut,
   X,
   Bot,
+  Package,
+  Users,
   type LucideIcon,
 } from 'lucide-react';
+
 import { useAuth } from '@/lib/context/AuthContext';
 import { cn } from '@/lib/utils';
 
@@ -46,10 +49,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Create Bill', href: '/items/new', icon: Sparkles },
     { name: 'Bills & Invoices', href: '/items', icon: Layers },
+    { name: 'Products & Stock', href: '/products', icon: Package },
+    { name: 'Customers (Parties)', href: '/customers', icon: Users },
     { name: 'AI Tax Assistant', href: '/ai-assistant', icon: Bot },
     { name: 'Sales Analytics', href: '/dashboard/analytics', icon: Activity },
     { name: 'Settings & Profile', href: '/settings', icon: Settings },
   ];
+
 
   return (
     <>

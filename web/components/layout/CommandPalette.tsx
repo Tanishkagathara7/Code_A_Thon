@@ -13,7 +13,10 @@ import {
   ArrowRight,
   ShieldAlert,
   X,
+  Package,
+  Users,
 } from 'lucide-react';
+
 import { itemsApi } from '@/lib/api/domain';
 import { HackathonItem } from '@/lib/types';
 import { domainConfig } from '@/lib/domain.config';
@@ -90,14 +93,15 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
   if (!isOpen) return null;
 
   const quickNav = [
-    { label: 'Go to Command Center Dashboard', href: '/dashboard', icon: Layers, badge: 'Overview' },
-    { label: 'Log New Incident Record', href: '/items/new', icon: Plus, badge: 'Create' },
-    { label: 'View All Incident Records', href: '/items', icon: ShieldAlert, badge: 'Triage' },
-    { label: 'Launch AI Copilot Workspace', href: '/ai-assistant', icon: Sparkles, badge: 'Intelligence' },
-    { label: 'Storage & Incident Assets', href: '/files', icon: FolderOpen, badge: 'Media' },
-    { label: 'Operational Notifications', href: '/notifications', icon: Bell, badge: 'Alerts' },
-    { label: 'Settings & Profile Preferences', href: '/settings', icon: Settings, badge: 'Account' },
+    { label: 'Command Center Dashboard', href: '/dashboard', icon: Layers, badge: 'Overview' },
+    { label: 'Create New GST Tax Invoice', href: '/items/new', icon: Plus, badge: 'Billing' },
+    { label: 'Bills & Invoices Ledger', href: '/items', icon: Layers, badge: 'Records' },
+    { label: 'Manage Products & Stock Inventory', href: '/products', icon: Package, badge: 'Catalog' },
+    { label: 'Manage Customers & Party Khata', href: '/customers', icon: Users, badge: 'Parties' },
+    { label: 'AI GST Tax Assistant', href: '/ai-assistant', icon: Sparkles, badge: 'Intelligence' },
+    { label: 'Settings & Business Profile', href: '/settings', icon: Settings, badge: 'Account' },
   ];
+
 
   const navigate = (href: string) => {
     handleClose();

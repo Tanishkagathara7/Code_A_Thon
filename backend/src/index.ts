@@ -56,13 +56,19 @@ app.get('/api/health', (req: Request, res: Response) => {
   });
 });
 
+import productRoutes from './routes/product.routes';
+import customerRoutes from './routes/customer.routes';
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/items', hackathonItemRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/customers', customerRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/notifications', notificationRoutes);
+
 
 
 

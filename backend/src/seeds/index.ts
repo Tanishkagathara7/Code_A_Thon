@@ -9,6 +9,7 @@ import { connectDatabase } from '../config/database';
 import { checkSeedSafety, logSeed } from './seed.utils';
 import { seedDemoUser, DEMO_USER_EMAIL, DEMO_USER_RAW_PASSWORD } from './users.seed';
 import { seedHackathonItems, resetDemoItems } from './hackathonItems.seed';
+import { seedProductsAndCustomers } from './productsAndCustomers.seed';
 import { genericDataset } from './datasets/generic';
 import { SeedDataset } from './datasets/types';
 
@@ -61,6 +62,10 @@ export async function runSeeder(args: string[] = process.argv.slice(2)): Promise
     // Step 5: Seed Demo Items
     logSeed(`📦 Seeding dataset: "${dataset.name}" (${dataset.items.length} records defined)...`);
     const seedResult = await seedHackathonItems(dataset, demoUser._id as mongoose.Types.ObjectId);
+
+    // Step 5b: Seed Products, Stock, and Customers
+    await seedProductsAndCustomers(demoUser._id as mongoose.Types.ObjectId);
+
 
     // Step 6: Print Concise Summary
     logSeed('==================================================');

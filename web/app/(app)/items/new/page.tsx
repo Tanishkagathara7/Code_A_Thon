@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+
 import {
   ArrowLeft,
   Plus,
@@ -16,7 +17,7 @@ import {
   Loader2,
   CheckCircle2,
 } from 'lucide-react';
-import { itemsApi, aiApi } from '@/lib/api/domain';
+import { itemsApi, aiApi, productsApi, customersApi } from '@/lib/api/domain';
 import { useToast } from '@/lib/context/ToastContext';
 import { useNotifications } from '@/lib/context/NotificationContext';
 import {
@@ -25,7 +26,10 @@ import {
   INDIAN_STATES,
   GST_SLABS,
   DEFAULT_BUSINESS,
+  ProductItem,
+  CustomerRecord,
 } from '@shared/types/gstBilling';
+
 import { formatCurrency, numberToWordsIndian } from '@/lib/utils';
 
 // Common catalog quick-picks for Indian retail/wholesalers
@@ -82,6 +86,10 @@ export default function CreateBillPage() {
   // Shop / Business Profile
   const business = DEFAULT_BUSINESS;
 
+  // Real database-backed products and customers
+  const [catalogProducts, setCatalogProducts] = useState<ProductItem[]>([]);
+  const [savedCustomers, setSavedCustomers] = useState<CustomerRecord[]>([]);
+
   // Step 1: Customer / Party State (Default to empty Custom Party)
   const [selectedPartyPreset, setSelectedPartyPreset] = useState<string>('custom');
   const [partyName, setPartyName] = useState('');
@@ -119,9 +127,62 @@ export default function CreateBillPage() {
     return partyState.trim().toLowerCase() !== business.state.trim().toLowerCase();
   }, [partyState, business.state]);
 
-  // Handle preset party selection
+  // Load live products & customers from backend
+  useEffect(() => {
+    const fetchCatalogAndCustomers = async () => {
+      try {
+        const [prodRes, custRes] = await Promise.all([
+          productsApi.getProducts({ limit: 100 }),
+          customersApi.getCustomers({ limit: 100 }),
+        ]);
+        if (prodRes.success && prodRes.data) {
+          setCatalogProducts(prodRes.data);
+        }
+        if (custRes.success && custRes.data) {
+          setSavedCustomers(custRes.data);
+        }
+      } catch (err) {
+        console.error('Failed to load catalog or customers', err);
+      }
+    };
+    fetchCatalogAndCustomers();
+  }, []);
+
+  // Parse URL searchParams if redirected from Customer Profile page
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const qPartyName = params.get('partyName');
+      const qPartyMobile = params.get('partyMobile');
+      const qPartyState = params.get('partyState');
+      const qPartyGstin = params.get('partyGstin');
+      if (qPartyName) {
+        setPartyName(qPartyName);
+        if (qPartyMobile) setPartyMobile(qPartyMobile);
+        if (qPartyState) setPartyState(qPartyState);
+        if (qPartyGstin) setPartyGstin(qPartyGstin);
+        setSelectedPartyPreset('url_param');
+      }
+    }
+  }, []);
+
+  // Handle party selection (Presets or Saved Customers from database)
   const handlePartyPresetChange = (presetKey: string) => {
     setSelectedPartyPreset(presetKey);
+
+    if (presetKey.startsWith('cust_')) {
+      const custId = presetKey.replace('cust_', '');
+      const cust = savedCustomers.find((c) => (c.id || c._id) === custId);
+      if (cust) {
+        setPartyName(cust.name);
+        setPartyMobile(cust.mobile);
+        setPartyState(cust.state || 'Gujarat');
+        setPartyGstin(cust.gstin || '');
+        setPartyAddress(cust.address || '');
+        return;
+      }
+    }
+
     if (presetKey.startsWith('preset_')) {
       const idx = parseInt(presetKey.split('_')[1], 10);
       const party = PRESET_PARTIES[idx];
@@ -146,6 +207,37 @@ export default function CreateBillPage() {
       setPartyAddress('');
     }
   };
+
+  // Select catalog product for a specific line item
+  const handleSelectProduct = (lineId: string, productId: string) => {
+    const prod = catalogProducts.find((p) => (p.id || p._id) === productId);
+    if (!prod) return;
+
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== lineId) return item;
+        const qty = Number(item.qty) || 1;
+        const rate = Number(prod.sellingPrice) || 0;
+        const gstRate = Number(prod.gstRate) ?? 18;
+        const taxable = qty * rate;
+        const tax = (taxable * gstRate) / 100;
+
+        return {
+          ...item,
+          productId: prod.id || prod._id,
+          name: prod.name,
+          hsn: prod.hsnCode || '',
+          unit: prod.unit || 'piece',
+          availableStock: prod.currentStock,
+          rate,
+          gstRate,
+          taxableAmount: taxable,
+          totalAmount: taxable + tax,
+        };
+      })
+    );
+  };
+
 
   // Line item manipulation
   const updateLineItem = (id: string, field: keyof InvoiceItemLine, value: any) => {
@@ -394,22 +486,34 @@ Verify HSN codes, correct intra/inter-state tax assignment, and provide a 2-sent
 
             {/* Quick Party Picker */}
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-zinc-500">Quick Select:</span>
+              <span className="text-xs font-medium text-zinc-500">Select Party:</span>
               <select
                 value={selectedPartyPreset}
                 onChange={(e) => handlePartyPresetChange(e.target.value)}
-                className="text-xs px-3 py-1.5 bg-zinc-50 border border-zinc-300 rounded-lg text-zinc-800 focus:outline-none focus:ring-1 focus:ring-zinc-900"
+                className="text-xs px-3 py-1.5 bg-zinc-50 border border-zinc-300 rounded-lg text-zinc-800 focus:outline-none focus:ring-1 focus:ring-zinc-900 font-medium cursor-pointer max-w-xs"
               >
                 <option value="custom">+ New Custom Party (Blank)</option>
                 <option value="walkin">Walk-in Retail Cash Customer</option>
-                {PRESET_PARTIES.map((p, idx) => (
-                  <option key={idx} value={`preset_${idx}`}>
-                    {p.name} ({p.state})
-                  </option>
-                ))}
+                {savedCustomers.length > 0 && (
+                  <optgroup label="Saved Customer Directory">
+                    {savedCustomers.map((c) => (
+                      <option key={c.id || c._id} value={`cust_${c.id || c._id}`}>
+                        {c.name} ({c.state}) {c.gstin ? `• ${c.gstin}` : ''}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+                <optgroup label="Preset Demo Parties">
+                  {PRESET_PARTIES.map((p, idx) => (
+                    <option key={idx} value={`preset_${idx}`}>
+                      {p.name} ({p.state})
+                    </option>
+                  ))}
+                </optgroup>
               </select>
             </div>
           </div>
+
 
           <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
             <div className="sm:col-span-4 space-y-1">
@@ -564,7 +668,21 @@ Verify HSN codes, correct intra/inter-state tax assignment, and provide a 2-sent
 
                   return (
                     <tr key={item.id} className="hover:bg-zinc-50/50">
-                      <td className="px-3 py-2.5">
+                      <td className="px-3 py-2.5 space-y-1">
+                        {catalogProducts.length > 0 && (
+                          <select
+                            value={item.productId || ''}
+                            onChange={(e) => handleSelectProduct(item.id, e.target.value)}
+                            className="w-full text-[11px] px-2 py-1 bg-zinc-100/80 border border-zinc-200 rounded text-zinc-700 font-medium focus:outline-none focus:bg-white"
+                          >
+                            <option value="">-- Choose from Catalog or Type Below --</option>
+                            {catalogProducts.map((p) => (
+                              <option key={p.id || p._id} value={p.id || p._id}>
+                                {p.name} (₹{p.sellingPrice} • {p.gstRate}% GST {p.trackInventory ? `• Stock: ${p.currentStock}` : ''})
+                              </option>
+                            ))}
+                          </select>
+                        )}
                         <input
                           type="text"
                           value={item.name}
@@ -573,6 +691,12 @@ Verify HSN codes, correct intra/inter-state tax assignment, and provide a 2-sent
                           required
                           className="w-full px-2.5 py-1.5 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-semibold focus:outline-none focus:bg-white focus:ring-1 focus:ring-zinc-900"
                         />
+                        {item.availableStock !== undefined && (
+                          <div className="flex items-center gap-1.5 text-[10px] text-zinc-400 font-medium">
+                            <span>Stock: <strong className={item.availableStock <= 0 ? 'text-rose-600' : item.availableStock <= 5 ? 'text-amber-600' : 'text-emerald-600'}>{item.availableStock}</strong></span>
+                            {item.unit && <span>• Unit: {item.unit}</span>}
+                          </div>
+                        )}
                       </td>
 
                       <td className="px-3 py-2.5">
@@ -584,6 +708,7 @@ Verify HSN codes, correct intra/inter-state tax assignment, and provide a 2-sent
                           className="w-full px-2 py-1.5 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-mono focus:outline-none focus:bg-white focus:ring-1 focus:ring-zinc-900"
                         />
                       </td>
+
 
                       <td className="px-3 py-2.5">
                         <input
