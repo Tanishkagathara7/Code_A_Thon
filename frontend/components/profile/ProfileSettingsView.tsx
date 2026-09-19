@@ -65,14 +65,14 @@ export const ProfileSettingsView: React.FC = () => {
           </View>
           <View style={styles.profileInfo}>
             <View style={styles.nameRow}>
-              <Text style={styles.userName}>{user?.name || 'Pulse Operator'}</Text>
+              <Text style={styles.userName}>{user?.name || 'Billing Operator'}</Text>
               <View style={styles.roleBadge}>
                 <Text style={styles.roleBadgeText}>{userRole}</Text>
               </View>
             </View>
-            <Text style={styles.userEmail}>{user?.email || 'operator@pulse.command'}</Text>
+            <Text style={styles.userEmail}>{user?.email || 'billing@vyaapargst.in'}</Text>
             <Text style={styles.meshStatus}>
-              ● Node Connected • Dispatch Mesh Active
+              ● GST Portal Linked • Tax Engine Active
             </Text>
           </View>
         </View>
@@ -80,17 +80,17 @@ export const ProfileSettingsView: React.FC = () => {
         <View style={styles.profileMetricsRow}>
           <View style={styles.metricItem}>
             <Text style={styles.metricNum}>Active</Text>
-            <Text style={styles.metricLabel}>Duty State</Text>
+            <Text style={styles.metricLabel}>Counter State</Text>
           </View>
           <View style={styles.metricDivider} />
           <View style={styles.metricItem}>
-            <Text style={styles.metricNum}>99.9%</Text>
-            <Text style={styles.metricLabel}>SLA Compliance</Text>
+            <Text style={styles.metricNum}>100%</Text>
+            <Text style={styles.metricLabel}>GST Compliance</Text>
           </View>
           <View style={styles.metricDivider} />
           <View style={styles.metricItem}>
             <Text style={styles.metricNum}>{isOffline ? 'Offline' : 'Real-time'}</Text>
-            <Text style={styles.metricLabel}>Sync Network</Text>
+            <Text style={styles.metricLabel}>Cloud Sync</Text>
           </View>
         </View>
       </View>
@@ -104,8 +104,8 @@ export const ProfileSettingsView: React.FC = () => {
         {/* Toggle Notifications */}
         <View style={styles.settingRow}>
           <View style={styles.settingInfo}>
-            <Text style={styles.settingTitle}>Push Dispatch Alerts</Text>
-            <Text style={styles.settingSubtitle}>Instant notification for high-priority incidents</Text>
+            <Text style={styles.settingTitle}>Push Billing Alerts</Text>
+            <Text style={styles.settingSubtitle}>Instant notification for invoices and khata dues</Text>
           </View>
           <Switch
             value={notificationsEnabled}
@@ -119,8 +119,8 @@ export const ProfileSettingsView: React.FC = () => {
         <View style={styles.settingDivider} />
         <View style={styles.settingRow}>
           <View style={styles.settingInfo}>
-            <Text style={styles.settingTitle}>Offline Cache Sync</Text>
-            <Text style={styles.settingSubtitle}>Store recent incident records for offline access</Text>
+            <Text style={styles.settingTitle}>Offline Invoice Cache</Text>
+            <Text style={styles.settingSubtitle}>Store recent bills locally for offline counter billing</Text>
           </View>
           <Switch
             value={offlineSyncEnabled}
@@ -135,7 +135,7 @@ export const ProfileSettingsView: React.FC = () => {
         <View style={styles.settingRow}>
           <View style={styles.settingInfo}>
             <Text style={styles.settingTitle}>Biometric Verification</Text>
-            <Text style={styles.settingSubtitle}>Require fingerprint/FaceID before deleting records</Text>
+            <Text style={styles.settingSubtitle}>Require fingerprint/FaceID before deleting tax bills</Text>
           </View>
           <Switch
             value={biometricEnabled}
@@ -161,8 +161,8 @@ export const ProfileSettingsView: React.FC = () => {
             <Text style={{ fontSize: 14 }}>📋</Text>
           </View>
           <View style={styles.settingInfo}>
-            <Text style={styles.settingTitle}>Incident Ledger</Text>
-            <Text style={styles.settingSubtitle}>Browse all active and resolved records</Text>
+            <Text style={styles.settingTitle}>Tax Invoices Ledger</Text>
+            <Text style={styles.settingSubtitle}>Browse all customer bills and tax records</Text>
           </View>
           <Text style={styles.actionArrow}>›</Text>
         </TouchableOpacity>
@@ -177,8 +177,8 @@ export const ProfileSettingsView: React.FC = () => {
             <Text style={{ fontSize: 14 }}>🔔</Text>
           </View>
           <View style={styles.settingInfo}>
-            <Text style={styles.settingTitle}>Alerts Center</Text>
-            <Text style={styles.settingSubtitle}>Review dispatch updates and system logs</Text>
+            <Text style={styles.settingTitle}>Billing Notifications</Text>
+            <Text style={styles.settingSubtitle}>Review payments and dispatch logs</Text>
           </View>
           <Text style={styles.actionArrow}>›</Text>
         </TouchableOpacity>
@@ -186,15 +186,15 @@ export const ProfileSettingsView: React.FC = () => {
         <View style={styles.settingDivider} />
         <TouchableOpacity
           style={styles.actionRow}
-          onPress={() => showToast(`Pulse Command Console v1.0.4 (${appConfig.appName})`, 'info')}
+          onPress={() => showToast(`GST Billing Engine v1.0.4 (${appConfig.appName})`, 'info')}
           activeOpacity={0.7}
         >
           <View style={styles.actionIconBox}>
             <Text style={{ fontSize: 14 }}>⚡</Text>
           </View>
           <View style={styles.settingInfo}>
-            <Text style={styles.settingTitle}>App & Engine Telemetry</Text>
-            <Text style={styles.settingSubtitle}>Pulse Engine v1.0.4 • Dual-Platform Web/Mobile</Text>
+            <Text style={styles.settingTitle}>GST Engine Telemetry</Text>
+            <Text style={styles.settingSubtitle}>GST Billing Core v1.0.4 • Dual-Platform Web/Mobile</Text>
           </View>
           <Text style={styles.actionArrow}>›</Text>
         </TouchableOpacity>

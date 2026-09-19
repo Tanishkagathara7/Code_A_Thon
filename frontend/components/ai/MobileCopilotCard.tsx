@@ -38,7 +38,7 @@ export const MobileCopilotCard: React.FC<MobileCopilotCardProps> = ({
       const res = await aiApi.generateAI({
         prompt: customPrompt,
         system:
-          'You are Pulse AI Copilot, an operational incident commander assistant. Provide concise, high-impact bulleted summaries and clear operational directives.',
+          'You are VyaaparGST AI Billing Copilot, a statutory Indian GST and invoicing intelligence assistant. Provide concise tax rules, CGST/SGST/IGST splits, HSN code verification, and invoice summaries.',
       });
       if (res.data?.text) {
         setResponse(res.data.text);
@@ -83,14 +83,14 @@ export const MobileCopilotCard: React.FC<MobileCopilotCardProps> = ({
           </View>
           <View style={{ flex: 1 }}>
             <View style={styles.titleWithBadge}>
-              <Text style={styles.title}>Pulse AI Copilot</Text>
+              <Text style={styles.title}>GST AI Billing Copilot</Text>
               <View style={styles.onlineBadge}>
                 <View style={styles.onlineDot} />
                 <Text style={styles.onlineText}>Online</Text>
               </View>
             </View>
             <Text style={styles.subtitle}>
-              Turn incident telemetry into actionable operational directives.
+              Instant tax audits, HSN code lookups, and statutory compliance checks.
             </Text>
           </View>
         </View>
@@ -104,12 +104,12 @@ export const MobileCopilotCard: React.FC<MobileCopilotCardProps> = ({
           activeOpacity={0.7}
           onPress={() =>
             runCopilot(
-              `Summarize active incidents: ${totalIncidents} total, ${activeIncidents} in-flight, ${resolvedIncidents} resolved. Recent: ${recentTitles.slice(0, 4).join(', ') || 'API latency spike, Database degraded, Auth timeout'}. Provide brief action points.`
+              `Summarize active invoices: ${totalIncidents} total bills generated, ${activeIncidents} partial balance, ${resolvedIncidents} paid in full. Recent customers: ${recentTitles.slice(0, 4).join(', ') || 'Rajesh Traders, Shreeji Electronics, Mumbai Textiles'}. Provide brief summary of GST liability.`
             )
           }
         >
           <Text style={styles.chipText} numberOfLines={1}>
-            ⚡ Summarize incidents
+            ⚡ Summarize bills
           </Text>
         </TouchableOpacity>
 
@@ -119,12 +119,12 @@ export const MobileCopilotCard: React.FC<MobileCopilotCardProps> = ({
           activeOpacity={0.7}
           onPress={() =>
             runCopilot(
-              `Generate priority triage recommendations for responder coordinator based on ${activeIncidents} active incidents.`
+              `Verify statutory GST rules for intra-state (CGST 50% + SGST 50%) versus inter-state (IGST 100%) and list mandatory tax invoice fields.`
             )
           }
         >
           <Text style={styles.chipText} numberOfLines={1}>
-            🎯 Triage priorities
+            🎯 GST rule audit
           </Text>
         </TouchableOpacity>
 
@@ -134,12 +134,12 @@ export const MobileCopilotCard: React.FC<MobileCopilotCardProps> = ({
           activeOpacity={0.7}
           onPress={() =>
             runCopilot(
-              `Draft an urgent operational dispatch memo to team responders regarding current service status.`
+              `Provide HSN codes and statutory GST slab rates (0%, 5%, 12%, 18%, 28%) for common retail grocery and hardware commodities.`
             )
           }
         >
           <Text style={styles.chipText} numberOfLines={1}>
-            📋 Draft memo
+            📋 HSN lookup
           </Text>
         </TouchableOpacity>
       </View>
@@ -148,7 +148,7 @@ export const MobileCopilotCard: React.FC<MobileCopilotCardProps> = ({
       {loading && (
         <View style={styles.loadingBox}>
           <ActivityIndicator size="small" color="#5B45F5" />
-          <Text style={styles.loadingText}>Synthesizing operational directives...</Text>
+          <Text style={styles.loadingText}>Synthesizing statutory tax advice...</Text>
         </View>
       )}
 
@@ -156,7 +156,7 @@ export const MobileCopilotCard: React.FC<MobileCopilotCardProps> = ({
       {response && !loading && (
         <View style={styles.responseBox}>
           <View style={styles.responseHeader}>
-            <Text style={styles.responseTag}>AI DIRECTIVE</Text>
+            <Text style={styles.responseTag}>GST AUDIT DIRECTIVE</Text>
             <TouchableOpacity
               onPress={handleCopy}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -173,7 +173,7 @@ export const MobileCopilotCard: React.FC<MobileCopilotCardProps> = ({
       <View style={styles.inputRow}>
         <TextInput
           style={styles.input}
-          placeholder="Ask Copilot (e.g. prioritize triage)..."
+          placeholder="Ask GST Copilot (e.g. HSN for basmati rice)..."
           placeholderTextColor="#94A3B8"
           value={prompt}
           onChangeText={setPrompt}

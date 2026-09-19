@@ -28,7 +28,7 @@ export const DashboardAnalyticsView: React.FC<DashboardAnalyticsViewProps> = ({
   if (isLoading && !data) {
     return (
       <View style={styles.container}>
-        <LoadingState message="Connecting to Pulse Dispatch telemetry..." count={2} />
+        <LoadingState message="Connecting to GST sales ledger and tax telemetry..." count={2} />
       </View>
     );
   }
@@ -46,8 +46,8 @@ export const DashboardAnalyticsView: React.FC<DashboardAnalyticsViewProps> = ({
       <View style={styles.container}>
         <EmptyState
           title="Telemetry Available After Sign In"
-          description="Authenticate with your responder or coordinator role to access live incident queue telemetry and performance rates."
-          actionLabel="Sign In to Command Center"
+          description="Authenticate to access real-time GST tax invoicing analytics, collection rates, and party khata ledger."
+          actionLabel="Sign In to GST Billing"
           onAction={() => router.replace('/(auth)')}
         />
       </View>

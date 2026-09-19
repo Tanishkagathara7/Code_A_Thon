@@ -27,6 +27,7 @@ import { CategoryDistributionChart } from '../components/analytics/CategoryDistr
 import { ActivityTrendChart } from '../components/analytics/ActivityTrendChart';
 import { MobileCopilotCard } from '../components/ai/MobileCopilotCard';
 import { DashboardRecentIncidents } from '../components/domain/DashboardRecentIncidents';
+import { MobileInteractivePosDesk } from '../components/domain/MobileInteractivePosDesk';
 import { NotificationBadge } from '../components/notifications/NotificationBadge';
 import { ProfileSettingsView } from '../components/profile/ProfileSettingsView';
 import { appConfig } from '../config/appConfig';
@@ -256,17 +257,12 @@ export default function HomeScreen() {
           />
 
           {/* ========================================================
-              3. DARK PULSE AI COPILOT CARD
+              3. INTERACTIVE POS COUNTER & INVOICE DESK (PARITY WITH WEB)
              ======================================================== */}
-          <MobileCopilotCard
-            totalIncidents={overview.total}
-            activeIncidents={overview.inProgress}
-            resolvedIncidents={overview.completed}
-            recentTitles={recentTitles}
-          />
+          <MobileInteractivePosDesk />
 
           {/* ========================================================
-              4. LIVE RECENT INCIDENT FEED
+              4. LIVE RECENT INVOICES & BILLS FEED
              ======================================================== */}
           <DashboardRecentIncidents
             items={recentItems}
@@ -274,14 +270,14 @@ export default function HomeScreen() {
           />
 
           {/* ========================================================
-              5. INCIDENT ACTIVITY TREND CHART
+              5. INVOICE VOLUME TREND CHART
              ======================================================== */}
           {analyticsData?.activity && (
             <ActivityTrendChart activity={analyticsData.activity} />
           )}
 
           {/* ========================================================
-              6. CATEGORY BREAKDOWN DONUT / STACK
+              6. CATEGORY & PLACE OF SUPPLY BREAKDOWN
              ======================================================== */}
           {analyticsData?.categories && (
             <CategoryDistributionChart
@@ -289,6 +285,16 @@ export default function HomeScreen() {
               totalCount={overview.total}
             />
           )}
+
+          {/* ========================================================
+              7. GST AI INVOICING COPILOT
+             ======================================================== */}
+          <MobileCopilotCard
+            totalIncidents={overview.total}
+            activeIncidents={overview.inProgress}
+            resolvedIncidents={overview.completed}
+            recentTitles={recentTitles}
+          />
         </ScrollView>
       );
     }
@@ -297,9 +303,9 @@ export default function HomeScreen() {
       return (
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           <View style={styles.tabHeadingBox}>
-            <Text style={styles.tabHeadingTitle}>AI Intelligence Copilot</Text>
+            <Text style={styles.tabHeadingTitle}>GST AI Billing Assistant</Text>
             <Text style={styles.tabHeadingSubtitle}>
-              Synthesize operational logs, draft project specifications, and decompose complex tasks.
+              Statutory tax audits, CGST/SGST/IGST breakdown checks, HSN master code lookups, and invoice analysis.
             </Text>
           </View>
           <MobileCopilotCard

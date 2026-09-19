@@ -281,7 +281,7 @@ export const MobileInteractivePosDesk: React.FC = () => {
                 activeOpacity={0.85}
                 onPress={() => {
                   setCounterState('printed');
-                  router.push('/items/new');
+                  router.push('/items/create');
                 }}
                 style={styles.printInvoiceBtn}
               >
@@ -310,21 +310,21 @@ export const MobileInteractivePosDesk: React.FC = () => {
           <View style={styles.presetPartyList}>
             <TouchableOpacity
               style={styles.partyItem}
-              onPress={() => router.push('/items/new')}
+              onPress={() => router.push('/items/create')}
             >
               <Text style={styles.partyItemTitle}>Rajesh Traders (Gujarat)</Text>
               <Text style={styles.partyItemGstin}>GSTIN: 24AABCT1357Q1ZP • ₹14,200 balance</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.partyItem}
-              onPress={() => router.push('/items/new')}
+              onPress={() => router.push('/items/create')}
             >
               <Text style={styles.partyItemTitle}>Shreeji Electronics (Gujarat)</Text>
               <Text style={styles.partyItemGstin}>GSTIN: 24AABCS9876K1Z3 • Paid in Full</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.partyItem}
-              onPress={() => router.push('/items/new')}
+              onPress={() => router.push('/items/create')}
             >
               <Text style={styles.partyItemTitle}>Mumbai Textile Syndicate (Maharashtra)</Text>
               <Text style={styles.partyItemGstin}>GSTIN: 27AAACT9012L1Z4 • Inter-State (IGST)</Text>
@@ -382,7 +382,7 @@ export const MobileInteractivePosDesk: React.FC = () => {
         </View>
         <TouchableOpacity
           style={styles.newBillBtn}
-          onPress={() => router.push('/items/new')}
+          onPress={() => router.push('/items/create')}
           activeOpacity={0.8}
         >
           <Text style={styles.newBillBtnText}>+ Create New Bill</Text>
