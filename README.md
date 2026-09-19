@@ -1,8 +1,23 @@
-# APP — Multi-Platform Operational Intelligence Platform
+# VyaaparGST — Smart GST Billing & Invoicing Suite for Indian Businesses
 
-> **One Product • Two First-Class Clients • One Shared Backend**
+> **One Modern Monorepo • Next.js 16 Web Desk • Expo React Native Mobile Client • Node.js & Express REST Backend**
 
-APP is a synchronized cross-platform operational intelligence platform featuring an **Expo React Native mobile client**, a **Next.js App Router web application**, and a **shared Node.js/Express REST backend** backed by MongoDB Atlas and the OpenRouter AI Gateway.
+**VyaaparGST** is a fast, compliant Indian GST billing, invoicing, party khata ledger, and inventory tracking platform designed for retail shopkeepers, wholesale merchants, kirana store owners, and service providers. It empowers merchants with 30-second invoice generation, automated CGST/SGST/IGST tax splits, printable A4 and thermal receipts, and real-time inventory tracking.
+
+---
+
+## 🌟 Core Feature Suite
+
+- ⚡ **30-Second GST Invoicing**: Instant line-item entry, quantity/rate arithmetic, statutory HSN/SAC code support, and automatic round-off.
+- 🇮🇳 **Automatic Intra-State vs. Inter-State Tax Engine**:
+  - **Intra-State (Local)**: Automatically divides GST into **50% CGST + 50% SGST**.
+  - **Inter-State**: Dynamically assigns **100% IGST** based on buyer's Place of Supply.
+  - Slabs: Fully supports **0% (Exempt), 5%, 12%, 18%, and 28%** statutory rates.
+- 🖨️ **Printable Tax Invoices & Thermal Slips**: A4 professional invoice generator with business trade header, party details, tax break-up table, amount in words, and signature blocks.
+- 📦 **Real-Time Inventory & Stock Audit**: Catalog of items, SKU codes, HSN numbers, purchase/selling margins, current stock levels, and automated low-stock warnings.
+- 👥 **Customer & Party Khata Ledger**: Customer directory with separate B2B (with statutory 15-character GSTIN verification) and B2C tracking, outstanding dues, and historical invoice ledgers.
+- 🤖 **Smart AI Billing Assistant**: Natural language prompt processor that converts text or spoken summaries into itemized GST invoices.
+- 🛡️ **End-to-End Field Validation**: Strict validation across client forms and backend endpoints for phone numbers, GSTINs, prices, HSN codes, and quantities.
 
 ---
 
@@ -10,41 +25,36 @@ APP is a synchronized cross-platform operational intelligence platform featuring
 
 ```text
 Code_A_Thon/
+├── web/                      # Next.js 16 App Router Web Application (Desktop-first POS Desk)
+│   ├── app/                  # Route groups: (auth) for login/signup, (app) for workspace
+│   │   ├── dashboard/        # Executive sales metrics, tax totals, recent invoices
+│   │   ├── items/            # Invoices hub: creation desk (/new), inspector (/[id]), editor (/[id]/edit)
+│   │   ├── products/         # Product catalog, stock levels, adjustment drawer
+│   │   ├── customers/        # Party directory, GSTIN ledger, transaction khata
+│   │   ├── ai-assistant/     # AI prompt billing synthesizer
+│   │   └── settings/         # Shop profile, GSTIN, business trade name
+│   ├── components/           # Modular UI: Layout (Sidebar/Topbar), POS Desk, Data Tables
+│   ├── lib/                  # Centralized API client, AuthContext, ToastContext, domain models
+│   └── README.md             # Dedicated Web Client Architecture & Developer Guide
+│
 ├── backend/                  # Shared Node.js + Express REST API
 │   ├── src/
-│   │   ├── controllers/     # Auth, Items, AI, Files, Analytics, Notifications
-│   │   ├── middleware/      # JWT validation, rate limiters, error handling
-│   │   ├── models/          # User, HackathonItem, Notification, UploadedFile
-│   │   ├── routes/          # /api/auth, /api/items, /api/ai, /api/files, etc.
-│   │   └── services/        # Auth, Email (SMTP), OpenRouter, Storage
+│   │   ├── controllers/      # CustomerController, ProductController, HackathonItemController, Auth
+│   │   ├── middleware/       # JWT auth guard, request rate limiters, error handling
+│   │   ├── models/           # Customer, Product, HackathonItem (Invoices), StockHistory, User
+│   │   ├── routes/           # /api/customers, /api/products, /api/items, /api/auth, /api/ai
+│   │   └── services/         # CustomerService, ProductService, OpenRouter AI, Email SMTP
 │   └── package.json
 │
 ├── frontend/                 # React Native + Expo 57 Mobile Application (Mobile Client)
-│   ├── app/                 # Expo Router (Home, Items CRUD, Auth, Notifications, Onboarding)
-│   ├── components/          # Native touch-first UI, bottom dock, Reanimated 4.5 animations
-│   ├── context/             # AuthContext (expo-secure-store), NetworkContext, ToastContext
-│   ├── services/api/        # Mobile API service layer
+│   ├── app/                  # Expo Router (Home, Invoices CRUD, Auth, Notifications, Onboarding)
+│   ├── components/           # Native touch-first UI, bottom dock, Reanimated 4.5 animations
+│   ├── context/              # AuthContext (expo-secure-store), NetworkContext, ToastContext
+│   ├── services/api/         # Mobile API service layer
 │   └── package.json
 │
-├── web/                      # Next.js 16 App Router Web Application (Web Client)
-│   ├── app/
-│   │   ├── page.tsx         # Premium multi-platform landing page (Hero, Ecosystem, FAQ)
-│   │   ├── (auth)/          # Desktop & mobile responsive Login, Signup, Forgot Password
-│   │   └── (app)/           # Protected workspace: Dashboard, Items Hub, AI Copilot, Files, Notifications
-│   ├── components/          # Sidebar, Topbar, Data Table, KPI cards, AI assistant form
-│   ├── lib/api/             # Centralized Web API client with JWT interceptor
-│   └── package.json
-│
-├── shared/                   # Shared TypeScript contracts (Zero UI duplication)
-│   ├── src/types/           # User, HackathonItem, Analytics, AI, File, Notification interfaces
-│   ├── src/constants/       # System categories, statuses, branding defaults
-│   └── src/validation/      # Password strength and email regex validators
-│
-├── hackathon/                # Hackathon execution operating pipeline (01_ through 13_)
-├── .agents/                  # Antigravity AI engineering skills (pivot, code review, mobile UX, web UX)
-├── HACKATHON_PIVOT_CHECKLIST.md # 3-hour rapid pivot guide
-├── PROJECT_ARCHITECTURE.md   # Architectural blueprint and API contract inventory
-└── package.json             # Root monorepo orchestrator
+├── shared/                   # Shared TypeScript contracts & domain models
+└── package.json              # Monorepo orchestrator
 ```
 
 ---
@@ -54,12 +64,11 @@ Code_A_Thon/
 ### 1. Prerequisites
 - **Node.js**: v18+ (tested on Node v20 & v24)
 - **npm**: v9+
-- **MongoDB Atlas Connection URI**
+- **MongoDB Atlas Database URI**
 
-### 2. Environment Variables
+### 2. Environment Setup
 
 #### Backend (`backend/.env`)
-Create `backend/.env` from `backend/.env.example`:
 ```env
 PORT=5000
 MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/pulse?retryWrites=true&w=majority
@@ -69,39 +78,38 @@ OPENROUTER_MODEL=openrouter/free
 ```
 
 #### Web Client (`web/.env.local`)
-Create `web/.env.local` from `web/.env.local.example`:
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id.apps.googleusercontent.com
-NEXT_PUBLIC_GITHUB_CLIENT_ID=your_github_client_id
 ```
 
 #### Mobile Client (`frontend/.env`)
-Create `frontend/.env` from `frontend/.env.example`:
 ```env
 EXPO_PUBLIC_API_URL=http://localhost:5000/api
-# Or use your deployed backend / local IP address for physical devices
 ```
 
 ---
 
-## 🏃 Running the Applications
+## 🏃 Running the Application
 
 From the repository root:
 
-### Run Everything Together (Mobile + Web + Backend)
+### Run Everything Together (Web + Mobile + Backend)
 ```bash
 npm run dev
 ```
-*Uses `concurrently` to boot the Mobile Expo Metro bundler, Next.js web dev server, and Express backend API simultaneously.*
 
 ### Run Clients Individually
-
 - **Web Application**:
   ```bash
   npm run web
   ```
   *Accessible at [http://localhost:3000](http://localhost:3000)*
+
+- **Backend API Server**:
+  ```bash
+  npm run backend
+  ```
+  *Runs Express API at [http://localhost:5000](http://localhost:5000)*
 
 - **Mobile Application**:
   ```bash
@@ -109,28 +117,18 @@ npm run dev
   # or
   npm run frontend
   ```
-  *Opens Expo Dev Tools to run on Android, iOS, or Expo Go.*
+  *Opens Expo Metro bundler for iOS, Android, or Expo Go.*
 
-- **Backend API**:
-  ```bash
-  npm run backend
-  ```
-  *Runs Express server at [http://localhost:5000](http://localhost:5000)*
-
-- **Seed Demo Data**:
-  ```bash
-  npm run seed:reset
-  ```
-
-- **Production Web Build Verification**:
+- **Production Web Build**:
   ```bash
   npm run web:build
   ```
 
 ---
 
-## 🔒 Security & Best Practices
-- **Strict Client Separation**: Web and mobile share TypeScript contracts and Express REST endpoints, but retain dedicated native UX paradigms.
-- **Mobile Integrity Preserved**: `frontend/` retains its verified Expo 57 setup, Reanimated 4.5 bindings, Metro configurations, and native bundle IDs without breaking changes.
-- **JWT & Rate Limiting**: Express backend applies `helmet()`, general and endpoint-specific rate limiters, bcrypt password hashing, and 6-digit OTP verification codes.
-- **Web Defense in Depth**: Strict form input validation, client/server secret isolation (`NEXT_PUBLIC_` prefix enforcement), safe token lifecycle handling, and route protection.
+## 🔒 Security & Statutory Compliance
+
+- **Statutory GSTIN Validation**: Regex-validated 15-character GSTIN codes (`^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$`).
+- **Clean Customer Isolation**: Customer directories begin completely clean upon new user logins, strictly scoped to each merchant account.
+- **JWT & Route Guarding**: Authenticated sessions are enforced via HTTP Bearer token headers, and private routes redirect unauthenticated traffic to login.
+- **Input Sanitization**: Numerical bounds enforcement on prices, stock delta adjustments, quantities, and phone numbers.
