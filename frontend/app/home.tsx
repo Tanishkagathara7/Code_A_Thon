@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
+  Image,
   Platform,
   RefreshControl,
   AppState,
