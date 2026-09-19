@@ -8,6 +8,7 @@ import {
   Printer,
   Share2,
   Trash2,
+  Edit2,
   CheckCircle2,
   AlertCircle,
   FileText,
@@ -176,11 +177,19 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+          <Link
+            href={`/items/${id}/edit`}
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-semibold shadow-xs transition-colors cursor-pointer flex-1 sm:flex-none"
+          >
+            <Edit2 className="w-3.5 h-3.5" />
+            <span>Edit Bill</span>
+          </Link>
+
           <button
             type="button"
             onClick={handleShareWhatsApp}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer flex-1 sm:flex-none"
           >
             <Share2 className="w-3.5 h-3.5" />
             <span>Share via WhatsApp</span>
@@ -189,7 +198,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
           <button
             type="button"
             onClick={handlePrint}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer flex-1 sm:flex-none"
           >
             <Printer className="w-3.5 h-3.5 text-emerald-400" />
             <span>Print A4 Invoice</span>
@@ -198,7 +207,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
           <button
             type="button"
             onClick={handleDelete}
-            className="p-2 rounded-xl border border-zinc-200 bg-white text-zinc-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+            className="p-2 rounded-xl border border-zinc-200 bg-white text-zinc-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
             title="Delete Invoice"
           >
             <Trash2 className="w-4 h-4" />
@@ -209,12 +218,12 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
       {/* ========================================================
           A4 PRINTABLE TAX INVOICE CANVAS
          ======================================================== */}
-      <div className="printable-invoice-card bg-white rounded-2xl border border-zinc-200 shadow-lg p-8 sm:p-12 print:p-2 print:border-none print:shadow-none print:m-0 space-y-5 text-zinc-900 font-sans">
+      <div className="printable-invoice-card bg-white rounded-2xl border border-zinc-200 shadow-lg p-4 sm:p-8 md:p-12 print:p-2 print:border-none print:shadow-none print:m-0 space-y-5 text-zinc-900 font-sans">
         {/* Invoice Top Header */}
-        <div className="flex justify-between items-start border-b-2 border-zinc-900 pb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 border-b-2 border-zinc-900 pb-5 sm:pb-6">
           <div className="space-y-1 max-w-md">
             <div>
-              <h2 className="text-2xl font-black tracking-tight text-zinc-950 uppercase">
+              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-zinc-950 uppercase">
                 {business.name}
               </h2>
             </div>
@@ -229,7 +238,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
             </p>
           </div>
 
-          <div className="text-right space-y-1.5">
+          <div className="text-left sm:text-right space-y-1.5">
             <div className="inline-block px-3 py-1 bg-zinc-950 text-white text-xs font-mono font-black uppercase tracking-wider rounded">
               TAX INVOICE
             </div>
@@ -246,7 +255,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
         </div>
 
         {/* Bill To & Dispatch Section */}
-        <div className="grid grid-cols-2 gap-6 bg-zinc-50/80 p-4 rounded-xl border border-zinc-200/80 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 bg-zinc-50/80 p-4 rounded-xl border border-zinc-200/80 text-xs">
           <div className="space-y-1">
             <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
               DETAILS OF RECEIVER (BILLED TO):
@@ -265,7 +274,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
             </p>
           </div>
 
-          <div className="space-y-1 text-right sm:text-left sm:border-l sm:border-zinc-200 sm:pl-6">
+          <div className="space-y-1 text-left sm:border-l sm:border-zinc-200 sm:pl-6 border-t sm:border-t-0 pt-3 sm:pt-0">
             <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
               DISPATCH & SUPPLY TERMS:
             </span>
@@ -273,17 +282,17 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
               Tax Supply Rule: <strong>{isInterState ? 'Inter-State (IGST 100%)' : 'Intra-State (CGST 50% + SGST 50%)'}</strong>
             </p>
             <p className="text-zinc-700">
-              Payment Terms: <strong>{paymentStatus}</strong>
+              State Code: <strong>{isInterState ? 'Outside Gujarat' : 'Gujarat (24)'}</strong>
             </p>
             <p className="text-zinc-700">
-              Reverse Charge: <strong>NO</strong>
+              Mode of Payment: <strong>{paymentStatus}</strong>
             </p>
           </div>
         </div>
 
         {/* Itemized Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border border-zinc-200">
+          <table className="w-full text-left text-xs border border-zinc-200 min-w-[650px]">
             <thead className="bg-zinc-100 text-zinc-800 font-bold border-b border-zinc-200">
               <tr>
                 <th className="px-3 py-2 text-center w-10 border-r border-zinc-200">#</th>
@@ -411,7 +420,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
         </div>
 
         {/* Invoice Footer & Signatory */}
-        <div className="pt-4 border-t border-zinc-200 flex justify-between items-end text-xs break-inside-avoid">
+        <div className="pt-4 border-t border-zinc-200 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 text-xs break-inside-avoid">
           <div className="space-y-1">
             <p className="text-zinc-500 font-medium">Customer Acknowledgment Signature</p>
             <div className="h-8 border-b border-dashed border-zinc-400 w-44" />

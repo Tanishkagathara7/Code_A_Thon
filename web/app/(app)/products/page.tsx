@@ -488,7 +488,102 @@ export default function ProductsPage() {
 
       {/* Products Table */}
       <div className="rounded-2xl bg-white border border-zinc-100 shadow-[0_1px_3px_rgba(0,0,0,0.03)] overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile Cards Feed (<md) */}
+        <div className="block md:hidden divide-y divide-zinc-100">
+          {loading ? (
+            <div className="p-8 text-center text-zinc-400">
+              <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-zinc-400" />
+              <span className="text-xs">Loading products...</span>
+            </div>
+          ) : products.length === 0 ? (
+            <div className="p-8 text-center text-zinc-400">
+              <Package className="w-8 h-8 mx-auto mb-2 text-zinc-300" />
+              <p className="font-bold text-zinc-700 text-sm">No products found</p>
+              <p className="text-xs text-zinc-400 mt-1">Try adjusting your search or add a new product.</p>
+            </div>
+          ) : (
+            products.map((p) => {
+              const isLow = p.trackInventory && p.currentStock > 0 && p.currentStock <= (p.minStockAlert || 5);
+              const isOut = p.trackInventory && p.currentStock <= 0;
+
+              return (
+                <div key={p.id || p._id} className="p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-bold text-zinc-900 text-sm truncate">{p.name}</h3>
+                      <div className="flex flex-wrap items-center gap-1.5 mt-0.5 text-[11px] text-zinc-500">
+                        <span>{p.category || 'General'}</span>
+                        {p.sku && <span>• SKU: <strong className="font-mono">{p.sku}</strong></span>}
+                        {p.hsnCode && <span>• HSN: <strong className="font-mono">{p.hsnCode}</strong></span>}
+                      </div>
+                    </div>
+                    {isOut ? (
+                      <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                        Out of Stock
+                      </span>
+                    ) : isLow ? (
+                      <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                        Low Stock ({p.currentStock})
+                      </span>
+                    ) : (
+                      <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        In Stock ({p.currentStock})
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between bg-zinc-50 p-2.5 rounded-xl text-xs">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-zinc-400 block">Selling Price</span>
+                      <span className="font-black text-sm text-zinc-900">
+                        ₹{Number(p.sellingPrice).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] uppercase font-bold text-zinc-400 block">GST Rate</span>
+                      <span className="inline-flex items-center gap-1 font-bold text-xs text-indigo-700">
+                        {p.gstRate}% {p.gstApplicability === 'exempt' ? '(Exempt)' : ''}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-1">
+                    <button
+                      onClick={() => handleOpenAdjust(p)}
+                      className="flex-1 py-2 text-xs font-bold rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 transition-colors text-center"
+                    >
+                      Adjust Stock
+                    </button>
+                    <button
+                      onClick={() => handleOpenEdit(p)}
+                      className="p-2 rounded-xl text-zinc-600 hover:text-indigo-600 hover:bg-indigo-50 border border-zinc-200 transition-colors"
+                      title="Edit Product"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleOpenHistory(p)}
+                      className="p-2 rounded-xl text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 border border-zinc-200 transition-colors"
+                      title="Stock History"
+                    >
+                      <History className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProduct(p)}
+                      className="p-2 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-rose-50 border border-zinc-200 transition-colors"
+                      title="Delete Product"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Desktop Table (>=md) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="bg-zinc-50/70 border-b border-zinc-100 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">

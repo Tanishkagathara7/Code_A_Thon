@@ -18,6 +18,7 @@ import {
   Filter,
   Flame,
   Check,
+  Edit2,
 } from 'lucide-react';
 import { analyticsApi, itemsApi } from '@/lib/api/domain';
 import { AnalyticsOverviewData, HackathonItem } from '@/lib/types';
@@ -313,7 +314,70 @@ export default function DashboardPage() {
             </Link>
           </div>
 
-          <div className="flex-1 overflow-x-auto">
+          {/* Mobile Card Feed (<md) */}
+          <div className="block md:hidden divide-y divide-[#E6E9F0]">
+            {recentItems.length === 0 ? (
+              <div className="p-6 text-center text-[#68728A] text-xs">
+                No invoices recorded yet. Click &ldquo;Create New Bill&rdquo; to generate your first GST bill.
+              </div>
+            ) : (
+              recentItems.slice(0, 5).map((row: any, idx: number) => {
+                const id = row.id || row._id || `inv-${idx}`;
+                const attrs = row.attributes || {};
+                const invoiceNo = attrs.invoiceNo || (row.title.includes('•') ? row.title.split('•')[0].trim() : (row.title || `INV-${String(idx + 1).padStart(4, '0')}`));
+                const partyName = attrs.party?.name || (row.title.includes('•') ? row.title.split('•')[1].trim() : row.title || 'Walk-in Customer');
+                const state = attrs.party?.state || (row.category && row.category !== 'Standard' ? row.category : '—');
+                const grandTotal = attrs.grandTotal ? Number(attrs.grandTotal) : 0;
+                const paymentStatus = attrs.paymentStatus || (row.status === 'completed' ? 'Paid in Full' : 'Unpaid / Due');
+                const isPaid = paymentStatus === 'Paid in Full';
+                const createdAt = formatDate(row.createdAt);
+
+                return (
+                  <div key={id} className="p-4 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-xs font-bold text-zinc-950">{invoiceNo}</span>
+                      <span
+                        className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          isPaid ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+                        }`}
+                      >
+                        {paymentStatus}
+                      </span>
+                    </div>
+
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="font-bold text-sm text-[#101226]">{partyName}</p>
+                        <p className="text-[11px] text-[#68728A]">{state} • {createdAt}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-black text-sm text-zinc-950">₹{Number(grandTotal).toLocaleString('en-IN')}</p>
+                      </div>
+                    </div>
+
+                    <div className="pt-1 flex items-center gap-2">
+                      <Link
+                        href={`/items/${row.id || id}/edit`}
+                        className="inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-bold transition-colors"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                        <span>Edit</span>
+                      </Link>
+                      <Link
+                        href={`/items/${row.id || id}`}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-900 text-xs font-bold transition-colors flex-1 justify-center"
+                      >
+                        <span>Print / View Invoice</span>
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Desktop Table (>=md) */}
+          <div className="hidden md:block flex-1 overflow-x-auto">
             <table className="w-full text-left text-xs min-w-[700px]">
               <thead className="bg-[#F8F9FC] text-[11px] font-bold text-[#68728A] border-b border-[#E6E9F0]">
                 <tr>
@@ -398,12 +462,22 @@ export default function DashboardPage() {
                         </td>
 
                         <td className="px-5 py-3.5 text-right">
-                          <Link
-                            href={`/items/${row.id || id}`}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-[11px] font-semibold transition-colors"
-                          >
-                            <span>Print / View</span>
-                          </Link>
+                          <div className="flex items-center justify-end gap-1.5">
+                            <Link
+                              href={`/items/${row.id || id}/edit`}
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-[11px] font-semibold transition-colors"
+                              title="Edit Bill"
+                            >
+                              <Edit2 className="w-3 h-3" />
+                              <span>Edit</span>
+                            </Link>
+                            <Link
+                              href={`/items/${row.id || id}`}
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-[11px] font-semibold transition-colors"
+                            >
+                              <span>Print / View</span>
+                            </Link>
+                          </div>
                         </td>
                       </tr>
                     );

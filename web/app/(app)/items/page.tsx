@@ -7,6 +7,7 @@ import {
   Plus,
   Trash2,
   Edit,
+  Edit2,
   ExternalLink,
   ChevronLeft,
   ChevronRight,
@@ -183,7 +184,91 @@ export default function ItemsPage() {
 
       {/* Invoices Table Card */}
       <div className="bg-white rounded-2xl border border-zinc-200/80 shadow-sm overflow-hidden flex flex-col">
-        <div className="overflow-x-auto">
+        {/* Mobile Invoices Card Feed (<md) */}
+        <div className="block md:hidden divide-y divide-zinc-100">
+          {loading ? (
+            <div className="p-8 text-center text-xs text-zinc-400">Loading invoice ledger...</div>
+          ) : items.length === 0 ? (
+            <div className="p-8 text-center space-y-3">
+              <Layers className="w-8 h-8 text-zinc-300 mx-auto" />
+              <p className="text-sm font-bold text-zinc-800">No invoices found</p>
+              <Link
+                href="/items/new"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs font-semibold"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Create Bill</span>
+              </Link>
+            </div>
+          ) : (
+            items.map((item, index) => {
+              const itemId = item.id || item._id || `item-${index}`;
+              const attrs = (item.attributes || {}) as any;
+              const invoiceNo = attrs.invoiceNo || (item.title.includes('•') ? item.title.split('•')[0].trim() : item.title || '—');
+              const partyName = attrs.party?.name || (item.title.includes('•') ? item.title.split('•')[1].trim() : item.title);
+              const state = attrs.party?.state || (item.category && item.category !== 'Standard' ? item.category : '—');
+              const grandTotal = attrs.grandTotal ? Number(attrs.grandTotal) : 0;
+              const paymentStatus = attrs.paymentStatus || (item.status === 'completed' ? 'Paid in Full' : 'Unpaid / Due');
+              const isPaid = paymentStatus === 'Paid in Full';
+
+              return (
+                <div key={itemId} className="p-4 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold text-zinc-950">{invoiceNo}</span>
+                    <span
+                      className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        isPaid ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-amber-50 text-amber-800 border border-amber-200'
+                      }`}
+                    >
+                      {paymentStatus}
+                    </span>
+                  </div>
+
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <Link href={`/items/${itemId}`} className="font-bold text-sm text-zinc-900 hover:text-indigo-600 block truncate">
+                        {partyName}
+                      </Link>
+                      <p className="text-[11px] text-zinc-500 mt-0.5">
+                        {state} • {formatDate(item.createdAt)}
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="font-black text-sm text-zinc-950">₹{Number(grandTotal).toLocaleString('en-IN')}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-1">
+                    <Link
+                      href={`/items/${itemId}/edit`}
+                      className="py-2 px-3 text-xs font-bold rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 transition-colors text-center inline-flex items-center justify-center gap-1"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                      <span>Edit</span>
+                    </Link>
+                    <Link
+                      href={`/items/${itemId}`}
+                      className="flex-1 py-2 text-xs font-bold rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 transition-colors text-center"
+                    >
+                      Print / View Invoice
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(itemId)}
+                      className="p-2 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-rose-50 border border-zinc-200 transition-colors"
+                      title="Delete Invoice"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Desktop Table (>=md) */}
+        <div className="hidden md:block overflow-x-auto">
           {loading ? (
             <div className="p-16 text-center text-sm text-zinc-400">Loading invoice ledger...</div>
           ) : items.length === 0 ? (
@@ -274,6 +359,14 @@ export default function ItemsPage() {
 
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
+                          <Link
+                            href={`/items/${itemId}/edit`}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-semibold transition-colors"
+                            title="Edit Invoice"
+                          >
+                            <Edit2 className="w-3 h-3" />
+                            <span>Edit</span>
+                          </Link>
                           <Link
                             href={`/items/${itemId}`}
                             className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-semibold transition-colors"

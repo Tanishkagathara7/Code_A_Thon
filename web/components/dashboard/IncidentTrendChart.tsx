@@ -145,9 +145,9 @@ export const IncidentTrendChart: React.FC<IncidentTrendChartProps> = ({
   }, '');
 
   return (
-    <div className="bg-white rounded-2xl border border-[#E6E9F0] p-6 shadow-xs flex flex-col justify-between">
+    <div className="bg-white rounded-2xl border border-[#E6E9F0] p-4 sm:p-6 shadow-xs flex flex-col justify-between">
       {/* Top Header Row */}
-      <div className="flex items-start justify-between gap-4 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -161,7 +161,7 @@ export const IncidentTrendChart: React.FC<IncidentTrendChartProps> = ({
         </div>
 
         {/* 7D, 14D, 30D toggles */}
-        <div className="flex items-center p-1 bg-[#F8F9FC] border border-[#E6E9F0] rounded-xl text-xs font-semibold">
+        <div className="flex items-center p-1 bg-[#F8F9FC] border border-[#E6E9F0] rounded-xl text-xs font-semibold self-start sm:self-auto">
           {(['7D', '14D', '30D'] as const).map((item) => (
             <button
               key={item}
@@ -227,7 +227,7 @@ export const IncidentTrendChart: React.FC<IncidentTrendChartProps> = ({
       </div>
 
       {/* Legend Row */}
-      <div className="flex items-center justify-center gap-6 pb-2 text-xs">
+      <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 pb-2 text-xs">
         <div className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-[#8B5CF6]" />
           <span className="text-[#68728A] font-medium text-xs">Total Invoices</span>

@@ -20,6 +20,7 @@ import {
   CheckCircle2,
   AlertCircle,
   TrendingUp,
+  Edit2,
 } from 'lucide-react';
 import { customersApi } from '@/lib/api/domain';
 import { CustomerProfileData } from '@/lib/types';
@@ -230,39 +231,16 @@ export default function CustomerProfilePage({ params }: { params: Promise<{ id: 
               </Link>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs divide-y divide-zinc-100 min-w-[650px]">
-                <thead>
-                  <tr className="text-[10.5px] font-bold text-zinc-400 uppercase tracking-wider pb-2">
-                    <th className="pb-2 font-semibold">Invoice No</th>
-                    <th className="pb-2 font-semibold">Date</th>
-                    <th className="pb-2 font-semibold">Tax Type</th>
-                    <th className="pb-2 font-semibold">Status</th>
-                    <th className="pb-2 text-right font-semibold">Grand Total</th>
-                    <th className="pb-2 text-right font-semibold">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-100">
-                  {invoices.map((inv) => (
-                    <tr key={inv.id} className="hover:bg-zinc-50/60 transition-colors">
-                      <td className="py-3 font-bold font-mono text-zinc-900">
-                        {inv.invoiceNo}
-                      </td>
-                      <td className="py-3 text-zinc-500">
-                        {new Date(inv.date).toLocaleDateString('en-IN', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
-                      </td>
-                      <td className="py-3">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-100 text-zinc-700">
-                          {inv.isInterState ? 'Inter-State (IGST)' : 'Intra-State (CGST+SGST)'}
-                        </span>
-                      </td>
-                      <td className="py-3">
+            <>
+              {/* Mobile Invoices Card List */}
+              <div className="block md:hidden divide-y divide-zinc-100">
+                {invoices.map((inv) => (
+                  <div key={inv.id} className="py-3.5 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-xs text-zinc-900">{inv.invoiceNo}</span>
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          className={`text-[9.5px] font-bold px-1.5 py-0.5 rounded-full ${
                             inv.status === 'completed'
                               ? 'bg-emerald-50 text-emerald-700'
                               : inv.status === 'in_progress'
@@ -272,24 +250,117 @@ export default function CustomerProfilePage({ params }: { params: Promise<{ id: 
                         >
                           {inv.paymentStatus}
                         </span>
-                      </td>
-                      <td className="py-3 text-right font-extrabold text-zinc-900">
+                      </div>
+                      <span className="font-extrabold text-xs text-zinc-900">
                         ₹{Number(inv.grandTotal).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                      </td>
-                      <td className="py-3 text-right">
-                        <Link
-                          href={`/items/${inv.id}`}
-                          className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 hover:text-indigo-800"
-                        >
-                          <span>View PDF</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </Link>
-                      </td>
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] text-zinc-500">
+                      <span>
+                        {new Date(inv.date).toLocaleDateString('en-IN', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </span>
+                      <span className="text-[10px] font-medium text-zinc-400">
+                        {inv.isInterState ? 'IGST' : 'CGST+SGST'}
+                      </span>
+                    </div>
+
+                    <div className="pt-1 flex items-center justify-end gap-2">
+                      <Link
+                        href={`/items/${inv.id}/edit`}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-bold text-xs transition-colors"
+                      >
+                        <Edit2 className="w-3 h-3" />
+                        <span>Edit</span>
+                      </Link>
+                      <Link
+                        href={`/items/${inv.id}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-indigo-600 font-bold text-xs transition-colors border border-zinc-200"
+                      >
+                        <span>View Invoice</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Invoices Table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left text-xs divide-y divide-zinc-100 min-w-[650px]">
+                  <thead>
+                    <tr className="text-[10.5px] font-bold text-zinc-400 uppercase tracking-wider pb-2">
+                      <th className="pb-2 font-semibold">Invoice No</th>
+                      <th className="pb-2 font-semibold">Date</th>
+                      <th className="pb-2 font-semibold">Tax Type</th>
+                      <th className="pb-2 font-semibold">Status</th>
+                      <th className="pb-2 text-right font-semibold">Grand Total</th>
+                      <th className="pb-2 text-right font-semibold">Action</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-100">
+                    {invoices.map((inv) => (
+                      <tr key={inv.id} className="hover:bg-zinc-50/60 transition-colors">
+                        <td className="py-3 font-bold font-mono text-zinc-900">
+                          {inv.invoiceNo}
+                        </td>
+                        <td className="py-3 text-zinc-500">
+                          {new Date(inv.date).toLocaleDateString('en-IN', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                          })}
+                        </td>
+                        <td className="py-3">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-100 text-zinc-700">
+                            {inv.isInterState ? 'Inter-State (IGST)' : 'Intra-State (CGST+SGST)'}
+                          </span>
+                        </td>
+                        <td className="py-3">
+                          <span
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                              inv.status === 'completed'
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : inv.status === 'in_progress'
+                                ? 'bg-blue-50 text-blue-700'
+                                : 'bg-amber-50 text-amber-700'
+                            }`}
+                          >
+                            {inv.paymentStatus}
+                          </span>
+                        </td>
+                        <td className="py-3 text-right font-extrabold text-zinc-900">
+                          ₹{Number(inv.grandTotal).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                        </td>
+                        <td className="py-3 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Link
+                              href={`/items/${inv.id}/edit`}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-[11px] font-bold transition-colors"
+                              title="Edit Bill"
+                            >
+                              <Edit2 className="w-2.5 h-2.5" />
+                              <span>Edit</span>
+                            </Link>
+                            <Link
+                              href={`/items/${inv.id}`}
+                              className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 hover:text-indigo-800"
+                            >
+                              <span>View PDF</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </Link>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
       </div>

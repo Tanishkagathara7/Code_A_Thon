@@ -69,7 +69,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-[#E6E9F0] p-6 shadow-xs flex flex-col justify-between relative overflow-hidden h-full">
+    <div className="bg-white rounded-2xl border border-[#E6E9F0] p-4 sm:p-6 shadow-xs flex flex-col justify-between relative overflow-hidden h-full">
       <div className="space-y-4 relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between">

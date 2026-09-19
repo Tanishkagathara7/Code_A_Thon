@@ -37,22 +37,22 @@ export const Topbar: React.FC<TopbarProps> = ({
   const breadcrumb = getBreadcrumb();
 
   return (
-    <header className="h-16 bg-white border-b border-[#E6E9F0] px-6 flex items-center justify-between sticky top-0 z-30 select-none">
-      <div className="flex items-center gap-3 min-w-0">
+    <header className="h-16 bg-white border-b border-[#E6E9F0] px-3 sm:px-6 flex items-center justify-between sticky top-0 z-30 select-none">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
         {/* Mobile Hamburger Button */}
         <button
           onClick={onMenuClick}
-          className="lg:hidden p-2 rounded-xl text-[#68728A] hover:text-[#101226] hover:bg-[#F8F9FC] transition-colors cursor-pointer"
+          className="lg:hidden p-2 rounded-xl text-[#68728A] hover:text-[#101226] hover:bg-[#F8F9FC] transition-colors cursor-pointer shrink-0"
           aria-label="Open workspace navigation"
         >
           <Menu className="w-5 h-5" />
         </button>
 
         {/* Operational Breadcrumbs */}
-        <div className="flex items-center gap-2 text-xs">
-          <span className="font-medium text-[#68728A]">{breadcrumb.section}</span>
-          <span className="text-[#68728A]">/</span>
-          <h1 className="font-bold text-[#101226] text-sm tracking-tight">
+        <div className="flex items-center gap-1.5 sm:gap-2 text-xs truncate">
+          <span className="hidden sm:inline font-medium text-[#68728A]">{breadcrumb.section}</span>
+          <span className="hidden sm:inline text-[#68728A]">/</span>
+          <h1 className="font-bold text-[#101226] text-xs sm:text-sm tracking-tight truncate">
             {breadcrumb.title}
           </h1>
         </div>
@@ -74,7 +74,7 @@ export const Topbar: React.FC<TopbarProps> = ({
         </button>
       </div>
 
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
         {/* Mobile Search Button */}
         <button
           onClick={onOpenCommandPalette}
@@ -90,10 +90,11 @@ export const Topbar: React.FC<TopbarProps> = ({
         {/* New Bill Primary Action */}
         <Link
           href="/items/new"
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#101226] hover:bg-[#1f2445] text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
+          className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl bg-[#101226] hover:bg-[#1f2445] text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
         >
           <Plus className="w-3.5 h-3.5" />
-          <span>Create Bill</span>
+          <span className="hidden sm:inline">Create Bill</span>
+          <span className="sm:hidden">Bill</span>
         </Link>
       </div>
     </header>

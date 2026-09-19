@@ -68,7 +68,7 @@ export default function WorkspaceShell({ children }: { children: React.ReactNode
           onMenuClick={() => setSidebarOpen(true)}
           onOpenCommandPalette={() => setCommandPaletteOpen(true)}
         />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto min-w-0">
+        <main className="flex-1 overflow-y-auto p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto min-w-0">
           {children}
         </main>
 
