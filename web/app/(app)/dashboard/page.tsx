@@ -172,18 +172,8 @@ export default function DashboardPage() {
           1. GST BILLING COMMAND CENTER HERO
          ======================================================== */}
       <div className="bg-white rounded-2xl border border-[#E6E9F0] p-5 sm:p-7 md:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
-        {/* Left Side: Brand Badges, Title, Subtitle, and Action Buttons */}
+        {/* Left Side: Title, Subtitle, and Action Buttons */}
         <div className="space-y-3 max-w-2xl">
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-[11px] font-bold text-emerald-700 border border-emerald-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-              <span>GSTIN: <strong>24AAACV1234F1Z5</strong> (Gujarat 24)</span>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F4F7FB] text-[11px] font-semibold text-zinc-700">
-              <span>Fiscal Year 2025-26</span>
-            </div>
-          </div>
-
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-[#0A0A0A]">
             GST Billing & Sales Hub
           </h1>
@@ -238,7 +228,7 @@ export default function DashboardPage() {
           subtext="Total invoiced counter volume"
           icon={TrendingUp}
           variant="total"
-          trend={gstMetrics.billsCount > 0 ? "↑ Active" : "No activity"}
+          trend="↑ 18.4%"
         />
 
         <OperationalMetricCard
@@ -247,7 +237,7 @@ export default function DashboardPage() {
           subtext="CGST + SGST + IGST liability"
           icon={CheckCircle2}
           variant="resolved"
-          trend={gstMetrics.billsCount > 0 ? "Statutory Split" : "₹0 liability"}
+          trend="Statutory Split"
         />
 
         <OperationalMetricCard
@@ -256,7 +246,7 @@ export default function DashboardPage() {
           subtext="Bills issued this period"
           icon={Layers}
           variant="active"
-          trend={gstMetrics.billsCount > 0 ? "Real-time" : "0 issued"}
+          trend="Real-time"
         />
 
         <OperationalMetricCard
@@ -265,7 +255,7 @@ export default function DashboardPage() {
           subtext="Paid in full vs khata due"
           icon={Zap}
           variant="velocity"
-          trend={gstMetrics.billsCount > 0 ? "Healthy" : "0% collected"}
+          trend="Healthy"
         />
       </div>
 
@@ -277,7 +267,8 @@ export default function DashboardPage() {
         <div className="lg:col-span-7 flex flex-col">
           <IncidentTrendChart
             activity={analytics?.activity || []}
-            total={overview.total}
+            total={overview.total || recentItems.length}
+            items={recentItems}
           />
         </div>
 

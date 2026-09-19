@@ -213,10 +213,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
         {/* Invoice Top Header */}
         <div className="flex justify-between items-start border-b-2 border-zinc-900 pb-6">
           <div className="space-y-1 max-w-md">
-            <div className="flex items-center gap-2">
-              <span className="w-6 h-6 rounded-md bg-zinc-950 text-white text-xs font-black flex items-center justify-center">
-                ₹
-              </span>
+            <div>
               <h2 className="text-2xl font-black tracking-tight text-zinc-950 uppercase">
                 {business.name}
               </h2>

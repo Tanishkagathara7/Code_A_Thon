@@ -371,180 +371,216 @@ export default function CustomersPage() {
       {/* MODAL: ADD / EDIT CUSTOMER */}
       {/* ========================================== */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-zinc-100 animate-in fade-in zoom-in-95 duration-150">
-            <div className="sticky top-0 bg-white/95 backdrop-blur-sm px-6 py-4 border-b border-zinc-100 flex items-center justify-between z-10">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-800">
-                  <Users className="w-4 h-4" />
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-zinc-200/80 overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto">
+            {/* Modal Header */}
+            <div className="px-6 py-5 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-zinc-900 text-white flex items-center justify-center shadow-xs">
+                  <Users className="w-5 h-5 text-emerald-400" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-zinc-900 text-base">
+                  <h3 className="font-bold text-zinc-950 text-base sm:text-lg tracking-tight">
                     {editingCustomer ? 'Edit Customer Party' : 'Add New Customer Party'}
                   </h3>
-                  <p className="text-[11px] text-zinc-400">
+                  <p className="text-xs text-zinc-500">
                     Maintain GSTIN, contact details, and state place-of-supply.
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100"
+                className="w-8 h-8 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-200/60 flex items-center justify-center transition-colors"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveCustomer} className="p-6 space-y-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-zinc-700 mb-1">
-                    Party / Contact Person Name <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Rajesh Kumar or Rajesh Traders"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900"
-                  />
+            {/* Modal Body */}
+            <form onSubmit={handleSaveCustomer} className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+              {/* Section 1: Basic Identity */}
+              <div className="bg-zinc-50/60 rounded-xl p-4 border border-zinc-200/70 space-y-3.5">
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-zinc-900 text-white text-[10px] font-black flex items-center justify-center">1</span>
+                  <span className="text-xs font-bold text-zinc-900 tracking-wide uppercase">Party Details</span>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-zinc-700 mb-1">
-                    Mobile Phone <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    placeholder="e.g. 9825123456"
-                    value={formData.mobile}
-                    onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-mono"
-                  />
-                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
+                      Party / Contact Person Name <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Rajesh Kumar or Rajesh Traders"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 shadow-xs font-medium"
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-zinc-700 mb-1">Email Address</label>
-                  <input
-                    type="email"
-                    placeholder="e.g. rajesh@traders.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900"
-                  />
-                </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
+                      Mobile Phone <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="e.g. 9825123456"
+                      value={formData.mobile}
+                      onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                      className="w-full px-3 py-2 text-xs rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-mono shadow-xs"
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-zinc-700 mb-1">Customer Category</label>
-                  <select
-                    value={formData.customerType}
-                    onChange={(e) => setFormData({ ...formData, customerType: e.target.value as any })}
-                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-medium cursor-pointer"
-                  >
-                    <option value="business">Registered Business (B2B)</option>
-                    <option value="individual">Retail Customer (B2C)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-zinc-700 mb-1">
-                    GSTIN (15-character statutory)
-                  </label>
-                  <input
-                    type="text"
-                    maxLength={15}
-                    placeholder="e.g. 24AABCR1234F1Z9"
-                    value={formData.gstin}
-                    onChange={(e) => setFormData({ ...formData, gstin: e.target.value.toUpperCase() })}
-                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-mono uppercase"
-                  />
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-zinc-700 mb-1">Business / Trade Name</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Rajesh Commercial Trading Private Limited"
-                    value={formData.businessName}
-                    onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900"
-                  />
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-zinc-700 mb-1">Billing Street Address</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Shop 12, APMC Market Yard, Ring Road"
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-zinc-700 mb-1">City</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Rajkot"
-                    value={formData.city}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-zinc-700 mb-1">
-                    Operating State (Place of Supply) <span className="text-rose-500">*</span>
-                  </label>
-                  <select
-                    value={formData.state}
-                    onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-medium cursor-pointer"
-                  >
-                    {INDIAN_STATES.map((s) => (
-                      <option key={s.code} value={s.name}>{s.name} ({s.code})</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-zinc-700 mb-1">Postal Code (PIN)</label>
-                  <input
-                    type="text"
-                    maxLength={6}
-                    placeholder="e.g. 360003"
-                    value={formData.pincode}
-                    onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-mono"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-zinc-700 mb-1">Notes / Ledger Remarks</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 15-day credit limit approved"
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900"
-                  />
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-700 mb-1.5">Email Address</label>
+                    <input
+                      type="email"
+                      placeholder="e.g. rajesh@traders.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full px-3 py-2 text-xs rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 shadow-xs"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="border-t border-zinc-100 pt-4 flex items-center justify-end gap-3">
+              {/* Section 2: Statutory GST Profile */}
+              <div className="bg-zinc-50/60 rounded-xl p-4 border border-zinc-200/70 space-y-3.5">
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-zinc-900 text-white text-[10px] font-black flex items-center justify-center">2</span>
+                  <span className="text-xs font-bold text-zinc-900 tracking-wide uppercase">GST & Business Profile</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-700 mb-1.5">Customer Category</label>
+                    <select
+                      value={formData.customerType}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          customerType: e.target.value as 'business' | 'individual',
+                        })
+                      }
+                      className="w-full px-3 py-2 text-xs rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 shadow-xs font-medium cursor-pointer"
+                    >
+                      <option value="business">Registered Business (B2B)</option>
+                      <option value="individual">Retail Customer (B2C)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
+                      GSTIN (15-character statutory)
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={15}
+                      placeholder="e.g. 24AABCR1234F1Z9"
+                      value={formData.gstin}
+                      onChange={(e) => setFormData({ ...formData, gstin: e.target.value.toUpperCase() })}
+                      className="w-full px-3 py-2 text-xs rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-mono uppercase shadow-xs font-bold text-emerald-800"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-semibold text-zinc-700 mb-1.5">Business / Trade Name</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Rajesh Commercial Trading Private Limited"
+                      value={formData.businessName}
+                      onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
+                      className="w-full px-3.5 py-2 text-xs rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 shadow-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Billing Address & Location */}
+              <div className="bg-zinc-50/60 rounded-xl p-4 border border-zinc-200/70 space-y-3.5">
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-zinc-900 text-white text-[10px] font-black flex items-center justify-center">3</span>
+                  <span className="text-xs font-bold text-zinc-900 tracking-wide uppercase">Address & Place of Supply</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-semibold text-zinc-700 mb-1.5">Billing Street Address</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Shop 12, APMC Market Yard, Ring Road"
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                      className="w-full px-3.5 py-2 text-xs rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 shadow-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-700 mb-1.5">City</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Rajkot"
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      className="w-full px-3 py-2 text-xs rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 shadow-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
+                      Operating State (Place of Supply) <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      value={formData.state}
+                      onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                      className="w-full px-3 py-2 text-xs rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 shadow-xs font-medium cursor-pointer"
+                    >
+                      {INDIAN_STATES.map((s) => (
+                        <option key={s.code} value={s.name}>{s.name} ({s.code})</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-700 mb-1.5">Postal Code (PIN)</label>
+                    <input
+                      type="text"
+                      maxLength={6}
+                      placeholder="e.g. 360003"
+                      value={formData.pincode}
+                      onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
+                      className="w-full px-3 py-2 text-xs rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-mono shadow-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-700 mb-1.5">Notes / Ledger Remarks</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 15-day credit limit approved"
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                      className="w-full px-3 py-2 text-xs rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 shadow-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Actions */}
+              <div className="pt-2 flex items-center justify-end gap-3 border-t border-zinc-100">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-700"
+                  className="px-4 py-2.5 text-xs font-semibold rounded-xl border border-zinc-200 hover:bg-zinc-100 text-zinc-700 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 text-xs font-bold rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white transition-all shadow-xs"
+                  className="px-6 py-2.5 text-xs font-bold rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white transition-all shadow-sm cursor-pointer"
                 >
                   {editingCustomer ? 'Update Customer' : 'Save Customer'}
                 </button>

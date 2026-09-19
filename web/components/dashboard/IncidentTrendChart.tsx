@@ -1,55 +1,137 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ActivityMetric } from '@/lib/types';
+import { ActivityMetric, HackathonItem } from '@/lib/types';
 import { Calendar, Gauge, Clock } from 'lucide-react';
 
 interface IncidentTrendChartProps {
   activity?: ActivityMetric[];
   total?: number;
+  items?: HackathonItem[];
 }
 
 export const IncidentTrendChart: React.FC<IncidentTrendChartProps> = ({
-  activity = [],
   total = 0,
+  items = [],
 }) => {
-  const [range, setRange] = useState<'24H' | '7D' | '30D'>('24H');
+  const [range, setRange] = useState<'7D' | '30D' | '14D'>('7D');
 
-  // Hardcoded or dynamically calibrated time ticks matching reference screenshot
-  const timeLabels = ['12 AM', '3 AM', '6 AM', '9 AM', '12 PM', '3 PM', '6 PM', '9 PM'];
+  // Compute total invoices from items or total prop
+  const effectiveItems = items;
+  const windowTotal = effectiveItems.length > 0 ? effectiveItems.length : total;
 
-  // Real calculations
-  const windowTotal = total;
-  const avgRatePerHour = total > 0 ? (total / 24).toFixed(1) : '0';
-  const peakHourIncidents = activity.length > 0 ? Math.max(...activity.map((a) => a.count), 0) : 0;
+  // Generate date slots based on selected range
+  const { barData, maxVal, yTicks } = React.useMemo(() => {
+    const now = new Date();
+    const slots: { label: string; key: string; isToday: boolean }[] = [];
 
-  // Bar data dynamically generated from activity or clean zeros
-  const hasData = total > 0 && activity.length > 0;
+    const daysCount = range === '30D' ? 14 : range === '14D' ? 14 : 7;
 
-  // Normalized bars for 17 slots
-  const barData = Array.from({ length: 17 }).map((_, i) => {
-    if (!hasData) return { new: 0, active: 0, resolved: 0 };
-    const act = activity[i % activity.length];
-    const count = act ? act.count : 0;
-    return {
-      new: Math.round(count * 0.4),
-      active: Math.round(count * 0.35),
-      resolved: Math.round(count * 0.25),
+    const formatLocalKey = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
     };
-  });
 
-  const maxVal = Math.max(...barData.map((b) => b.new + b.active + b.resolved), 1);
+    for (let i = daysCount - 1; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const key = formatLocalKey(d);
+      const label = d.toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+      });
+      slots.push({ label, key, isToday: i === 0 });
+    }
 
-  // Line trend coordinate points
-  const linePoints = barData.map((b, i) => {
-    const x = 50 + i * 35;
-    const count = b.new + b.active + b.resolved;
-    const y = hasData ? 132 - (count / maxVal) * 50 : 132;
-    return { x, y };
-  });
+    // Group items by date
+    const itemsByDate: Record<string, { total: number; paid: number; due: number }> = {};
+    slots.forEach((s) => {
+      itemsByDate[s.key] = { total: 0, paid: 0, due: 0 };
+    });
+
+    effectiveItems.forEach((item) => {
+      let itemDateKey = '';
+      if (item.createdAt) {
+        try {
+          const itemDate = new Date(item.createdAt);
+          if (!isNaN(itemDate.getTime())) {
+            itemDateKey = formatLocalKey(itemDate);
+          }
+        } catch {
+          // ignore
+        }
+      }
+      if (!itemDateKey || !itemsByDate[itemDateKey]) {
+        // If created today or out of range, attribute to today
+        itemDateKey = slots[slots.length - 1].key;
+      }
+
+      if (itemsByDate[itemDateKey]) {
+        itemsByDate[itemDateKey].total += 1;
+        const isPaid =
+          item.status === 'completed' ||
+          (item.attributes as Record<string, unknown>)?.paymentStatus === 'Paid in Full';
+        if (isPaid) {
+          itemsByDate[itemDateKey].paid += 1;
+        } else {
+          itemsByDate[itemDateKey].due += 1;
+        }
+      }
+    });
+
+    const bars = slots.map((s) => {
+      const d = itemsByDate[s.key];
+      const count = d.total;
+      return {
+        label: s.label,
+        key: s.key,
+        due: d.due,
+        paid: d.paid,
+        total: count,
+      };
+    });
+
+    const highestCount = Math.max(...bars.map((b) => b.total), 0);
+    // Determine top tick for Y-axis (e.g. 5 if highest is <= 5, or round up to nearest multiple of 5)
+    const topTick = highestCount <= 4 ? 4 : highestCount <= 8 ? 8 : Math.ceil(highestCount / 5) * 5;
+    const ticks = [
+      topTick,
+      Math.round(topTick * 0.75),
+      Math.round(topTick * 0.5),
+      Math.round(topTick * 0.25),
+      0,
+    ];
+
+    return {
+      barData: bars,
+      maxVal: topTick,
+      yTicks: ticks,
+    };
+  }, [effectiveItems, range]);
+
+  // Statistics
+  const peakDayCount = Math.max(...barData.map((b) => b.total), 0);
+  const avgRatePerDay = (windowTotal / barData.length).toFixed(1);
 
   const svgWidth = 660;
   const svgHeight = 160;
+  const chartBottomY = 135;
+  const chartTopY = 25;
+  const chartHeight = chartBottomY - chartTopY;
+
+  // Calculate X position for each date bar & point
+  const totalSlots = barData.length;
+  const slotWidth = (svgWidth - 90) / (totalSlots - 1);
+
+  // Line trend coordinate points
+  const linePoints = barData.map((b, i) => {
+    const x = 50 + i * slotWidth;
+    const count = b.total;
+    const y = chartBottomY - (count / maxVal) * chartHeight;
+    return { x, y, count };
+  });
 
   // Build smooth path
   const linePath = linePoints.reduce((acc, pt, i, arr) => {
@@ -74,13 +156,13 @@ export const IncidentTrendChart: React.FC<IncidentTrendChartProps> = ({
           </div>
           <div>
             <h3 className="text-sm font-bold text-[#101226]">Billing & Invoicing Activity</h3>
-            <p className="text-xs text-[#68728A]">Real-time invoice generation and counter bill trends</p>
+            <p className="text-xs text-[#68728A]">Date-wise invoice issuance and payment trends</p>
           </div>
         </div>
 
-        {/* 24H, 7D, 30D toggles */}
+        {/* 7D, 14D, 30D toggles */}
         <div className="flex items-center p-1 bg-[#F8F9FC] border border-[#E6E9F0] rounded-xl text-xs font-semibold">
-          {(['24H', '7D', '30D'] as const).map((item) => (
+          {(['7D', '14D', '30D'] as const).map((item) => (
             <button
               key={item}
               onClick={() => setRange(item)}
@@ -123,22 +205,22 @@ export const IncidentTrendChart: React.FC<IncidentTrendChartProps> = ({
               AVERAGE RATE
             </span>
             <span className="text-xs font-bold text-[#101226]">
-              <strong className="text-sm font-black">{avgRatePerHour}</strong> / hour
+              <strong className="text-sm font-black">{avgRatePerDay}</strong> / day
             </span>
           </div>
         </div>
 
-        {/* Peak Hour */}
+        {/* Peak Day */}
         <div className="flex items-center gap-3 p-3 rounded-xl bg-[#F8F9FC] border border-[#E6E9F0]">
           <div className="w-8 h-8 rounded-lg bg-[#DCFCE7] text-[#16B981] flex items-center justify-center shrink-0">
             <Clock className="w-4 h-4" />
           </div>
           <div>
             <span className="text-[10px] font-bold text-[#68728A] uppercase tracking-wider block">
-              PEAK HOUR
+              PEAK DAY
             </span>
             <span className="text-xs font-bold text-[#101226]">
-              <strong className="text-sm font-black">{peakHourIncidents}</strong> bills <span className="text-[10px] text-[#68728A] font-normal">{hasData ? 'Today' : 'No peak data'}</span>
+              <strong className="text-sm font-black">{peakDayCount}</strong> bills <span className="text-[10px] text-[#68728A] font-normal">{windowTotal > 0 ? 'Recorded' : 'No data'}</span>
             </span>
           </div>
         </div>
@@ -148,7 +230,7 @@ export const IncidentTrendChart: React.FC<IncidentTrendChartProps> = ({
       <div className="flex items-center justify-center gap-6 pb-2 text-xs">
         <div className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-[#8B5CF6]" />
-          <span className="text-[#68728A] font-medium text-xs">Tax Invoices</span>
+          <span className="text-[#68728A] font-medium text-xs">Total Invoices</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-[#38BDF8]" />
@@ -161,62 +243,64 @@ export const IncidentTrendChart: React.FC<IncidentTrendChartProps> = ({
       </div>
 
       {/* Chart Visualization */}
-      <div className="relative w-full h-48 select-none">
+      <div className="relative w-full h-52 select-none">
         <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="w-full h-full overflow-visible">
           {/* Y-Axis Gridlines & labels */}
-          {[20, 15, 10, 5, 0].map((val, idx) => {
-            const y = 20 + idx * 28;
+          {yTicks.map((val, idx) => {
+            const y = chartTopY + idx * (chartHeight / (yTicks.length - 1));
             return (
-              <g key={val}>
-                <text x="10" y={y + 3} className="text-[10px] fill-[#68728A] font-sans">
+              <g key={`${val}-${idx}`}>
+                <text x="12" y={y + 3} className="text-[10px] fill-[#68728A] font-sans font-medium">
                   {val}
                 </text>
-                <line x1="28" y1={y} x2={svgWidth} y2={y} stroke="#E6E9F0" strokeWidth="1" />
+                <line x1="32" y1={y} x2={svgWidth} y2={y} stroke="#E6E9F0" strokeWidth="1" />
               </g>
             );
           })}
 
-          {/* Stacked Bars */}
+          {/* Stacked Bars for each Date */}
           {barData.map((bar, i) => {
-            const x = 50 + i * 35;
-            const baseY = 132;
-            const hNew = bar.new * 0.7;
-            const hActive = bar.active * 0.7;
-            const hResolved = bar.resolved * 0.7;
+            const pt = linePoints[i];
+            const x = pt.x - 7;
+            const barWidth = 14;
+            const paidHeight = (bar.paid / maxVal) * chartHeight;
+            const dueHeight = (bar.due / maxVal) * chartHeight;
 
             return (
-              <g key={i}>
-                {/* Resolved segment (bottom or top) */}
-                {hResolved > 0 && (
+              <g key={bar.key}>
+                {/* Due / Unpaid segment */}
+                {dueHeight > 0 && (
                   <rect
                     x={x}
-                    y={baseY - hNew - hActive - hResolved}
-                    width="10"
-                    height={hResolved}
-                    fill="#34D399"
+                    y={chartBottomY - paidHeight - dueHeight}
+                    width={barWidth}
+                    height={dueHeight}
+                    fill="#38BDF8"
+                    rx="2"
+                  />
+                )}
+                {/* Paid in full segment */}
+                {paidHeight > 0 && (
+                  <rect
+                    x={x}
+                    y={chartBottomY - paidHeight}
+                    width={barWidth}
+                    height={paidHeight}
+                    fill="#10B981"
+                    rx="2"
+                  />
+                )}
+                {/* Base bar if count is 0 for placeholder bar */}
+                {bar.total === 0 && (
+                  <rect
+                    x={x}
+                    y={chartBottomY - 2}
+                    width={barWidth}
+                    height={2}
+                    fill="#E6E9F0"
                     rx="1"
                   />
                 )}
-                {/* Active segment */}
-                {hActive > 0 && (
-                  <rect
-                    x={x}
-                    y={baseY - hNew - hActive}
-                    width="10"
-                    height={hActive}
-                    fill="#818CF8"
-                    rx="1"
-                  />
-                )}
-                {/* New segment (base) */}
-                <rect
-                  x={x}
-                  y={baseY - hNew}
-                  width="10"
-                  height={hNew}
-                  fill="#A78BFA"
-                  rx="1"
-                />
               </g>
             );
           })}
@@ -225,7 +309,7 @@ export const IncidentTrendChart: React.FC<IncidentTrendChartProps> = ({
           <path
             d={linePath}
             fill="none"
-            stroke="#3B82F6"
+            stroke="#6366F1"
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -233,25 +317,39 @@ export const IncidentTrendChart: React.FC<IncidentTrendChartProps> = ({
 
           {/* Data Points on Line */}
           {linePoints.map((pt, i) => (
-            <circle
-              key={i}
-              cx={pt.x}
-              cy={pt.y}
-              r="3.5"
-              fill="#FFFFFF"
-              stroke="#3B82F6"
-              strokeWidth="2"
-            />
+            <g key={i}>
+              <circle
+                cx={pt.x}
+                cy={pt.y}
+                r={pt.count > 0 ? 5 : 3.5}
+                fill={pt.count > 0 ? '#6366F1' : '#FFFFFF'}
+                stroke="#6366F1"
+                strokeWidth="2"
+              />
+              {pt.count > 0 && (
+                <text
+                  x={pt.x}
+                  y={pt.y - 8}
+                  textAnchor="middle"
+                  className="text-[10px] font-black fill-[#4338CA]"
+                >
+                  {pt.count}
+                </text>
+              )}
+            </g>
           ))}
         </svg>
 
-        {/* X-Axis Timeline Labels */}
-        <div className="flex justify-between pl-8 pr-4 text-[10px] text-[#68728A] font-sans mt-1">
-          {timeLabels.map((lbl) => (
-            <span key={lbl}>{lbl}</span>
+        {/* X-Axis Timeline Labels (Date Wise) */}
+        <div className="flex justify-between pl-9 pr-2 text-[10px] font-medium text-[#68728A] font-sans mt-2">
+          {barData.map((b) => (
+            <span key={b.key} className="text-center truncate">
+              {b.label}
+            </span>
           ))}
         </div>
       </div>
     </div>
   );
 };
+

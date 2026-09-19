@@ -16,6 +16,7 @@ import {
   Sparkles,
   Loader2,
   CheckCircle2,
+  Package,
 } from 'lucide-react';
 import { itemsApi, aiApi, productsApi, customersApi } from '@/lib/api/domain';
 import { useToast } from '@/lib/context/ToastContext';
@@ -41,41 +42,6 @@ const DEFAULT_CATALOG: { name: string; hsn: string; rate: number; gstRate: numbe
   { name: 'Electrical LED Tube 20W (Pack of 10)', hsn: '8539', rate: 1450, gstRate: 18 },
   { name: 'Modular Power Switch Socket 16A', hsn: '8536', rate: 280, gstRate: 18 },
   { name: 'Cotton Bed Linen Single Set', hsn: '6302', rate: 750, gstRate: 12 },
-];
-
-const PRESET_PARTIES: Party[] = [
-  {
-    name: 'Rajesh Traders',
-    mobile: '9825123456',
-    state: 'Gujarat',
-    stateCode: '24',
-    gstin: '24AABCR1234F1Z9',
-    address: 'Shop 12, APMC Market Yard, Rajkot',
-  },
-  {
-    name: 'Shreeji Electronics & Hardware',
-    mobile: '9712345678',
-    state: 'Gujarat',
-    stateCode: '24',
-    gstin: '24AAFPS9876G1Z2',
-    address: '45 Ring Road Circle, Surat',
-  },
-  {
-    name: 'Mumbai Textile Syndicate',
-    mobile: '9820011223',
-    state: 'Maharashtra',
-    stateCode: '27',
-    gstin: '27AABCM5678J1Z4',
-    address: 'Kalbadevi Wholesale Bazaar, Mumbai',
-  },
-  {
-    name: 'Bangalore General Provisions',
-    mobile: '9448099887',
-    state: 'Karnataka',
-    stateCode: '29',
-    gstin: '29AABCB4321K1Z1',
-    address: 'Chickpet Commercial Area, Bengaluru',
-  },
 ];
 
 export default function CreateBillPage() {
@@ -127,22 +93,25 @@ export default function CreateBillPage() {
     return partyState.trim().toLowerCase() !== business.state.trim().toLowerCase();
   }, [partyState, business.state]);
 
-  // Load live products & customers from backend
+  // Load live products & customers from backend / local store
   useEffect(() => {
     const fetchCatalogAndCustomers = async () => {
       try {
-        const [prodRes, custRes] = await Promise.all([
-          productsApi.getProducts({ limit: 100 }),
-          customersApi.getCustomers({ limit: 100 }),
-        ]);
-        if (prodRes.success && prodRes.data) {
+        const prodRes = await productsApi.getProducts({ limit: 100 });
+        if (prodRes?.success && prodRes.data) {
           setCatalogProducts(prodRes.data);
         }
-        if (custRes.success && custRes.data) {
+      } catch (err) {
+        console.error('Failed to load products catalog', err);
+      }
+
+      try {
+        const custRes = await customersApi.getCustomers({ limit: 100 });
+        if (custRes?.success && custRes.data) {
           setSavedCustomers(custRes.data);
         }
       } catch (err) {
-        console.error('Failed to load catalog or customers', err);
+        console.error('Failed to load customers', err);
       }
     };
     fetchCatalogAndCustomers();
@@ -166,43 +135,35 @@ export default function CreateBillPage() {
     }
   }, []);
 
-  // Handle party selection (Presets or Saved Customers from database)
+  // Handle party selection (Saved Customers from Customers & Parties section ONLY, or Blank / Walkin)
   const handlePartyPresetChange = (presetKey: string) => {
     setSelectedPartyPreset(presetKey);
 
     if (presetKey.startsWith('cust_')) {
       const custId = presetKey.replace('cust_', '');
-      const cust = savedCustomers.find((c) => (c.id || c._id) === custId);
+      const cust = savedCustomers.find((c) => (c.id || (c as any)._id) === custId);
       if (cust) {
-        setPartyName(cust.name);
-        setPartyMobile(cust.mobile);
-        setPartyState(cust.state || 'Gujarat');
+        setPartyName(cust.name || (cust as any).businessName || '');
+        setPartyMobile(cust.mobile || '');
+        setPartyState(cust.state || business.state || 'Gujarat');
         setPartyGstin(cust.gstin || '');
-        setPartyAddress(cust.address || '');
+        const fullAddr = [cust.address, (cust as any).city].filter(Boolean).join(', ');
+        setPartyAddress(fullAddr || cust.address || '');
         return;
       }
     }
 
-    if (presetKey.startsWith('preset_')) {
-      const idx = parseInt(presetKey.split('_')[1], 10);
-      const party = PRESET_PARTIES[idx];
-      if (party) {
-        setPartyName(party.name);
-        setPartyMobile(party.mobile);
-        setPartyState(party.state);
-        setPartyGstin(party.gstin || '');
-        setPartyAddress(party.address || '');
-      }
-    } else if (presetKey === 'walkin') {
+    if (presetKey === 'walkin') {
       setPartyName('Walk-in Retail Cash Customer');
       setPartyMobile('9999999999');
-      setPartyState('Gujarat');
+      setPartyState(business.state || 'Gujarat');
       setPartyGstin('');
       setPartyAddress('Counter Sale');
     } else {
-      // custom
+      // custom blank
       setPartyName('');
       setPartyMobile('');
+      setPartyState(business.state || 'Gujarat');
       setPartyGstin('');
       setPartyAddress('');
     }
@@ -210,7 +171,14 @@ export default function CreateBillPage() {
 
   // Select catalog product for a specific line item
   const handleSelectProduct = (lineId: string, productId: string) => {
-    const prod = catalogProducts.find((p) => (p.id || p._id) === productId);
+    if (!productId) {
+      setItems((prev) =>
+        prev.map((item) => (item.id === lineId ? { ...item, productId: undefined } : item))
+      );
+      return;
+    }
+
+    const prod = catalogProducts.find((p) => (p.id || (p as any)._id) === productId);
     if (!prod) return;
 
     setItems((prev) =>
@@ -224,7 +192,7 @@ export default function CreateBillPage() {
 
         return {
           ...item,
-          productId: prod.id || prod._id,
+          productId: prod.id || (prod as any)._id,
           name: prod.name,
           hsn: prod.hsnCode || '',
           unit: prod.unit || 'piece',
@@ -236,6 +204,40 @@ export default function CreateBillPage() {
         };
       })
     );
+  };
+
+  // Directly insert a product selected from the Products section as a new row
+  const addProductAsLineItem = (productId: string) => {
+    const prod = catalogProducts.find((p) => (p.id || (p as any)._id) === productId);
+    if (!prod) return;
+    const rate = Number(prod.sellingPrice) || 0;
+    const gstRate = Number(prod.gstRate) ?? 18;
+    const qty = 1;
+    const taxable = qty * rate;
+    const tax = (taxable * gstRate) / 100;
+
+    const newItem: InvoiceItemLine = {
+      id: `item_${Date.now()}`,
+      productId: prod.id || (prod as any)._id,
+      name: prod.name,
+      hsn: prod.hsnCode || '',
+      unit: prod.unit || 'piece',
+      availableStock: prod.currentStock,
+      qty,
+      rate,
+      gstRate,
+      taxableAmount: taxable,
+      totalAmount: taxable + tax,
+    };
+
+    setItems((prev) => {
+      if (prev.length === 1 && !prev[0].name.trim() && (Number(prev[0].rate) || 0) === 0) {
+        return [newItem];
+      }
+      return [...prev, newItem];
+    });
+
+    toast(`Selected "${prod.name}" from Products section`, 'info');
   };
 
 
@@ -406,6 +408,18 @@ Verify HSN codes, correct intra/inter-state tax assignment, and provide a 2-sent
         attributes: invoicePayload as any,
       });
 
+      // Update catalog stock in background for tracked products
+      items.forEach((it) => {
+        if (it.productId) {
+          productsApi.adjustStock(
+            it.productId,
+            'decrease',
+            Number(it.qty) || 1,
+            `Billed in invoice ${invoiceNo}`
+          ).catch(() => {});
+        }
+      });
+
       // Dispatch real-time billing notification
       addNotification({
         recipient: 'retailer',
@@ -485,32 +499,40 @@ Verify HSN codes, correct intra/inter-state tax assignment, and provide a 2-sent
             </div>
 
             {/* Quick Party Picker */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-zinc-500">Select Party:</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold text-zinc-600">Select Party:</span>
               <select
                 value={selectedPartyPreset}
                 onChange={(e) => handlePartyPresetChange(e.target.value)}
-                className="text-xs px-3 py-1.5 bg-zinc-50 border border-zinc-300 rounded-lg text-zinc-800 focus:outline-none focus:ring-1 focus:ring-zinc-900 font-medium cursor-pointer max-w-xs"
+                className="text-xs px-3 py-1.5 bg-zinc-50 hover:bg-white border border-zinc-300 rounded-lg text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900 font-medium cursor-pointer max-w-xs shadow-2xs transition-colors"
               >
                 <option value="custom">+ New Custom Party (Blank)</option>
                 <option value="walkin">Walk-in Retail Cash Customer</option>
-                {savedCustomers.length > 0 && (
-                  <optgroup label="Saved Customer Directory">
-                    {savedCustomers.map((c) => (
-                      <option key={c.id || c._id} value={`cust_${c.id || c._id}`}>
-                        {c.name} ({c.state}) {c.gstin ? `• ${c.gstin}` : ''}
-                      </option>
-                    ))}
+                {savedCustomers.length > 0 ? (
+                  <optgroup label="Customers & Parties Directory">
+                    {savedCustomers.map((c) => {
+                      const cId = c.id || (c as any)._id;
+                      return (
+                        <option key={cId} value={`cust_${cId}`}>
+                          {c.name} ({c.state || 'Gujarat'}){c.gstin ? ` • ${c.gstin}` : ''}
+                        </option>
+                      );
+                    })}
                   </optgroup>
+                ) : (
+                  <option disabled value="">(No saved parties in Customers section)</option>
                 )}
-                <optgroup label="Preset Demo Parties">
-                  {PRESET_PARTIES.map((p, idx) => (
-                    <option key={idx} value={`preset_${idx}`}>
-                      {p.name} ({p.state})
-                    </option>
-                  ))}
-                </optgroup>
               </select>
+
+              <Link
+                href="/customers"
+                target="_blank"
+                className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-md transition-colors inline-flex items-center gap-1"
+                title="Manage customer and party directory"
+              >
+                <span>Manage Parties</span>
+                <span>↗</span>
+              </Link>
             </div>
           </div>
 
@@ -623,25 +645,45 @@ Verify HSN codes, correct intra/inter-state tax assignment, and provide a 2-sent
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-medium text-zinc-500">Quick Add:</span>
-              {DEFAULT_CATALOG.slice(0, 3).map((cat, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => addLineItem(cat)}
-                  className="text-xs px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 rounded-lg font-medium transition-colors cursor-pointer"
-                >
-                  + {cat.name.split(' ')[0]} (₹{cat.rate})
-                </button>
-              ))}
+              {/* Quick Select & Insert from Products Section */}
+              <select
+                value=""
+                onChange={(e) => {
+                  if (e.target.value) {
+                    addProductAsLineItem(e.target.value);
+                  }
+                }}
+                className="text-xs px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-900 rounded-xl font-bold transition-all shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              >
+                <option value="" disabled>+ Choose Product from Products Section...</option>
+                {catalogProducts.map((p) => {
+                  const pId = p.id || (p as any)._id;
+                  return (
+                    <option key={pId} value={pId}>
+                      {p.name} — ₹{p.sellingPrice} ({p.gstRate}% GST{p.trackInventory ? ` • Stock: ${p.currentStock}` : ''})
+                    </option>
+                  );
+                })}
+              </select>
+
               <button
                 type="button"
                 onClick={() => addLineItem()}
-                className="inline-flex items-center gap-1 text-xs px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg font-semibold transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-xs px-3.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-xl font-bold transition-all shadow-xs cursor-pointer"
               >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Add Row</span>
+                <Plus className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Add Blank Row</span>
               </button>
+
+              <Link
+                href="/products"
+                target="_blank"
+                className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 rounded-xl font-semibold transition-colors shadow-xs"
+                title="Manage product master catalog"
+              >
+                <Package className="w-3.5 h-3.5 text-zinc-500" />
+                <span>Products Directory ↗</span>
+              </Link>
             </div>
           </div>
 
@@ -650,7 +692,7 @@ Verify HSN codes, correct intra/inter-state tax assignment, and provide a 2-sent
             <table className="w-full text-left text-xs min-w-[780px]">
               <thead className="bg-[#F8F9FC] text-[11px] font-bold text-[#68728A] border-y border-[#E6E9F0]">
                 <tr>
-                  <th className="px-3 py-2.5">Item Description</th>
+                  <th className="px-3 py-2.5 min-w-[280px]">Item Description & Product Choice</th>
                   <th className="px-3 py-2.5 w-24">HSN</th>
                   <th className="px-3 py-2.5 w-20">Qty</th>
                   <th className="px-3 py-2.5 w-28">Rate (₹)</th>
@@ -668,32 +710,52 @@ Verify HSN codes, correct intra/inter-state tax assignment, and provide a 2-sent
 
                   return (
                     <tr key={item.id} className="hover:bg-zinc-50/50">
-                      <td className="px-3 py-2.5 space-y-1">
-                        {catalogProducts.length > 0 && (
+                      <td className="px-3 py-2.5 space-y-1.5 min-w-[280px]">
+                        {/* Choose from Products Section */}
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider shrink-0">Product:</span>
                           <select
                             value={item.productId || ''}
                             onChange={(e) => handleSelectProduct(item.id, e.target.value)}
-                            className="w-full text-[11px] px-2 py-1 bg-zinc-100/80 border border-zinc-200 rounded text-zinc-700 font-medium focus:outline-none focus:bg-white"
+                            className="w-full text-xs px-2.5 py-1.5 bg-zinc-100 hover:bg-white border border-zinc-300 focus:border-zinc-500 rounded-lg text-zinc-800 font-medium focus:outline-none focus:ring-1 focus:ring-zinc-900 transition-colors cursor-pointer"
                           >
-                            <option value="">-- Choose from Catalog or Type Below --</option>
-                            {catalogProducts.map((p) => (
-                              <option key={p.id || p._id} value={p.id || p._id}>
-                                {p.name} (₹{p.sellingPrice} • {p.gstRate}% GST {p.trackInventory ? `• Stock: ${p.currentStock}` : ''})
-                              </option>
-                            ))}
+                            <option value="">-- Choose from Products Section or Type Below --</option>
+                            {catalogProducts.map((p) => {
+                              const pId = p.id || (p as any)._id;
+                              return (
+                                <option key={pId} value={pId}>
+                                  {p.name} (₹{p.sellingPrice} • {p.gstRate}% GST{p.trackInventory ? ` • Stock: ${p.currentStock}` : ''})
+                                </option>
+                              );
+                            })}
                           </select>
-                        )}
+                        </div>
+
                         <input
                           type="text"
                           value={item.name}
                           onChange={(e) => updateLineItem(item.id, 'name', e.target.value)}
-                          placeholder="Item or Service description"
+                          placeholder="Item or service description"
                           required
                           className="w-full px-2.5 py-1.5 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-semibold focus:outline-none focus:bg-white focus:ring-1 focus:ring-zinc-900"
                         />
+
                         {item.availableStock !== undefined && (
-                          <div className="flex items-center gap-1.5 text-[10px] text-zinc-400 font-medium">
-                            <span>Stock: <strong className={item.availableStock <= 0 ? 'text-rose-600' : item.availableStock <= 5 ? 'text-amber-600' : 'text-emerald-600'}>{item.availableStock}</strong></span>
+                          <div className="flex items-center gap-1.5 text-[10px] text-zinc-500 font-medium">
+                            <span>
+                              Available Stock:{' '}
+                              <strong
+                                className={
+                                  item.availableStock <= 0
+                                    ? 'text-rose-600 font-bold'
+                                    : item.availableStock <= 5
+                                    ? 'text-amber-600 font-bold'
+                                    : 'text-emerald-600 font-bold'
+                                }
+                              >
+                                {item.availableStock}
+                              </strong>
+                            </span>
                             {item.unit && <span>• Unit: {item.unit}</span>}
                           </div>
                         )}

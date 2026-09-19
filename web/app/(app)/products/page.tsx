@@ -292,14 +292,52 @@ export default function ProductsPage() {
     }
   };
 
-  // Unique categories for filter
+  // Standard Category mappings to Statutory HSN/SAC codes & default GST rates
+  const CATEGORY_METADATA_MAP: Record<string, { hsn: string; defaultGstRate: number; defaultUnit: string }> = {
+    'Grains & Pulses': { hsn: '1006', defaultGstRate: 5, defaultUnit: 'kg' },
+    'Edible Oils': { hsn: '1515', defaultGstRate: 5, defaultUnit: 'litre' },
+    'Spices & Condiments': { hsn: '0910', defaultGstRate: 5, defaultUnit: 'kg' },
+    'Dairy & Bakery': { hsn: '0401', defaultGstRate: 5, defaultUnit: 'pack' },
+    'Beverages': { hsn: '2202', defaultGstRate: 18, defaultUnit: 'piece' },
+    'Packaged Foods': { hsn: '1905', defaultGstRate: 12, defaultUnit: 'pack' },
+    'Personal Care': { hsn: '3304', defaultGstRate: 18, defaultUnit: 'piece' },
+    'Cleaning & Household': { hsn: '3402', defaultGstRate: 18, defaultUnit: 'piece' },
+    'Stationery & Office': { hsn: '4820', defaultGstRate: 12, defaultUnit: 'piece' },
+    'Hardware & Electricals': { hsn: '8536', defaultGstRate: 18, defaultUnit: 'piece' },
+    'Textiles & Garments': { hsn: '6203', defaultGstRate: 5, defaultUnit: 'piece' },
+    'General': { hsn: '9999', defaultGstRate: 18, defaultUnit: 'piece' },
+  };
+
+  const DEFAULT_CATEGORIES = Object.keys(CATEGORY_METADATA_MAP);
+
   const categoriesList = useMemo(() => {
-    const set = new Set<string>();
+    const set = new Set<string>(DEFAULT_CATEGORIES);
     products.forEach((p) => {
-      if (p.category) set.add(p.category);
+      if (p.category && p.category.trim()) set.add(p.category.trim());
     });
     return Array.from(set);
   }, [products]);
+
+  // Auto-apply HSN code and GST rate when category changes
+  const handleCategoryChange = (newCategory: string) => {
+    const trimmed = newCategory.trim();
+    const meta = CATEGORY_METADATA_MAP[trimmed];
+
+    if (meta) {
+      setFormData((prev) => ({
+        ...prev,
+        category: newCategory,
+        hsnCode: meta.hsn,
+        gstRate: meta.defaultGstRate,
+        unit: prev.unit === 'piece' ? meta.defaultUnit : prev.unit,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        category: newCategory,
+      }));
+    }
+  };
 
   return (
     <div className="space-y-6 pb-16">
@@ -601,40 +639,44 @@ export default function ProductsPage() {
       {/* MODAL: ADD / EDIT PRODUCT */}
       {/* ========================================== */}
       {isFormOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-zinc-100 animate-in fade-in zoom-in-95 duration-150">
-            <div className="sticky top-0 bg-white/95 backdrop-blur-sm px-6 py-4 border-b border-zinc-100 flex items-center justify-between z-10">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-800">
-                  <Package className="w-4 h-4" />
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-zinc-200/80 overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto">
+            {/* Modal Header */}
+            <div className="px-6 py-5 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-zinc-900 text-white flex items-center justify-center shadow-xs">
+                  <Package className="w-5 h-5 text-emerald-400" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-zinc-900 text-base">
-                    {editingProduct ? 'Edit Product' : 'Add New Product'}
+                  <h3 className="font-bold text-zinc-950 text-base sm:text-lg tracking-tight">
+                    {editingProduct ? 'Edit Catalog Product' : 'Add New Catalog Product'}
                   </h3>
-                  <p className="text-[11px] text-zinc-400">
-                    Product-wise pricing, GST rate configuration, and stock inventory.
+                  <p className="text-xs text-zinc-500">
+                    HSN code, GST rates, unit pricing, and stock alerts.
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsFormOpen(false)}
-                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100"
+                className="w-8 h-8 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-200/60 flex items-center justify-center transition-colors"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveProduct} className="p-6 space-y-6">
-              {/* Section 1: Basic Info */}
-              <div>
-                <h4 className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-3">
-                  1. Product Details
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="sm:col-span-2">
-                    <label className="block text-xs font-bold text-zinc-700 mb-1">
-                      Product Name <span className="text-rose-500">*</span>
+            {/* Modal Body */}
+            <form onSubmit={handleSaveProduct} className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
+              {/* Section 1: Item Identity */}
+              <div className="bg-zinc-50/60 rounded-xl p-4 border border-zinc-200/70 space-y-4">
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-zinc-900 text-white text-[10px] font-black flex items-center justify-center">1</span>
+                  <span className="text-xs font-bold text-zinc-900 tracking-wide uppercase">Product Information</span>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
+                      Product / Item Name <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -642,109 +684,116 @@ export default function ProductsPage() {
                       placeholder="e.g. Basmati Rice Premium (25kg Bag)"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900"
+                      className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 shadow-xs font-medium"
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-zinc-700 mb-1">SKU / Item Code</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. RICE-BAS-25"
-                      value={formData.sku}
-                      onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900"
-                    />
-                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-700 mb-1.5">HSN / SAC Code</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 1006"
+                        value={formData.hsnCode}
+                        onChange={(e) => setFormData({ ...formData, hsnCode: e.target.value })}
+                        className="w-full px-3 py-2 text-xs rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-mono shadow-xs"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-zinc-700 mb-1">HSN / SAC Code</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 1006"
-                      value={formData.hsnCode}
-                      onChange={(e) => setFormData({ ...formData, hsnCode: e.target.value })}
-                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-mono"
-                    />
-                  </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-xs font-semibold text-zinc-700">Category</label>
+                        <span className="text-[10px] text-zinc-400">Select or type new</span>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          list="category-suggestions"
+                          placeholder="Select or enter category..."
+                          value={formData.category}
+                          onChange={(e) => handleCategoryChange(e.target.value)}
+                          className="w-full px-3 py-2 text-xs rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 shadow-xs font-medium"
+                        />
+                        <datalist id="category-suggestions">
+                          {categoriesList.map((cat) => (
+                            <option key={cat} value={cat} />
+                          ))}
+                        </datalist>
+                      </div>
+                    </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-zinc-700 mb-1">Category</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Grains & Pulses, Hardware"
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-zinc-700 mb-1">Unit of Measurement</label>
-                    <select
-                      value={formData.unit}
-                      onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-medium cursor-pointer"
-                    >
-                      <option value="piece">Piece / Pcs</option>
-                      <option value="kg">Kilogram (kg)</option>
-                      <option value="gram">Gram (g)</option>
-                      <option value="litre">Litre (L)</option>
-                      <option value="metre">Metre (m)</option>
-                      <option value="box">Box / Carton</option>
-                      <option value="pack">Pack / Bag</option>
-                    </select>
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-700 mb-1.5">Unit (UOM)</label>
+                      <select
+                        value={formData.unit}
+                        onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                        className="w-full px-3 py-2 text-xs rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 shadow-xs font-medium cursor-pointer"
+                      >
+                        <option value="piece">Piece (Pcs)</option>
+                        <option value="kg">Kilogram (kg)</option>
+                        <option value="gram">Gram (g)</option>
+                        <option value="litre">Litre (L)</option>
+                        <option value="metre">Metre (m)</option>
+                        <option value="box">Box / Carton</option>
+                        <option value="pack">Pack / Bag</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Section 2: Pricing */}
-              <div className="border-t border-zinc-100 pt-5">
-                <h4 className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-3">
-                  2. Pricing & Cost
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Section 2: Pricing & GST */}
+              <div className="bg-zinc-50/60 rounded-xl p-4 border border-zinc-200/70 space-y-4">
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-zinc-900 text-white text-[10px] font-black flex items-center justify-center">2</span>
+                  <span className="text-xs font-bold text-zinc-900 tracking-wide uppercase">Pricing & GST Rate</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div>
-                    <label className="block text-xs font-bold text-zinc-700 mb-1">
+                    <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
                       Selling Price (₹) <span className="text-rose-500">*</span>
                     </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      required
-                      placeholder="e.g. 1850.00"
-                      value={formData.sellingPrice}
-                      onChange={(e) => setFormData({ ...formData, sellingPrice: e.target.value })}
-                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-mono font-bold"
-                    />
+                    <div className="relative">
+                      <span className="absolute left-3 top-2.5 text-zinc-400 font-bold text-xs">₹</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        required
+                        placeholder="1850.00"
+                        value={formData.sellingPrice}
+                        onChange={(e) => setFormData({ ...formData, sellingPrice: e.target.value })}
+                        className="w-full pl-7 pr-3 py-2 text-xs sm:text-sm rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-mono font-bold shadow-xs"
+                      />
+                    </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-zinc-700 mb-1">Purchase / Cost Price (₹)</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="e.g. 1550.00"
-                      value={formData.purchasePrice}
-                      onChange={(e) => setFormData({ ...formData, purchasePrice: e.target.value })}
-                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-mono"
-                    />
+                    <label className="block text-xs font-semibold text-zinc-700 mb-1.5">Purchase / Cost (₹)</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-2.5 text-zinc-400 font-bold text-xs">₹</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        placeholder="1550.00"
+                        value={formData.purchasePrice}
+                        onChange={(e) => setFormData({ ...formData, purchasePrice: e.target.value })}
+                        className="w-full pl-7 pr-3 py-2 text-xs sm:text-sm rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-mono shadow-xs"
+                      />
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Section 3: GST Configuration */}
-              <div className="border-t border-zinc-100 pt-5">
-                <h4 className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-3">
-                  3. Product-Wise GST Configuration
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-zinc-700 mb-1">GST Applicability</label>
+                    <label className="block text-xs font-semibold text-zinc-700 mb-1.5">GST Applicability</label>
                     <select
                       value={formData.gstApplicability}
-                      onChange={(e) => setFormData({ ...formData, gstApplicability: e.target.value as any })}
-                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-medium cursor-pointer"
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          gstApplicability: e.target.value as 'taxable' | 'exempt' | 'non_gst',
+                        })
+                      }
+                      className="w-full px-3 py-2 text-xs rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 shadow-xs font-medium cursor-pointer"
                     >
                       <option value="taxable">Taxable Supply</option>
                       <option value="exempt">Exempt (0% Nil-Rated)</option>
@@ -753,16 +802,16 @@ export default function ProductsPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-zinc-700 mb-1">Product GST Slab Rate</label>
+                    <label className="block text-xs font-semibold text-zinc-700 mb-1.5">GST Slab Rate</label>
                     <select
                       value={formData.gstRate}
                       disabled={formData.gstApplicability !== 'taxable'}
                       onChange={(e) => setFormData({ ...formData, gstRate: Number(e.target.value) })}
-                      className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-bold text-indigo-700 cursor-pointer disabled:opacity-50"
+                      className="w-full px-3 py-2 text-xs rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 shadow-xs font-bold text-emerald-700 cursor-pointer disabled:opacity-50"
                     >
                       {GST_SLABS.map((rate) => (
                         <option key={rate} value={rate}>
-                          {rate}% GST (Intra: {rate / 2}% CGST + {rate / 2}% SGST | Inter: {rate}% IGST)
+                          {rate}% GST (Intra: {rate / 2}% + {rate / 2}% | Inter: {rate}%)
                         </option>
                       ))}
                     </select>
@@ -770,46 +819,48 @@ export default function ProductsPage() {
                 </div>
               </div>
 
-              {/* Section 4: Inventory & Stock */}
-              <div className="border-t border-zinc-100 pt-5">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
-                    4. Stock Management
-                  </h4>
-                  <label className="flex items-center gap-2 text-xs text-zinc-700 cursor-pointer">
+              {/* Section 3: Inventory Control */}
+              <div className="bg-zinc-50/60 rounded-xl p-4 border border-zinc-200/70 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-zinc-900 text-white text-[10px] font-black flex items-center justify-center">3</span>
+                    <span className="text-xs font-bold text-zinc-900 tracking-wide uppercase">Stock & Inventory</span>
+                  </div>
+
+                  <label className="flex items-center gap-2 text-xs text-zinc-700 cursor-pointer select-none">
                     <input
                       type="checkbox"
                       checked={formData.trackInventory}
                       onChange={(e) => setFormData({ ...formData, trackInventory: e.target.checked })}
-                      className="rounded text-zinc-900 focus:ring-zinc-900"
+                      className="w-4 h-4 rounded text-zinc-900 focus:ring-zinc-900 cursor-pointer"
                     />
-                    <span className="font-semibold">Track Inventory</span>
+                    <span className="font-semibold text-zinc-800">Track Inventory</span>
                   </label>
                 </div>
 
                 {formData.trackInventory && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
                     {!editingProduct && (
                       <div>
-                        <label className="block text-xs font-bold text-zinc-700 mb-1">Opening Stock Quantity</label>
+                        <label className="block text-xs font-semibold text-zinc-700 mb-1.5">Initial Opening Stock</label>
                         <input
                           type="number"
                           placeholder="e.g. 50"
                           value={formData.openingStock}
                           onChange={(e) => setFormData({ ...formData, openingStock: e.target.value })}
-                          className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-mono"
+                          className="w-full px-3 py-2 text-xs rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-mono shadow-xs"
                         />
                       </div>
                     )}
 
                     <div>
-                      <label className="block text-xs font-bold text-zinc-700 mb-1">Reorder Alert Threshold</label>
+                      <label className="block text-xs font-semibold text-zinc-700 mb-1.5">Low Stock Alert Threshold</label>
                       <input
                         type="number"
                         placeholder="e.g. 5"
                         value={formData.minStockAlert}
                         onChange={(e) => setFormData({ ...formData, minStockAlert: e.target.value })}
-                        className="w-full px-3.5 py-2 text-xs rounded-xl bg-zinc-50 border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-mono"
+                        className="w-full px-3 py-2 text-xs rounded-lg bg-white border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 font-mono shadow-xs"
                       />
                     </div>
                   </div>
@@ -817,17 +868,17 @@ export default function ProductsPage() {
               </div>
 
               {/* Modal Actions */}
-              <div className="border-t border-zinc-100 pt-4 flex items-center justify-end gap-3">
+              <div className="pt-2 flex items-center justify-end gap-3 border-t border-zinc-100">
                 <button
                   type="button"
                   onClick={() => setIsFormOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-700 transition-colors"
+                  className="px-4 py-2.5 text-xs font-semibold rounded-xl border border-zinc-200 hover:bg-zinc-100 text-zinc-700 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 text-xs font-bold rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white transition-all shadow-xs"
+                  className="px-6 py-2.5 text-xs font-bold rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white transition-all shadow-sm cursor-pointer"
                 >
                   {editingProduct ? 'Update Product' : 'Save Product'}
                 </button>
@@ -841,7 +892,7 @@ export default function ProductsPage() {
       {/* MODAL: ADJUST STOCK */}
       {/* ========================================== */}
       {isAdjustOpen && adjustingProduct && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-[100] flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-zinc-100 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-4 border-b border-zinc-100">
               <div>
@@ -942,7 +993,7 @@ export default function ProductsPage() {
       {/* DRAWER: STOCK AUDIT HISTORY */}
       {/* ========================================== */}
       {isHistoryOpen && adjustingProduct && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex justify-end">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-[100] flex justify-end">
           <div className="bg-white w-full max-w-md h-full shadow-2xl p-6 flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-200">
             <div>
               <div className="flex items-center justify-between pb-4 border-b border-zinc-100">

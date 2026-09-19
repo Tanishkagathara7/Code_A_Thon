@@ -2,20 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import {
-  ArrowLeft,
-  TrendingUp,
-  BarChart3,
-  Calendar,
-  Layers,
-  CheckCircle2,
-  DollarSign,
-  Download,
-  Filter,
-} from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { analyticsApi, itemsApi } from '@/lib/api/domain';
 import { HackathonItem, AnalyticsOverviewData } from '@/lib/types';
-import { formatCurrency, formatDate } from '@/lib/utils';
 import { IncidentTrendChart } from '@/components/dashboard/IncidentTrendChart';
 import { CategoryBreakdownCard } from '@/components/dashboard/CategoryBreakdownCard';
 
@@ -59,7 +48,7 @@ export default function AnalyticsPage() {
   let interStateSales = 0;
 
   items.forEach((item) => {
-    const attrs = (item.attributes || {}) as any;
+    const attrs = (item.attributes || {}) as Record<string, unknown>;
     const amount = Number(attrs.grandTotal) || 0;
     const tax = Number(attrs.totalTax) || (amount > 0 ? Math.round(amount * 0.08) : 0);
     totalSales += amount;
@@ -172,18 +161,39 @@ export default function AnalyticsPage() {
         <div className="lg:col-span-8 flex flex-col">
           <IncidentTrendChart
             activity={analytics?.activity || []}
-            total={analytics?.overview?.total || items.length || 14}
+            total={items.length || analytics?.overview?.total || 0}
+            items={items}
           />
         </div>
 
         <div className="lg:col-span-4 flex flex-col">
           <CategoryBreakdownCard
-            categories={analytics?.categories || [
-              { category: 'Gujarat (Intra-State)', count: 18 },
-              { category: 'Maharashtra', count: 6 },
-              { category: 'Karnataka', count: 3 },
-            ]}
-            totalIncidents={analytics?.overview?.total || 27}
+            categories={
+              items.length > 0
+                ? [
+                    {
+                      category: 'Gujarat (Intra-State)',
+                      count: items.filter(
+                        (i) => !(i.attributes as Record<string, unknown> | undefined)?.isInterState
+                      ).length,
+                    },
+                    ...(items.some(
+                      (i) => (i.attributes as Record<string, unknown> | undefined)?.isInterState
+                    )
+                      ? [
+                          {
+                            category: 'Inter-State (IGST)',
+                            count: items.filter(
+                              (i) =>
+                                (i.attributes as Record<string, unknown> | undefined)?.isInterState
+                            ).length,
+                          },
+                        ]
+                      : []),
+                  ]
+                : analytics?.categories || []
+            }
+            totalIncidents={items.length || analytics?.overview?.total || 0}
           />
         </div>
       </div>

@@ -71,9 +71,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Sidebar Container */}
       <aside
         className={cn(
-          'bg-[#FAFCFF] border-r border-[#EEF2F6] flex flex-col justify-between h-screen fixed inset-y-0 left-0 z-50 transition-all duration-300 ease-in-out select-none lg:static lg:translate-x-0 relative overflow-hidden',
+          'bg-[#FAFCFF] border-r border-[#EEF2F6] flex flex-col justify-between h-screen fixed inset-y-0 left-0 z-40 lg:z-20 transition-all duration-300 ease-in-out select-none lg:static lg:translate-x-0 relative overflow-hidden',
           collapsed ? 'w-[72px]' : 'w-[270px]',
-          isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+          isOpen ? 'translate-x-0 shadow-2xl z-50' : '-translate-x-full'
         )}
       >
         {/* Scrollable Upper Area */}
