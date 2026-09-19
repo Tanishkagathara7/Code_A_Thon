@@ -60,23 +60,16 @@ export default function AnalyticsPage() {
 
   items.forEach((item) => {
     const attrs = (item.attributes || {}) as any;
-    const amount = Number(attrs.grandTotal) || 2850;
-    const tax = Number(attrs.totalTax) || Math.round(amount * 0.08);
+    const amount = Number(attrs.grandTotal) || 0;
+    const tax = Number(attrs.totalTax) || (amount > 0 ? Math.round(amount * 0.08) : 0);
     totalSales += amount;
     totalTax += tax;
     if (attrs.isInterState) {
       interStateSales += amount;
-    } else {
+    } else if (amount > 0) {
       intraStateSales += amount;
     }
   });
-
-  if (totalSales === 0) {
-    totalSales = 184500;
-    totalTax = 16840;
-    intraStateSales = 138000;
-    interStateSales = 46500;
-  }
 
   return (
     <div className="space-y-8 pb-20 max-w-6xl mx-auto">

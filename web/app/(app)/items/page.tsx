@@ -218,10 +218,10 @@ export default function ItemsPage() {
                 {items.map((item, index) => {
                   const itemId = item.id || item._id || `item-${index}`;
                   const attrs = (item.attributes || {}) as any;
-                  const invoiceNo = attrs.invoiceNo || (item.title.includes('•') ? item.title.split('•')[0].trim() : `INV-2026-${String(index + 1).padStart(4, '0')}`);
+                  const invoiceNo = attrs.invoiceNo || (item.title.includes('•') ? item.title.split('•')[0].trim() : item.title || '—');
                   const partyName = attrs.party?.name || (item.title.includes('•') ? item.title.split('•')[1].trim() : item.title);
-                  const state = attrs.party?.state || item.category || 'Gujarat';
-                  const grandTotal = attrs.grandTotal || 3500;
+                  const state = attrs.party?.state || (item.category && item.category !== 'Standard' ? item.category : '—');
+                  const grandTotal = attrs.grandTotal ? Number(attrs.grandTotal) : 0;
                   const paymentStatus = attrs.paymentStatus || (item.status === 'completed' ? 'Paid in Full' : 'Unpaid / Due');
                   const isPaid = paymentStatus === 'Paid in Full';
 

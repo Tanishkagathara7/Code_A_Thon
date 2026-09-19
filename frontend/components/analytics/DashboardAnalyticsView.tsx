@@ -75,18 +75,18 @@ export const DashboardAnalyticsView: React.FC<DashboardAnalyticsViewProps> = ({
           <MetricCard
             index={0}
             label="TOTAL SALES (₹)"
-            value={total > 0 ? `₹${(total * 2850).toLocaleString('en-IN')}` : '₹48,920'}
+            value={total > 0 ? `₹${(total * 2850).toLocaleString('en-IN')}` : '₹0'}
             subtext="Counter sales volume"
             variant="total"
-            trend="↑ 18%"
+            trend={total > 0 ? "↑ 18%" : "0%"}
           />
           <MetricCard
             index={1}
             label="TOTAL TAX (GST)"
-            value={total > 0 ? `₹${Math.round(total * 2850 * 0.08).toLocaleString('en-IN')}` : '₹4,650'}
+            value={total > 0 ? `₹${Math.round(total * 2850 * 0.08).toLocaleString('en-IN')}` : '₹0'}
             subtext="CGST + SGST collected"
             variant="resolved"
-            trend="Statutory"
+            trend={total > 0 ? "Statutory" : "₹0"}
           />
         </View>
 
@@ -94,18 +94,18 @@ export const DashboardAnalyticsView: React.FC<DashboardAnalyticsViewProps> = ({
           <MetricCard
             index={2}
             label="BILLS ISSUED"
-            value={total > 0 ? total : 14}
+            value={total > 0 ? total : 0}
             subtext="Tax invoices generated"
             variant="active"
-            trend="Real-time"
+            trend={total > 0 ? "Real-time" : "0"}
           />
           <MetricCard
             index={3}
             label="COLLECTION RATIO"
-            value={completionRate > 0 ? `${completionRate}%` : '85%'}
+            value={completionRate > 0 ? `${completionRate}%` : '0%'}
             subtext="Cash/UPI vs khata credit"
             variant="velocity"
-            trend="Healthy"
+            trend={total > 0 ? "Healthy" : "0%"}
           />
         </View>
       </View>

@@ -12,7 +12,6 @@ import {
   Layers,
   ArrowRight,
   RefreshCw,
-  AlertTriangle,
   ShieldCheck,
   Zap,
   Radio,
@@ -92,7 +91,7 @@ export default function DashboardPage() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [user?.id]);
 
   const overview = analytics?.overview || {
     total: 0,
@@ -131,14 +130,14 @@ export default function DashboardPage() {
   // Extract recent incident titles for Copilot context
   const recentIncidentTitles = recentItems.map((item) => item.title);
 
-  // Calculate real GST metrics from recent items
+  // Calculate real GST metrics from recent items (Zero by default, no fake mock data)
   const gstMetrics = useMemo(() => {
     let sales = 0;
     let tax = 0;
-    let billCount = recentItems.length;
+    const billCount = recentItems.length;
 
     recentItems.forEach((item) => {
-      const attrs = item.attributes as any;
+      const attrs = (item.attributes || {}) as any;
       if (attrs?.grandTotal) {
         sales += Number(attrs.grandTotal) || 0;
       } else if (item.title && item.title.includes('₹')) {
@@ -146,22 +145,24 @@ export default function DashboardPage() {
         if (match) {
           sales += parseFloat(match[1].replace(/,/g, '')) || 0;
         }
-      } else {
-        sales += 2850; // realistic baseline fallback per invoice
       }
 
       if (attrs?.totalTax) {
         tax += Number(attrs.totalTax) || 0;
-      } else {
+      } else if (sales > 0) {
         tax += Math.round(sales * 0.08);
       }
     });
 
+    const paidCount = recentItems.filter(
+      (i) => i.status === 'completed' || (i.attributes as any)?.paymentStatus === 'Paid in Full'
+    ).length;
+
     return {
-      totalSales: sales > 0 ? sales : 48920,
-      totalTax: tax > 0 ? tax : 4650,
-      billsCount: billCount > 0 ? billCount : 14,
-      paidCount: recentItems.filter((i) => i.status === 'completed' || (i.attributes as any)?.paymentStatus === 'Paid in Full').length || 10,
+      totalSales: sales,
+      totalTax: tax,
+      billsCount: billCount,
+      paidCount,
     };
   }, [recentItems]);
 
@@ -226,20 +227,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {error && (
-        <div className="p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl text-xs flex items-center justify-between shadow-xs">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
-            <span>{error}</span>
-          </div>
-          <button
-            onClick={() => loadData()}
-            className="underline font-bold cursor-pointer hover:text-rose-950 ml-4 shrink-0"
-          >
-            Retry Telemetry Probe
-          </button>
-        </div>
-      )}
 
       {/* ========================================================
           2. FOUR OPERATIONAL GST KPI CARDS
@@ -251,7 +238,7 @@ export default function DashboardPage() {
           subtext="Total invoiced counter volume"
           icon={TrendingUp}
           variant="total"
-          trend="↑ 18.4%"
+          trend={gstMetrics.billsCount > 0 ? "↑ Active" : "No activity"}
         />
 
         <OperationalMetricCard
@@ -260,7 +247,7 @@ export default function DashboardPage() {
           subtext="CGST + SGST + IGST liability"
           icon={CheckCircle2}
           variant="resolved"
-          trend="Statutory Split"
+          trend={gstMetrics.billsCount > 0 ? "Statutory Split" : "₹0 liability"}
         />
 
         <OperationalMetricCard
@@ -269,16 +256,16 @@ export default function DashboardPage() {
           subtext="Bills issued this period"
           icon={Layers}
           variant="active"
-          trend="Real-time"
+          trend={gstMetrics.billsCount > 0 ? "Real-time" : "0 issued"}
         />
 
         <OperationalMetricCard
           label="COLLECTION RATIO"
-          value={loading ? '—' : `${Math.round((gstMetrics.paidCount / (gstMetrics.billsCount || 1)) * 100)}%`}
+          value={loading ? '—' : `${gstMetrics.billsCount > 0 ? Math.round((gstMetrics.paidCount / gstMetrics.billsCount) * 100) : 0}%`}
           subtext="Paid in full vs khata due"
           icon={Zap}
           variant="velocity"
-          trend="Healthy"
+          trend={gstMetrics.billsCount > 0 ? "Healthy" : "0% collected"}
         />
       </div>
 
@@ -358,13 +345,13 @@ export default function DashboardPage() {
                   </tr>
                 ) : (
                   recentItems.slice(0, 5).map((row: any, idx: number) => {
-                    const id = row.id || row._id || `INV-2026-00${42 + idx}`;
+                    const id = row.id || row._id || `inv-${idx}`;
                     const attrs = row.attributes || {};
-                    const invoiceNo = attrs.invoiceNo || (row.title.includes('•') ? row.title.split('•')[0].trim() : `INV-2026-${String(idx + 1).padStart(4, '0')}`);
-                    const partyName = attrs.party?.name || (row.title.includes('•') ? row.title.split('•')[1].trim() : row.title);
-                    const state = attrs.party?.state || row.category || 'Gujarat';
-                    const grandTotal = attrs.grandTotal || (idx === 0 ? 7665 : idx === 1 ? 44100 : 15840);
-                    const totalTax = attrs.totalTax || Math.round(grandTotal * 0.08);
+                    const invoiceNo = attrs.invoiceNo || (row.title.includes('•') ? row.title.split('•')[0].trim() : (row.title || `INV-${String(idx + 1).padStart(4, '0')}`));
+                    const partyName = attrs.party?.name || (row.title.includes('•') ? row.title.split('•')[1].trim() : row.title || 'Walk-in Customer');
+                    const state = attrs.party?.state || (row.category && row.category !== 'Standard' ? row.category : '—');
+                    const grandTotal = attrs.grandTotal ? Number(attrs.grandTotal) : 0;
+                    const totalTax = attrs.totalTax ? Number(attrs.totalTax) : Math.round(grandTotal * 0.08);
                     const paymentStatus = attrs.paymentStatus || (row.status === 'completed' ? 'Paid in Full' : 'Unpaid / Due');
                     const isPaid = paymentStatus === 'Paid in Full';
                     const createdAt = formatDate(row.createdAt);

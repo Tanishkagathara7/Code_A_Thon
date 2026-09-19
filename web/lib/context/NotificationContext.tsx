@@ -21,66 +21,44 @@ interface NotificationContextType {
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
-const LOCAL_STORAGE_KEY = 'vyaapar_gst_notifications';
-
-const DEFAULT_GST_NOTIFICATIONS: NotificationItem[] = [
-  {
-    _id: 'notif_init_1',
-    recipient: 'retailer',
-    type: 'invoice_generated',
-    title: 'Tax Invoice Generated: INV-2026-0042',
-    message: 'Rajesh Traders (Gujarat) billed for ₹7,665.00 with CGST 2.5% + SGST 2.5%. Tax invoice ready for print.',
-    read: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-    entityId: 'INV-2026-0042',
-  },
-  {
-    _id: 'notif_init_2',
-    recipient: 'retailer',
-    type: 'payment_received',
-    title: 'Payment Received: ₹44,100.00',
-    message: 'Shreeji Electronics cleared outstanding dues for INV-2026-0043 via UPI settlement. Account marked Paid.',
-    read: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 75).toISOString(),
-    entityId: 'INV-2026-0043',
-  },
-  {
-    _id: 'notif_init_3',
-    recipient: 'retailer',
-    type: 'tax_rule',
-    title: 'Inter-State Supply Auto-Routed (IGST)',
-    message: 'Billed to Mumbai Textile Syndicate. System auto-routed 100% tax liability to Integrated GST (12%).',
-    read: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 220).toISOString(),
-    entityId: 'INV-2026-0044',
-  },
-  {
-    _id: 'notif_init_4',
-    recipient: 'retailer',
-    type: 'compliance',
-    title: 'GSTR-1 Monthly Outward Summary Ready',
-    message: 'Monthly sales and HSN tax breakup compiled for current FY period. Total GST collected: ₹16,840.00.',
-    read: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-  },
-];
-
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const getStorageKey = useCallback(() => {
+    const userId = user?.id || (user?.isGuest ? 'guest' : 'anonymous');
+    return `vyaapar_gst_notifications_${userId}`;
+  }, [user]);
+
   // Load from local storage or server
   const loadInitial = useCallback(async () => {
     setLoading(true);
+    const key = getStorageKey();
+
     try {
-      // Check localStorage first
+      // 1. Try fetching from API if authenticated real user
+      if (user && !user.isGuest && user.role !== 'guest') {
+        try {
+          const res = await notificationsApi.getNotifications(1, 30);
+          if (res.data && Array.isArray(res.data)) {
+            setNotifications(res.data);
+            if (typeof window !== 'undefined') {
+              localStorage.setItem(key, JSON.stringify(res.data));
+            }
+            setLoading(false);
+            return;
+          }
+        } catch {}
+      }
+
+      // 2. Check user-scoped localStorage
       if (typeof window !== 'undefined') {
-        const cached = localStorage.getItem(LOCAL_STORAGE_KEY);
+        const cached = localStorage.getItem(key);
         if (cached) {
           try {
             const parsed = JSON.parse(cached);
-            if (Array.isArray(parsed) && parsed.length > 0) {
+            if (Array.isArray(parsed)) {
               setNotifications(parsed);
               setLoading(false);
               return;
@@ -89,30 +67,15 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
       }
 
-      // Try fetching from API if user is authenticated
-      if (user) {
-        try {
-          const res = await notificationsApi.getNotifications(1, 30);
-          if (res.data && res.data.length > 0) {
-            setNotifications(res.data);
-            if (typeof window !== 'undefined') {
-              localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(res.data));
-            }
-            setLoading(false);
-            return;
-          }
-        } catch {}
-      }
-
-      // Fallback to rich GST sample notifications
-      setNotifications(DEFAULT_GST_NOTIFICATIONS);
+      // 3. New login or no notifications -> clean empty state (no fake data)
+      setNotifications([]);
       if (typeof window !== 'undefined') {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(DEFAULT_GST_NOTIFICATIONS));
+        localStorage.setItem(key, JSON.stringify([]));
       }
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, getStorageKey]);
 
   useEffect(() => {
     loadInitial();
@@ -123,7 +86,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setNotifications(updated);
     if (typeof window !== 'undefined') {
       try {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
+        localStorage.setItem(getStorageKey(), JSON.stringify(updated));
       } catch {}
     }
   };
