@@ -231,6 +231,25 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </View>
 
+            {/* Quick Hub Navigation: Products & Customers */}
+            <View style={[styles.heroActionRow, { marginTop: 8 }]}>
+              <TouchableOpacity
+                style={[styles.secondaryButton, { flex: 1 }]}
+                activeOpacity={0.8}
+                onPress={() => router.push('/products')}
+              >
+                <Text style={styles.secondaryButtonText}>📦 Products & Stock</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.secondaryButton, { flex: 1 }]}
+                activeOpacity={0.8}
+                onPress={() => router.push('/customers')}
+              >
+                <Text style={styles.secondaryButtonText}>👥 Customer Khata</Text>
+              </TouchableOpacity>
+            </View>
+
             {/* Statutory Compliance Line */}
             <View style={styles.lifecycleRow}>
               <View style={styles.stepGroup}>

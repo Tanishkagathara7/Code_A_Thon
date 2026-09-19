@@ -169,3 +169,45 @@ export const NavPlusIcon: React.FC<{ size?: number; color?: string }> = ({
     />
   </Svg>
 );
+
+// Products / Stock Package Icon
+export const NavPackageIcon: React.FC<NavIconProps> = ({ size = 24, color = '#787E92', focused }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path
+      d="M16.5 9.4 7.55 4.24M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"
+      stroke={color}
+      strokeWidth={focused ? '2.2' : '1.8'}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M3.29 7 12 12l8.71-5M12 22V12"
+      stroke={color}
+      strokeWidth={focused ? '2.2' : '1.8'}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+// Customers / Parties Icon
+export const NavUsersIcon: React.FC<NavIconProps> = ({ size = 24, color = '#787E92', focused }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path
+      d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+      stroke={color}
+      strokeWidth={focused ? '2.2' : '1.8'}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Circle cx="9" cy="7" r="4" stroke={color} strokeWidth={focused ? '2.2' : '1.8'} />
+    <Path
+      d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
+      stroke={color}
+      strokeWidth={focused ? '2.2' : '1.8'}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+

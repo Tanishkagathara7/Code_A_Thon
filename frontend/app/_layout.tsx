@@ -49,6 +49,13 @@ export default function RootLayout() {
               <Stack.Screen name="items/[id]" options={{ animation: 'slide_from_right' }} />
               <Stack.Screen name="items/create" options={{ animation: 'slide_from_right' }} />
               <Stack.Screen name="items/edit/[id]" options={{ animation: 'slide_from_right' }} />
+              <Stack.Screen name="products/index" options={{ animation: 'slide_from_right' }} />
+              <Stack.Screen name="products/create" options={{ animation: 'slide_from_right' }} />
+              <Stack.Screen name="products/edit/[id]" options={{ animation: 'slide_from_right' }} />
+              <Stack.Screen name="customers/index" options={{ animation: 'slide_from_right' }} />
+              <Stack.Screen name="customers/[id]" options={{ animation: 'slide_from_right' }} />
+              <Stack.Screen name="customers/create" options={{ animation: 'slide_from_right' }} />
+              <Stack.Screen name="customers/edit/[id]" options={{ animation: 'slide_from_right' }} />
               <Stack.Screen name="notifications/index" options={{ animation: 'slide_from_right' }} />
               <Stack.Screen name="oauthredirect" options={{ animation: 'fade' }} />
             </Stack>

@@ -127,3 +127,102 @@ export class ApiError extends Error {
     return 'UNKNOWN';
   }
 }
+
+// ==========================================
+// PRODUCTS & INVENTORY TYPES
+// ==========================================
+
+export type GSTApplicability = 'taxable' | 'exempt' | 'non_gst';
+export type UnitOfMeasurement = 'piece' | 'kg' | 'gram' | 'litre' | 'metre' | 'box' | 'pack' | 'tin' | string;
+export type StockStatus = 'in_stock' | 'low_stock' | 'out_of_stock';
+
+export interface ProductItem {
+  id: string;
+  _id?: string;
+  name: string;
+  sku?: string;
+  hsnCode?: string;
+  category?: string;
+  brand?: string;
+  description?: string;
+  unit: UnitOfMeasurement;
+  purchasePrice?: number;
+  sellingPrice: number;
+  isTaxInclusive?: boolean;
+  gstApplicability: GSTApplicability;
+  gstRate: number; // 0, 5, 12, 18, 28
+  currentStock: number;
+  openingStock?: number;
+  minStockAlert?: number;
+  trackInventory: boolean;
+  stockStatus: StockStatus;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface StockHistoryItem {
+  _id?: string;
+  product: string;
+  operationType: 'initial' | 'purchase_increase' | 'sale_deduction' | 'manual_increase' | 'manual_decrease' | 'damage' | 'return';
+  previousQuantity: number;
+  quantityDelta: number;
+  newQuantity: number;
+  reason: string;
+  referenceInvoiceNo?: string;
+  createdAt: string;
+}
+
+export interface ProductSummary {
+  totalProducts: number;
+  lowStockCount: number;
+  outOfStockCount: number;
+  totalInventoryValue: number;
+}
+
+// ==========================================
+// CUSTOMERS & PARTIES TYPES
+// ==========================================
+
+export type CustomerType = 'individual' | 'business';
+
+export interface CustomerRecord {
+  id: string;
+  _id?: string;
+  name: string;
+  mobile: string;
+  email?: string;
+  customerType: CustomerType;
+  gstin?: string;
+  businessName?: string;
+  address?: string;
+  city?: string;
+  state: string;
+  stateCode?: string;
+  pincode?: string;
+  notes?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CustomerProfileData {
+  customer: CustomerRecord;
+  stats: {
+    totalInvoices: number;
+    totalBilled: number;
+    totalTax: number;
+    pendingBalance: number;
+  };
+  invoices: Array<{
+    id: string;
+    invoiceNo: string;
+    title: string;
+    date: string;
+    status: string;
+    paymentStatus: string;
+    grandTotal: number;
+    itemsCount: number;
+    isInterState: boolean;
+  }>;
+}
+

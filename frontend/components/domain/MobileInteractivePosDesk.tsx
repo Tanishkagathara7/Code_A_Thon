@@ -303,28 +303,33 @@ export const MobileInteractivePosDesk: React.FC = () => {
         </View>
       ) : activeTab === 'parties' ? (
         <View style={styles.altTabCard}>
-          <Text style={styles.altTabTitle}>Customer & Khata Registry</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+            <Text style={styles.altTabTitle}>Customer & Khata Registry</Text>
+            <TouchableOpacity onPress={() => router.push('/customers')}>
+              <Text style={{ fontSize: 11, fontWeight: '800', color: '#0A0A0A' }}>View All ›</Text>
+            </TouchableOpacity>
+          </View>
           <Text style={styles.altTabSubtitle}>
-            Direct ledger sync with 14 active trade parties. Tap to bill immediately:
+            Direct ledger sync with active trade parties. Tap to bill or view:
           </Text>
           <View style={styles.presetPartyList}>
             <TouchableOpacity
               style={styles.partyItem}
-              onPress={() => router.push('/items/create')}
+              onPress={() => router.push('/customers')}
             >
               <Text style={styles.partyItemTitle}>Rajesh Traders (Gujarat)</Text>
               <Text style={styles.partyItemGstin}>GSTIN: 24AABCT1357Q1ZP • ₹14,200 balance</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.partyItem}
-              onPress={() => router.push('/items/create')}
+              onPress={() => router.push('/customers')}
             >
               <Text style={styles.partyItemTitle}>Shreeji Electronics (Gujarat)</Text>
               <Text style={styles.partyItemGstin}>GSTIN: 24AABCS9876K1Z3 • Paid in Full</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.partyItem}
-              onPress={() => router.push('/items/create')}
+              onPress={() => router.push('/customers')}
             >
               <Text style={styles.partyItemTitle}>Mumbai Textile Syndicate (Maharashtra)</Text>
               <Text style={styles.partyItemGstin}>GSTIN: 27AAACT9012L1Z4 • Inter-State (IGST)</Text>
@@ -333,23 +338,28 @@ export const MobileInteractivePosDesk: React.FC = () => {
         </View>
       ) : activeTab === 'products' ? (
         <View style={styles.altTabCard}>
-          <Text style={styles.altTabTitle}>Product Catalog & HSN Master</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+            <Text style={styles.altTabTitle}>Product Catalog & HSN Master</Text>
+            <TouchableOpacity onPress={() => router.push('/products')}>
+              <Text style={{ fontSize: 11, fontWeight: '800', color: '#0A0A0A' }}>View Catalog ›</Text>
+            </TouchableOpacity>
+          </View>
           <Text style={styles.altTabSubtitle}>
             Pre-configured retail grocery & electrical items with verified GST rates:
           </Text>
           <View style={styles.presetPartyList}>
-            <View style={styles.partyItem}>
+            <TouchableOpacity style={styles.partyItem} onPress={() => router.push('/products')}>
               <Text style={styles.partyItemTitle}>Basmati Rice (25kg Bag) • HSN 1006</Text>
               <Text style={styles.partyItemGstin}>Rate: ₹1,850.00 • 5% GST Slabs</Text>
-            </View>
-            <View style={styles.partyItem}>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.partyItem} onPress={() => router.push('/products')}>
               <Text style={styles.partyItemTitle}>Sunflower Refined Oil (15L Tin) • HSN 1512</Text>
               <Text style={styles.partyItemGstin}>Rate: ₹2,750.00 • 5% GST Slabs</Text>
-            </View>
-            <View style={styles.partyItem}>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.partyItem} onPress={() => router.push('/products')}>
               <Text style={styles.partyItemTitle}>Electrical LED Tube 20W • HSN 8539</Text>
               <Text style={styles.partyItemGstin}>Rate: ₹1,450.00 • 18% GST Slabs</Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
       ) : (
