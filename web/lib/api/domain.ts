@@ -365,134 +365,40 @@ export const notificationsApi = {
 // ==========================================
 // PRODUCTS API
 // ==========================================
-const DEFAULT_INITIAL_PRODUCTS = [
-  {
-    id: 'prod_1',
-    name: 'Basmati Rice Premium (25kg Bag)',
-    sku: 'RICE-BAS-25',
-    hsnCode: '1006',
-    category: 'Grains & Pulses',
-    unit: 'pack',
-    purchasePrice: 1550,
-    sellingPrice: 1850,
-    gstApplicability: 'taxable',
-    gstRate: 5,
-    currentStock: 48,
-    openingStock: 50,
-    minStockAlert: 10,
-    trackInventory: true,
-    stockStatus: 'in_stock',
-  },
-  {
-    id: 'prod_2',
-    name: 'Cold-Pressed Groundnut Oil (15L Tin)',
-    sku: 'OIL-GND-15L',
-    hsnCode: '1508',
-    category: 'Edible Oils',
-    unit: 'tin',
-    purchasePrice: 2400,
-    sellingPrice: 2750,
-    gstApplicability: 'taxable',
-    gstRate: 5,
-    currentStock: 22,
-    openingStock: 25,
-    minStockAlert: 8,
-    trackInventory: true,
-    stockStatus: 'in_stock',
-  },
-  {
-    id: 'prod_3',
-    name: 'Refined Wheat Flour (Maida 50kg)',
-    sku: 'FLOUR-MAIDA-50',
-    hsnCode: '1101',
-    category: 'Grains & Pulses',
-    unit: 'pack',
-    purchasePrice: 1400,
-    sellingPrice: 1650,
-    gstApplicability: 'taxable',
-    gstRate: 5,
-    currentStock: 4,
-    openingStock: 20,
-    minStockAlert: 6,
-    trackInventory: true,
-    stockStatus: 'low_stock',
-  },
-  {
-    id: 'prod_4',
-    name: 'Electrical LED Tube 20W (Pack of 10)',
-    sku: 'ELEC-LED-20W',
-    hsnCode: '8539',
-    category: 'Electrical & Hardware',
-    unit: 'box',
-    purchasePrice: 1100,
-    sellingPrice: 1450,
-    gstApplicability: 'taxable',
-    gstRate: 18,
-    currentStock: 12,
-    openingStock: 15,
-    minStockAlert: 5,
-    trackInventory: true,
-    stockStatus: 'in_stock',
-  },
-  {
-    id: 'prod_5',
-    name: 'Toor Dal Premium (30kg Sack)',
-    sku: 'PULSE-TOOR-30',
-    hsnCode: '0713',
-    category: 'Grains & Pulses',
-    unit: 'pack',
-    purchasePrice: 3400,
-    sellingPrice: 3900,
-    gstApplicability: 'taxable',
-    gstRate: 5,
-    currentStock: 18,
-    openingStock: 20,
-    minStockAlert: 5,
-    trackInventory: true,
-    stockStatus: 'in_stock',
-  },
-  {
-    id: 'prod_6',
-    name: 'Modular Power Switch Socket 16A',
-    sku: 'ELEC-SW-16A',
-    hsnCode: '8536',
-    category: 'Electrical & Hardware',
-    unit: 'piece',
-    purchasePrice: 190,
-    sellingPrice: 280,
-    gstApplicability: 'taxable',
-    gstRate: 18,
-    currentStock: 65,
-    openingStock: 70,
-    minStockAlert: 15,
-    trackInventory: true,
-    stockStatus: 'in_stock',
-  },
-];
+
+function getCurrentProductStorageKey(): string {
+  if (typeof window === 'undefined') return 'vyaapar_products_guest';
+  try {
+    const userStr = localStorage.getItem(USER_STORAGE_KEY);
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      if (user.id) return `vyaapar_products_${user.id}`;
+      if (user.isGuest || user.role === 'guest') return 'vyaapar_products_guest';
+    }
+    const token = localStorage.getItem(TOKEN_STORAGE_KEY);
+    if (token === 'guest-token') return 'vyaapar_products_guest';
+  } catch {}
+  return 'vyaapar_products_guest';
+}
 
 function getStoredProducts(): any[] {
-  if (typeof window === 'undefined') return DEFAULT_INITIAL_PRODUCTS;
+  if (typeof window === 'undefined') return [];
   try {
-    const raw = localStorage.getItem('vyaapar_products_guest');
-    if (!raw) {
-      localStorage.setItem('vyaapar_products_guest', JSON.stringify(DEFAULT_INITIAL_PRODUCTS));
-      return DEFAULT_INITIAL_PRODUCTS;
-    }
+    const key = getCurrentProductStorageKey();
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      localStorage.setItem('vyaapar_products_guest', JSON.stringify(DEFAULT_INITIAL_PRODUCTS));
-      return DEFAULT_INITIAL_PRODUCTS;
-    }
-    return parsed;
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
-    return DEFAULT_INITIAL_PRODUCTS;
+    return [];
   }
 }
 
 function saveStoredProducts(prods: any[]) {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem('vyaapar_products_guest', JSON.stringify(prods));
+    const key = getCurrentProductStorageKey();
+    localStorage.setItem(key, JSON.stringify(prods));
   } catch {}
 }
 
@@ -527,7 +433,7 @@ export const productsApi = {
 
     try {
       const res = await apiClient.get<any>('/products', params);
-      if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
+      if (res && res.data && Array.isArray(res.data)) {
         return res;
       }
       const local = filterLocally(getStoredProducts());
@@ -671,60 +577,6 @@ export const productsApi = {
 // ==========================================
 // CUSTOMERS API
 // ==========================================
-const DEFAULT_INITIAL_CUSTOMERS = [
-  {
-    id: 'cust_1',
-    name: 'Rajesh Traders',
-    mobile: '9825123456',
-    email: 'rajesh.traders@gmail.com',
-    customerType: 'business',
-    state: 'Gujarat',
-    stateCode: '24',
-    gstin: '24AABCR1234F1Z9',
-    businessName: 'Rajesh Commercial Trading Co',
-    address: 'Shop 12, APMC Market Yard, Rajkot',
-    city: 'Rajkot',
-  },
-  {
-    id: 'cust_2',
-    name: 'Shreeji Electronics & Hardware',
-    mobile: '9712345678',
-    email: 'shreeji.electricals@yahoo.co.in',
-    customerType: 'business',
-    state: 'Gujarat',
-    stateCode: '24',
-    gstin: '24AAFPS9876G1Z2',
-    businessName: 'Shreeji Electricals Wholesale',
-    address: '45 Ring Road Circle, Surat',
-    city: 'Surat',
-  },
-  {
-    id: 'cust_3',
-    name: 'Mumbai Textile Syndicate',
-    mobile: '9820011223',
-    email: 'accounts@mumbaitextiles.org',
-    customerType: 'business',
-    state: 'Maharashtra',
-    stateCode: '27',
-    gstin: '27AABCM5678J1Z4',
-    businessName: 'Mumbai Textile Syndicate LLP',
-    address: 'Kalbadevi Wholesale Bazaar, Mumbai',
-    city: 'Mumbai',
-  },
-  {
-    id: 'cust_4',
-    name: 'Bangalore General Provisions',
-    mobile: '9448099887',
-    email: 'bangalore.provisions@gmail.com',
-    customerType: 'business',
-    state: 'Karnataka',
-    stateCode: '29',
-    gstin: '29AABCB4321K1Z1',
-    businessName: 'Bangalore General Provisions Mart',
-    address: 'Chickpet Commercial Area, Bengaluru',
-    city: 'Bengaluru',
-  },
-];
 
 function getCurrentCustomerStorageKey(): string {
   if (typeof window === 'undefined') return 'vyaapar_customers_guest';
