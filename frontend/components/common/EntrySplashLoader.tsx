@@ -18,7 +18,7 @@ interface EntrySplashLoaderProps {
 }
 
 export const EntrySplashLoader: React.FC<EntrySplashLoaderProps> = ({
-  subtitle = 'CODE-A-THON',
+  subtitle = 'GST BILLING',
   onFinished,
   postAnimationHoldMs = 2000, // Hold for 2 seconds so user clearly sees the logo
 }) => {

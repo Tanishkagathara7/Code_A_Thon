@@ -4,26 +4,26 @@
  */
 
 export const SITE_CONFIG = {
-  name: 'APP',
-  fullName: 'APP — Real-Time Cross-Platform Intelligence & Operations',
+  name: 'GST Billing',
+  fullName: 'GST Billing — Bill Smarter, Grow Faster',
   shortDescription:
-    'Synchronized cross-platform operational intelligence and developer workspace powered by Next.js 16, React Native Expo, and Express.',
+    'Modern GST Billing & Invoicing System with real-time cross-platform synchronization across Web and Mobile.',
   fullDescription:
-    'APP is an agile cross-platform operational intelligence workspace. Coordinate data pipelines, monitor real-time parity between desktop and native mobile clients, and execute AI-assisted workflows with zero architectural drift.',
+    'GST Billing is a high-speed, compliant invoicing and tax management system. Generate GST-compliant invoices, track payments, monitor sales analytics, and manage client accounts with real-time sync across web and mobile clients.',
   defaultKeywords: [
-    'operational intelligence',
-    'cross-platform development',
+    'GST Billing',
+    'invoicing system',
+    'tax invoice',
+    'GST compliance',
+    'cross-platform billing',
     'Next.js 16',
     'React Native Expo',
     'real-time synchronization',
-    'developer workspace',
-    'Mongoose schemas',
-    'AI copilot',
-    'JWT authentication',
-    'engineering operations',
+    'business accounting',
+    'inventory and billing',
   ],
-  author: 'APP Engineering Team',
-  twitterHandle: '@APPEngine',
+  author: 'GST Billing Engineering Team',
+  twitterHandle: '@GSTBilling',
   themeColor: '#FAFAFA',
 };
 

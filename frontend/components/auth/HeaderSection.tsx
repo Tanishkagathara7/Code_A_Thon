@@ -1,6 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Platform } from 'react-native';
-import Svg, { Path, Defs, LinearGradient as SvgGradient, Stop } from 'react-native-svg';
+import { StyleSheet, View, Text, TouchableOpacity, Image, Platform } from 'react-native';
 import { AuthHeroVisual } from './AuthHeroVisual';
 
 interface HeaderSectionProps {
@@ -16,42 +15,15 @@ export const HeaderSection: React.FC<HeaderSectionProps> = ({ authMode, onSkip }
       {/* Brand Header Row: Logo + App Name + Guest Login Button */}
       <View style={styles.brandRow}>
         <View style={styles.brandTitleWrapper}>
-          {/* Luminous Butterfly/Bloom Gradient Logo */}
-          <Svg width={28} height={28} viewBox="0 0 32 32" fill="none">
-            <Defs>
-              <SvgGradient id="logoGrad1" x1="0" y1="0" x2="1" y2="1">
-                <Stop offset="0%" stopColor="#818CF8" />
-                <Stop offset="100%" stopColor="#3B82F6" />
-              </SvgGradient>
-              <SvgGradient id="logoGrad2" x1="0" y1="0" x2="1" y2="1">
-                <Stop offset="0%" stopColor="#C084FC" />
-                <Stop offset="100%" stopColor="#6366F1" />
-              </SvgGradient>
-            </Defs>
-            <Path
-              d="M 16 16 C 10 10 4 10 4 16 C 4 22 10 22 16 16 Z"
-              fill="url(#logoGrad1)"
-            />
-            <Path
-              d="M 16 16 C 22 10 28 10 28 16 C 28 22 22 22 16 16 Z"
-              fill="url(#logoGrad2)"
-              opacity="0.85"
-            />
-            <Path
-              d="M 16 16 C 10 22 10 28 16 28 C 22 28 22 22 16 16 Z"
-              fill="url(#logoGrad1)"
-              opacity="0.7"
-            />
-            <Path
-              d="M 16 16 C 10 10 10 4 16 4 C 22 4 22 10 16 16 Z"
-              fill="url(#logoGrad2)"
-              opacity="0.9"
-            />
-          </Svg>
+          <Image
+            source={require('../../assets/icon.png')}
+            style={styles.brandLogo}
+            resizeMode="contain"
+          />
 
           <View style={styles.brandTextGroup}>
-            <Text style={styles.brandName}>APP</Text>
-            <Text style={styles.brandTagline}>IDEAS  •  PEOPLE  •  IMPACT</Text>
+            <Text style={styles.brandName}>GST Billing</Text>
+            <Text style={styles.brandTagline}>SMART  •  FAST  •  COMPLIANT</Text>
           </View>
         </View>
 
@@ -113,19 +85,27 @@ const styles = StyleSheet.create({
   brandTitleWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
+  },
+  brandLogo: {
+    width: 46,
+    height: 46,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(15, 23, 42, 0.08)',
   },
   brandTextGroup: {
     gap: 1,
   },
   brandName: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '800',
     color: '#0F172A',
     letterSpacing: -0.5,
   },
   brandTagline: {
-    fontSize: 9,
+    fontSize: 9.5,
     fontWeight: '700',
     color: '#64748B',
     letterSpacing: 1.5,

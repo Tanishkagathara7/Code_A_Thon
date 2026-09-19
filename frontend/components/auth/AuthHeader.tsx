@@ -1,6 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import Svg, { Rect, Circle, Path } from 'react-native-svg';
+import { StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
 import { AppTheme, DefaultTheme } from '../../theme/config';
 
 interface AuthHeaderProps {
@@ -14,18 +13,16 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({
 }) => {
   return (
     <View style={styles.container}>
-      {/* Abstract Precision Geometric Logo Mark + App Title */}
+      {/* Brand Logo Mark + App Title */}
       <View style={styles.brandRow}>
-        <Svg width={28} height={28} viewBox="0 0 32 32" fill="none">
-          <Rect x={4} y={4} width={24} height={24} rx={7} fill={theme.colors.accent} />
-          <Circle cx={16} cy={16} r={6} fill={theme.colors.background} />
-          <Path d="M 12 16 L 20 16" stroke={theme.colors.accent} strokeWidth={2} strokeLinecap="round" />
-        </Svg>
-        {theme.logoText ? (
-          <Text style={[styles.brandText, { color: theme.colors.text }]}>
-            {theme.logoText}
-          </Text>
-        ) : null}
+        <Image
+          source={require('../../assets/icon.png')}
+          style={styles.brandLogo}
+          resizeMode="contain"
+        />
+        <Text style={[styles.brandText, { color: theme.colors.text }]}>
+          {theme.logoText || 'GST Billing'}
+        </Text>
       </View>
 
       {/* Guest Action Option */}
@@ -59,10 +56,18 @@ const styles = StyleSheet.create({
   brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
+  },
+  brandLogo: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.08)',
   },
   brandText: {
-    fontSize: 17,
+    fontSize: 20,
     fontWeight: '800',
     letterSpacing: -0.4,
   },

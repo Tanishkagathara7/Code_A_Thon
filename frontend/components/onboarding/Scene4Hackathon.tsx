@@ -105,7 +105,7 @@ export const Scene4Hackathon: React.FC<SceneProps> = ({ index, scrollX }) => {
         <View style={styles.divider} />
 
         <Text style={styles.subtext}>
-          Created for Code-A-Thon — where ideas become experiences.
+          Created for GST Billing — where compliance meets seamless speed.
         </Text>
       </Animated.View>
 
@@ -125,7 +125,7 @@ export const Scene4Hackathon: React.FC<SceneProps> = ({ index, scrollX }) => {
           {/* Minimal Event Metadata Footprint */}
           <View style={styles.eventBanner}>
             <View style={styles.eventDot} />
-            <Text style={styles.eventBannerText}>HACKATHON EDITION 2026</Text>
+            <Text style={styles.eventBannerText}>GST BILLING EDITION 2026</Text>
           </View>
         </Animated.View>
       </View>

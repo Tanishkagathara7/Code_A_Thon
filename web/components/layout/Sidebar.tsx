@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -87,32 +88,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 collapsed ? 'justify-center' : 'gap-3.5 min-w-0'
               )}
             >
-              {/* Pulse wavy icon */}
-              <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center">
-                <svg
-                  width="30"
-                  height="30"
-                  viewBox="0 0 32 32"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M3 16H8L11.5 6.5L18 25.5L22 16H29"
-                    stroke="#5C4CF6"
-                    strokeWidth="3.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+              {/* GST Billing Brand Logo */}
+              <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl overflow-hidden shadow-xs border border-black/[0.08] bg-white p-0.5">
+                <Image
+                  src="/icon.png"
+                  alt="GST Billing Logo"
+                  width={40}
+                  height={40}
+                  className="object-contain w-full h-full scale-110"
+                  priority
+                />
               </div>
 
               {!collapsed && (
                 <div className="flex flex-col truncate">
-                  <span className="font-extrabold text-[19px] tracking-tight text-[#161828] leading-none">
-                    Pulse
+                  <span className="font-extrabold text-[18px] tracking-tight text-[#161828] leading-none">
+                    GST Billing
                   </span>
                   <span className="text-[9px] font-bold tracking-[0.06em] text-[#8C95A6] mt-1 uppercase">
-                    COMMAND CENTER
+                    SYSTEM DASHBOARD
                   </span>
                 </div>
               )}

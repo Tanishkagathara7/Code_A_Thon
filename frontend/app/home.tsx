@@ -341,9 +341,11 @@ export default function HomeScreen() {
       <SafeAreaView edges={['top']} style={styles.safeHeaderArea}>
         <View style={styles.headerBar}>
           <View style={styles.headerLeft}>
-            <View style={styles.brandIconBox}>
-              <Text style={styles.brandIconText}>⚡</Text>
-            </View>
+            <Image
+              source={require('../assets/icon.png')}
+              style={styles.headerLogo}
+              resizeMode="contain"
+            />
             <View>
               <Text style={styles.appNameText}>{appConfig.appName}</Text>
               <Text style={styles.appSubText}>
@@ -412,28 +414,25 @@ const styles = StyleSheet.create({
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
   },
-  brandIconBox: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    backgroundColor: '#101226',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  brandIconText: {
-    fontSize: 15,
+  headerLogo: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.08)',
   },
   appNameText: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '900',
     color: '#101226',
     fontFamily: 'PlusJakartaSans_700Bold',
     letterSpacing: -0.3,
   },
   appSubText: {
-    fontSize: 10.5,
+    fontSize: 11,
     color: '#68728A',
     fontFamily: 'PlusJakartaSans_500Medium',
   },

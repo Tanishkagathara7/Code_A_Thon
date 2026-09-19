@@ -109,7 +109,7 @@ export const Scene1Intro: React.FC<SceneProps> = ({ index, scrollX }) => {
         <View style={styles.divider} />
 
         <Text style={styles.subtext}>
-          An experience created for Code-A-Thon.
+          An experience created for GST Billing — Bill Smarter, Grow Faster.
         </Text>
       </Animated.View>
 

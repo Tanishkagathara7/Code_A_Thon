@@ -95,7 +95,7 @@ export const Scene2Creator: React.FC<SceneProps> = ({ index, scrollX }) => {
         <Text style={styles.headline}>Made by Tanish.</Text>
 
         <Text style={styles.subtext}>
-          Designed, developed, and brought to life for Code-A-Thon.
+          Designed, developed, and brought to life for GST Billing.
         </Text>
 
         <View style={styles.tagContainer}>

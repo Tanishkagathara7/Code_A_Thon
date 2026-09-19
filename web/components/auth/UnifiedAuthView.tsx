@@ -122,14 +122,14 @@ export function UnifiedAuthView({ initialMode = 'signin' }: AuthPageProps) {
                   ['ON', 'WEB', 'AND', 'MOBILE.'],
                 ]
               : [
-                  ['JOIN', 'THE', 'CODE-A-THON.'],
-                  ['ENTER.', 'BUILD.', 'SHIP.'],
+                  ['JOIN', 'GST', 'BILLING.'],
+                  ['BILL.', 'MANAGE.', 'GROW.'],
                 ]
           }
-          subheading="One shared Express backend, cryptographically secure JWT authentication, and zero latency across React Native Expo and Next.js 14 workspaces."
+          subheading="Seamless invoicing, real-time GST reconciliation, and zero latency across React Native Expo and Next.js workspaces."
         />
 
-        {/* Seamless Background-less Code-A-Thon Logo Presentation with 360 load flip & cursor tilt */}
+        {/* GST Billing Brand Presentation with 360 load flip & cursor tilt */}
         <div className="relative pt-2 pb-2">
           <TiltCard
             key={mode}
@@ -139,16 +139,16 @@ export function UnifiedAuthView({ initialMode = 'signin' }: AuthPageProps) {
             maxTilt={12}
             perspective={1200}
             glare={false}
-            className="w-full max-w-xl"
+            className="w-full max-w-md"
           >
-            <div className="relative aspect-[2083/755] w-full flex items-center justify-start cursor-pointer">
+            <div className="relative aspect-square w-full max-w-[340px] rounded-3xl overflow-hidden shadow-2xl border border-black/[0.06] bg-white flex items-center justify-center cursor-pointer p-4 group">
               <Image
-                src="/code.png"
-                alt="Code-A-Thon"
+                src="/logo.png"
+                alt="GST Billing"
                 fill
                 priority
-                sizes="(max-width: 1024px) 100vw, 650px"
-                className="object-contain object-left filter drop-shadow-[0_10px_25px_rgba(0,0,0,0.06)] hover:scale-[1.02] transition-transform duration-300"
+                sizes="340px"
+                className="object-contain p-2 filter drop-shadow-[0_10px_25px_rgba(0,0,0,0.06)] group-hover:scale-105 transition-transform duration-300"
               />
             </div>
           </TiltCard>

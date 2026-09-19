@@ -44,8 +44,8 @@ export interface AppTheme {
 }
 
 export const DefaultTheme: AppTheme = {
-  appName: 'App',
-  logoText: 'APP',
+  appName: 'GST Billing',
+  logoText: 'GST Billing',
   colors: {
     background: '#F8F9FC',      // Web clean canvas background
     surface: '#FFFFFF',         // Crisp white card background

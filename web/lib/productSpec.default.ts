@@ -6,10 +6,10 @@ export const defaultProductSpec: CompleteProductSpec = {
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   meta: {
-    name: 'Pulse',
-    shortName: 'Pulse',
-    tagline: 'Multi-Platform Operational Intelligence & AI Workflow Platform',
-    description: 'High-density operational intelligence with real-time web & mobile synchronization.',
+    name: 'GST Billing',
+    shortName: 'GST Billing',
+    tagline: 'Bill Smarter • Grow Faster',
+    description: 'High-density GST billing and financial operational management with real-time web & mobile synchronization.',
     objective: 'Provide high-density multi-platform operational intelligence and real-time incident lifecycle management across web and native mobile clients.',
     problemSummary: 'Fragmented operations across slow web dashboards and disconnected mobile tools lead to critical delays in field reporting and resolution.',
     targetUsers: ['Operations Coordinators', 'Field Responders', 'Risk Analysts', 'Incident Commanders'],
@@ -273,7 +273,7 @@ export const defaultProductSpec: CompleteProductSpec = {
     loginGuidanceText: 'Sign in with your operational credentials to access your designated workspace.',
   },
   mobileExperience: {
-    appName: 'Pulse',
+    appName: 'GST Billing',
     tabBarItems: [
       { key: 'home', label: 'Home', iconName: 'Home' },
       { key: 'items', label: 'Records', iconName: 'Shield' },

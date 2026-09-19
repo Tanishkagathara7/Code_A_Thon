@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
 import { domainConfig } from '@/lib/domain.config';
@@ -54,11 +55,18 @@ export const MarketingNav: React.FC = () => {
       >
         {/* Brand identity: Sleek, high-precision */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-zinc-900 to-zinc-800 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-zinc-950/20 group-hover:scale-105 transition-transform">
-            {domainConfig.brand.shortName.charAt(0)}
+          <div className="w-11 h-11 rounded-xl overflow-hidden shadow-md shadow-zinc-950/10 border border-zinc-200/90 group-hover:scale-105 transition-transform flex items-center justify-center bg-white p-0.5 shrink-0">
+            <Image
+              src="/icon.png"
+              alt="GST Billing"
+              width={44}
+              height={44}
+              className="object-contain w-full h-full scale-110"
+              priority
+            />
           </div>
           <div className="flex items-center gap-2">
-            <span className="font-bold tracking-tight text-zinc-900 text-base">
+            <span className="font-extrabold tracking-tight text-zinc-950 text-lg">
               {domainConfig.brand.name}
             </span>
           </div>

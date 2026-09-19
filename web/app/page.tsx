@@ -585,16 +585,16 @@ export default function MarketingPage() {
               </div>
             </div>
 
-            {/* Real Code-A-Thon Asset Frame */}
+            {/* Real GST Billing Brand Asset Frame */}
             <div className="lg:col-span-7 relative">
               <TiltCard maxTilt={14} perspective={1200} className="w-full">
                 <div className="codeathon-visual-frame bento-card p-4 sm:p-6 shadow-xl bg-white/90 backdrop-blur-md transition-all duration-300 hover:shadow-2xl">
-                  <div className="relative aspect-[2083/755] w-full rounded-xl bg-zinc-50/70 p-2 overflow-hidden border border-black/[0.06]">
+                  <div className="relative aspect-square max-h-[380px] mx-auto w-full rounded-2xl bg-zinc-50/70 p-4 overflow-hidden border border-black/[0.06] flex items-center justify-center">
                     <Image
-                      src="/code.png"
-                      alt="APP multi-platform engineering architecture diagram illustrating Next.js, React Native Expo, and Express REST integration"
+                      src="/logo.png"
+                      alt="GST Billing System Logo and Brand Mark"
                       fill
-                      sizes="(max-width: 768px) 100vw, 700px"
+                      sizes="(max-width: 768px) 100vw, 450px"
                       className="object-contain p-2"
                       priority
                     />

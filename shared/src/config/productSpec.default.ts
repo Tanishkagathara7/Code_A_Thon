@@ -1,5 +1,4 @@
 import { CompleteProductSpec } from '../types/productSpec';
-import { domainConfig } from './domain.config';
 
 /**
  * Default starter active product specification.
@@ -7,20 +6,20 @@ import { domainConfig } from './domain.config';
  * Replaced automatically by the Product Generation Engine when analyzing a problem statement.
  */
 export const defaultProductSpec: CompleteProductSpec = {
-  id: 'pulse-default-starter',
+  id: 'gst-billing-starter',
   version: '1.0.0',
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   meta: {
-    name: domainConfig.brand.name,
-    shortName: domainConfig.brand.shortName,
-    tagline: domainConfig.brand.tagline,
-    description: domainConfig.brand.description,
-    objective: 'Provide high-density multi-platform operational intelligence and real-time incident lifecycle management across web and native mobile clients.',
-    problemSummary: 'Fragmented operations across slow web dashboards and disconnected mobile tools lead to critical delays in field reporting and resolution.',
-    targetUsers: ['Operations Coordinators', 'Field Responders', 'Risk Analysts', 'Incident Commanders'],
-    accentColorHex: domainConfig.brand.accentColor,
-    themeGradient: domainConfig.brand.themeGradient,
+    name: 'GST Billing',
+    shortName: 'GST Billing',
+    tagline: 'Bill Smarter • Grow Faster',
+    description: 'High-density GST billing and financial operational management with real-time web & mobile synchronization.',
+    objective: 'Provide high-speed multi-platform GST invoicing, tax computation, client account management, and real-time ledger synchronization across web and native mobile clients.',
+    problemSummary: 'Disjointed billing tools and manual tax calculations lead to delays, compliance errors, and cashflow friction.',
+    targetUsers: ['Accountants', 'Billing Operators', 'Business Owners', 'Auditors'],
+    accentColorHex: '#4F46E5',
+    themeGradient: ['#1E274A', '#2D3A6B'],
   },
   roles: [
     {
@@ -279,7 +278,7 @@ export const defaultProductSpec: CompleteProductSpec = {
     loginGuidanceText: 'Sign in with your operational credentials to access your designated workspace.',
   },
   mobileExperience: {
-    appName: domainConfig.brand.name,
+    appName: 'GST Billing',
     tabBarItems: [
       { key: 'home', label: 'Home', iconName: 'Home' },
       { key: 'items', label: 'Records', iconName: 'Shield' },
@@ -287,8 +286,8 @@ export const defaultProductSpec: CompleteProductSpec = {
       { key: 'ai', label: 'AI Copilot', iconName: 'Sparkles' },
       { key: 'notifications', label: 'Alerts', iconName: 'Bell' },
     ],
-    quickActionTitle: 'Log Operational Incident',
-    primaryEntityWorkflowName: 'Field Incident Triage',
+    quickActionTitle: 'Create Tax Invoice',
+    primaryEntityWorkflowName: 'GST Invoicing Lifecycle',
   },
-  aiSystemPrompt: domainConfig.domain.aiSystemPrompt,
+  aiSystemPrompt: 'Act as a specialized GST Billing and financial intelligence copilot. Assist with tax slabs, invoice itemization, HSN codes, and ledger reconciliation.',
 };
