@@ -2,11 +2,12 @@
 
 import React, { useRef } from 'react';
 import {
-  Layers,
+  FileText,
+  Users,
+  Package,
+  Printer,
+  CheckCircle2,
   TrendingUp,
-  Activity,
-  ShieldCheck,
-  Zap,
 } from 'lucide-react';
 
 export const HeroProductShowcase: React.FC = () => {
@@ -15,187 +16,183 @@ export const HeroProductShowcase: React.FC = () => {
   return (
     <>
       {/* ========================================================
-          HERO MAIN STAGE: 3D ISOMETRIC TABLET MOCKUP WITH STYLUS
+          HERO MAIN STAGE: REALISTIC GST INVOICE COUNTER PREVIEW
          ======================================================== */}
       <div className="w-full relative py-0 select-none">
-        {/* 3D Perspective Stage Container */}
-        <div className="tablet-perspective-stage relative max-w-5xl mx-auto pt-2 pb-4 px-2 sm:px-6">
-          {/* Playful background decorative shapes matching reference image */}
-          <div className="absolute -top-10 -left-12 w-64 h-64 bg-pink-200/40 rounded-full blur-2xl pointer-events-none -z-10" />
-          <div className="absolute -bottom-8 left-1/4 w-80 h-32 bg-emerald-300/30 rounded-full blur-2xl pointer-events-none -z-10" />
-          <div className="absolute top-1/4 -right-10 w-72 h-72 bg-blue-200/40 rounded-full blur-2xl pointer-events-none -z-10" />
+        <div className="relative max-w-5xl mx-auto pt-2 pb-4 px-2 sm:px-6">
+          {/* Subtle warm decorative tints */}
+          <div className="absolute -top-10 -left-12 w-64 h-64 bg-[#FEF7ED] rounded-full blur-2xl pointer-events-none -z-10" />
+          <div className="absolute -bottom-8 left-1/4 w-80 h-32 bg-[#F1F8F2] rounded-full blur-2xl pointer-events-none -z-10" />
+          <div className="absolute top-1/4 -right-10 w-72 h-72 bg-[#F4F7FB] rounded-full blur-2xl pointer-events-none -z-10" />
           
-          {/* 3D Isometric Tablet Body */}
+          {/* Main Desktop Dashboard & Invoice Body */}
           <div
             ref={stageRef}
-            className="tablet-3d-body relative rounded-[2.5rem] bg-[#1E242B] p-3 sm:p-4 border-2 border-zinc-700/60 shadow-2xl transition-transform duration-300 overflow-hidden"
+            className="tablet-3d-body relative rounded-[2rem] bg-[#1E242B] p-2.5 sm:p-3.5 border border-zinc-800 shadow-2xl transition-transform duration-300 overflow-hidden"
           >
-            {/* Tablet Camera Pinhole & Sensor */}
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-30 pointer-events-none">
-              <span className="w-2 h-2 rounded-full bg-zinc-900 border border-zinc-700/80" />
-              <span className="w-1 h-1 rounded-full bg-blue-900/60" />
-            </div>
-
             {/* Glossy Screen Glare overlay */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.04] via-transparent to-white/[0.08] pointer-events-none z-20 rounded-[2rem]" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.03] via-transparent to-white/[0.06] pointer-events-none z-20 rounded-[1.8rem]" />
 
-            {/* Inner Tablet Screen Container */}
-            <div className="relative rounded-[2rem] bg-white overflow-hidden shadow-inner flex flex-col min-h-[460px] text-zinc-800">
+            {/* Inner POS / Billing Container */}
+            <div className="relative rounded-[1.6rem] bg-[#FFFDF8] overflow-hidden shadow-inner flex flex-col min-h-[460px] text-zinc-900 border border-[#E2E4E9]">
               
-              {/* Tablet Top Navigation Bar */}
-              <div className="h-14 bg-white border-b border-zinc-200/80 px-4 sm:px-6 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1.5 text-zinc-900 font-extrabold tracking-tight text-lg">
-                    <span className="text-[#1E242B] font-black">Tech</span>
-                    <span className="text-zinc-500 font-semibold text-sm">matrix</span>
+              {/* Top Application Bar */}
+              <div className="h-14 bg-white border-b border-[#E2E4E9] px-4 sm:px-6 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-[#0A0A0A] text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                    ₹
                   </div>
-                  <button className="text-cyan-500 hover:text-cyan-600 p-1 cursor-pointer" aria-label="Menu">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                  </button>
+                  <div>
+                    <div className="text-sm font-extrabold tracking-tight text-[#0A0A0A] leading-none">
+                      Shreeji General Store
+                    </div>
+                    <div className="text-[10px] font-mono text-[#525866] mt-0.5">
+                      GSTIN: 24AAACP1234M1Z5 • Gujarat (State 24)
+                    </div>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 pl-2 pr-3 py-1 rounded-full bg-cyan-50/60 border border-cyan-100 text-xs font-semibold text-cyan-800">
-                    <div className="w-6 h-6 rounded-full bg-cyan-500 text-white flex items-center justify-center font-bold text-[11px] shadow-sm">
-                      TM
-                    </div>
-                    <span className="hidden sm:inline font-medium">tripMatrix</span>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-[#F1F8F2] text-[#16A34A] border border-[#DCFCE7]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] animate-pulse" />
+                    GST Portal Linked
+                  </span>
+                  <div className="hidden sm:flex items-center gap-1 bg-[#F4F7FB] px-2.5 py-1 rounded-lg text-xs font-mono text-[#525866] border border-[#E2E4E9]">
+                    <span>Counter 01</span>
                   </div>
                 </div>
               </div>
 
-              {/* Tablet Two-Column Layout (Sidebar + Main Data Tables) */}
+              {/* Two-Column Layout (Mini Navigation + Live Tax Invoice Workspace) */}
               <div className="flex flex-1 overflow-hidden">
                 
                 {/* Left Mini Sidebar */}
-                <div className="w-40 sm:w-48 bg-zinc-50/70 border-r border-zinc-200/80 p-3 sm:p-4 flex flex-col justify-between hidden sm:flex">
+                <div className="w-44 bg-[#FAF9F5] border-r border-[#E2E4E9] p-3 flex flex-col justify-between hidden sm:flex">
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-cyan-50 text-cyan-700 font-semibold text-xs border border-cyan-200/60 shadow-xs">
-                      <Layers className="w-4 h-4 text-cyan-600" />
-                      <span>Dashboard</span>
+                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-[#0A0A0A] text-white font-semibold text-xs shadow-xs">
+                      <FileText className="w-4 h-4 text-white" />
+                      <span>Billing Desk</span>
                     </div>
-                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-zinc-600 hover:bg-zinc-100 text-xs font-medium transition-colors">
-                      <Activity className="w-4 h-4 text-zinc-400" />
-                      <span>Inquiry</span>
+                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[#525866] hover:bg-white text-xs font-medium transition-colors">
+                      <Users className="w-4 h-4 text-[#868C98]" />
+                      <span>Parties (Khata)</span>
                     </div>
-                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-zinc-600 hover:bg-zinc-100 text-xs font-medium transition-colors">
-                      <TrendingUp className="w-4 h-4 text-zinc-400" />
-                      <span>Tracking</span>
+                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[#525866] hover:bg-white text-xs font-medium transition-colors">
+                      <Package className="w-4 h-4 text-[#868C98]" />
+                      <span>Products & HSN</span>
                     </div>
-                    <div className="flex items-center justify-between px-3 py-2 rounded-lg text-zinc-600 hover:bg-zinc-100 text-xs font-medium transition-colors">
-                      <div className="flex items-center gap-2.5">
-                        <ShieldCheck className="w-4 h-4 text-zinc-400" />
-                        <span>Manage</span>
-                      </div>
-                      <span className="text-xs text-zinc-400 font-mono">›</span>
-                    </div>
-                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-zinc-600 hover:bg-zinc-100 text-xs font-medium transition-colors">
-                      <Zap className="w-4 h-4 text-zinc-400" />
-                      <span>Setting</span>
+                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[#525866] hover:bg-white text-xs font-medium transition-colors">
+                      <TrendingUp className="w-4 h-4 text-[#868C98]" />
+                      <span>Sales & Tax</span>
                     </div>
                   </div>
 
-                  <div className="p-2.5 rounded-lg bg-white border border-zinc-200/80 text-xs text-zinc-500">
-                    <div className="font-semibold text-zinc-800">Status</div>
-                    <div className="flex items-center gap-1.5 text-emerald-600 font-medium mt-0.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      Live Inquiries Active
-                    </div>
+                  <div className="p-2.5 rounded-xl bg-white border border-[#E2E4E9] text-xs space-y-1">
+                    <div className="text-[10px] uppercase font-bold text-[#868C98]">Today&apos;s Collection</div>
+                    <div className="font-extrabold text-sm text-[#0A0A0A] font-mono">₹48,920.00</div>
+                    <div className="text-[10px] text-[#16A34A] font-medium">18 bills generated</div>
                   </div>
                 </div>
 
-                {/* Main Content Area */}
-                <div className="flex-1 p-5 sm:p-6 space-y-6 overflow-x-auto bg-white">
+                {/* Main Content: Live GST Invoice Creation Form */}
+                <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-x-auto bg-[#FFFDF8]">
                   
-                  {/* Dashboard Header Bar (Using div with presentation semantics to not disrupt page H1->H2 outline) */}
-                  <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
+                  {/* Bill Meta Row */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#E2E4E9]">
                     <div>
-                      <div className="text-base font-bold tracking-tight text-zinc-900" role="presentation">
-                        Operational Dashboard
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs font-bold text-[#0A0A0A] bg-zinc-100 px-2 py-0.5 rounded border border-zinc-200">
+                          TAX INVOICE
+                        </span>
+                        <span className="font-mono text-xs font-semibold text-zinc-600">
+                          #INV-2026-0042
+                        </span>
                       </div>
-                      <div className="text-xs text-zinc-500 font-medium">Real-Time Inquiry Telemetry</div>
+                      <div className="text-xs text-[#525866] mt-1">
+                        Billed To: <strong className="text-zinc-900">Rajesh Traders</strong> (GSTIN: 24AABCT1357Q1ZP • Gujarat)
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs text-zinc-600 bg-zinc-100 px-3 py-1 rounded-md tabular-nums">
-                        16-07-2026 05:03 pm
+                      <span className="text-xs text-emerald-800 font-semibold bg-[#F1F8F2] border border-emerald-200 px-2.5 py-1 rounded-lg">
+                        Intra-State (CGST 2.5% + SGST 2.5%)
                       </span>
                     </div>
                   </div>
 
-                  {/* Summary Metric Cards (Spacious & High Readability) */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                    <div className="p-3.5 rounded-xl bg-cyan-50/60 border border-cyan-200/70">
-                      <div className="text-xs text-cyan-800 font-semibold">Active Inquiries</div>
-                      <div className="text-xl font-bold text-cyan-950 mt-1">24 Received</div>
-                    </div>
-                    <div className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200/70">
-                      <div className="text-xs text-emerald-800 font-semibold">Sync Status</div>
-                      <div className="text-xl font-bold text-emerald-950 mt-1">100% In Sync</div>
-                    </div>
-                    <div className="p-3.5 rounded-xl bg-violet-50/60 border border-violet-200/70">
-                      <div className="text-xs text-violet-800 font-semibold">Avg Response</div>
-                      <div className="text-xl font-bold text-violet-950 mt-1">&lt; 38ms</div>
-                    </div>
+                  {/* Itemized Table */}
+                  <div className="rounded-xl border border-[#E2E4E9] overflow-hidden bg-white shadow-xs">
+                    <table className="w-full text-left text-xs" aria-label="Invoice Line Items Preview">
+                      <thead className="bg-[#F7F5EF] border-b border-[#E2E4E9] text-[#525866] font-semibold">
+                        <tr>
+                          <th className="px-3.5 py-2.5">Item Description</th>
+                          <th className="px-3 py-2.5 font-mono">HSN</th>
+                          <th className="px-3 py-2.5 text-right font-mono">Qty</th>
+                          <th className="px-3 py-2.5 text-right font-mono">Rate (₹)</th>
+                          <th className="px-3 py-2.5 text-right font-mono">Taxable (₹)</th>
+                          <th className="px-3 py-2.5 text-center font-mono">GST %</th>
+                          <th className="px-3 py-2.5 text-right font-mono">Tax (₹)</th>
+                          <th className="px-3.5 py-2.5 text-right font-mono">Total (₹)</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-zinc-100 font-mono text-zinc-800">
+                        <tr className="hover:bg-zinc-50/50">
+                          <td className="px-3.5 py-2.5 font-sans font-medium text-zinc-900">
+                            Basmati Rice 5kg Pack
+                          </td>
+                          <td className="px-3 py-2.5 text-zinc-500">1006</td>
+                          <td className="px-3 py-2.5 text-right">10</td>
+                          <td className="px-3 py-2.5 text-right">450.00</td>
+                          <td className="px-3 py-2.5 text-right">4,500.00</td>
+                          <td className="px-3 py-2.5 text-center text-emerald-700">5%</td>
+                          <td className="px-3 py-2.5 text-right text-zinc-600">225.00</td>
+                          <td className="px-3.5 py-2.5 text-right font-bold text-zinc-900">4,725.00</td>
+                        </tr>
+                        <tr className="hover:bg-zinc-50/50">
+                          <td className="px-3.5 py-2.5 font-sans font-medium text-zinc-900">
+                            Sunflower Refined Oil 1L
+                          </td>
+                          <td className="px-3 py-2.5 text-zinc-500">1512</td>
+                          <td className="px-3 py-2.5 text-right">20</td>
+                          <td className="px-3 py-2.5 text-right">140.00</td>
+                          <td className="px-3 py-2.5 text-right">2,800.00</td>
+                          <td className="px-3 py-2.5 text-center text-emerald-700">5%</td>
+                          <td className="px-3 py-2.5 text-right text-zinc-600">140.00</td>
+                          <td className="px-3.5 py-2.5 text-right font-bold text-zinc-900">2,940.00</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
 
-                  {/* Focused Table Preview */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="font-semibold text-zinc-800 text-sm">Recent Live Inquiries</div>
-                      <span className="text-xs text-zinc-500">Showing 2 of 24 records</span>
+                  {/* Summary Footer */}
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+                    <div className="text-xs text-[#525866]">
+                      Amount in words:{' '}
+                      <span className="font-semibold text-zinc-800 italic">
+                        Seven Thousand Six Hundred Sixty-Five Rupees Only
+                      </span>
                     </div>
 
-                    <div className="rounded-xl border border-zinc-200 overflow-hidden shadow-xs">
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-left text-xs" aria-label="Recent Inquiries Preview">
-                          <thead className="bg-zinc-50 border-b border-zinc-200 text-zinc-600 font-semibold">
-                            <tr>
-                              <th className="px-4 py-3">Inquiry ID</th>
-                              <th className="px-4 py-3">Customer</th>
-                              <th className="px-4 py-3">Destination</th>
-                              <th className="px-4 py-3">Handled By</th>
-                              <th className="px-4 py-3">Timestamp</th>
-                              <th className="px-4 py-3">Status</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-zinc-100 text-zinc-700">
-                            <tr className="hover:bg-zinc-50/60 transition-colors">
-                              <td className="px-4 py-3 font-mono font-medium text-zinc-900">INQ-001</td>
-                              <td className="px-4 py-3 font-medium text-zinc-800">Mr. Alice</td>
-                              <td className="px-4 py-3">Thailand</td>
-                              <td className="px-4 py-3">Mr. John</td>
-                              <td className="px-4 py-3 font-mono text-xs tabular-nums text-zinc-600">
-                                16-07-2026 05:03 pm
-                              </td>
-                              <td className="px-4 py-3">
-                                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
-                                  New
-                                </span>
-                              </td>
-                            </tr>
-                            <tr className="hover:bg-zinc-50/60 transition-colors">
-                              <td className="px-4 py-3 font-mono font-medium text-zinc-900">INQ-002</td>
-                              <td className="px-4 py-3 font-medium text-zinc-800">Mr. Mike</td>
-                              <td className="px-4 py-3">Thailand</td>
-                              <td className="px-4 py-3">Mr. John</td>
-                              <td className="px-4 py-3 font-mono text-xs tabular-nums text-zinc-600">
-                                16-07-2026 05:03 pm
-                              </td>
-                              <td className="px-4 py-3">
-                                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                                  In Progress
-                                </span>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
+                    <div className="flex items-center gap-4 bg-white border border-[#E2E4E9] px-4 py-2.5 rounded-xl shadow-xs">
+                      <div className="text-right">
+                        <div className="text-[10px] uppercase font-bold text-[#525866]">
+                          Grand Total (Incl. Taxes)
+                        </div>
+                        <div className="text-lg font-black font-mono text-[#0A0A0A]">
+                          ₹7,665.00
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5 pl-3 border-l border-[#E2E4E9]">
+                        <button
+                          type="button"
+                          className="px-3 py-1.5 bg-[#0A0A0A] hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                        >
+                          <Printer className="w-3.5 h-3.5" />
+                          <span>Print Tax Invoice</span>
+                        </button>
                       </div>
                     </div>
                   </div>
+
                 </div>
               </div>
             </div>

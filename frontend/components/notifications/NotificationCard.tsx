@@ -20,12 +20,16 @@ interface NotificationCardProps {
   onPress?: (notification: AppNotification) => void;
 }
 
-const TYPE_CONFIG: Record<NotificationType, { label: string; badgeBg: string; textColor: string }> = {
-  ITEM_CREATED: { label: 'ITEM CREATED', badgeBg: '#EEF2FF', textColor: '#4F46E5' },
-  ITEM_UPDATED: { label: 'ITEM UPDATED', badgeBg: '#F0FDF4', textColor: '#16A34A' },
-  ITEM_COMPLETED: { label: 'COMPLETED', badgeBg: '#ECFDF5', textColor: '#059669' },
-  AI_COMPLETED: { label: 'AI TASK', badgeBg: '#F5F3FF', textColor: '#7C3AED' },
-  SYSTEM: { label: 'SYSTEM', badgeBg: '#F3F4F6', textColor: '#4B5563' },
+const TYPE_CONFIG: Record<string, { label: string; badgeBg: string; textColor: string }> = {
+  invoice_generated: { label: 'TAX INVOICE', badgeBg: '#ECFDF5', textColor: '#047857' },
+  payment_received: { label: 'PAYMENT CLEARED', badgeBg: '#EFF6FF', textColor: '#1D4ED8' },
+  tax_rule: { label: 'GST TAX ROUTE', badgeBg: '#FFFBEB', textColor: '#B45309' },
+  compliance: { label: 'STATUTORY COMPLIANCE', badgeBg: '#F3F4F6', textColor: '#374151' },
+  ITEM_CREATED: { label: 'BILL CREATED', badgeBg: '#ECFDF5', textColor: '#047857' },
+  ITEM_UPDATED: { label: 'BILL UPDATED', badgeBg: '#EFF6FF', textColor: '#1D4ED8' },
+  ITEM_COMPLETED: { label: 'PAID IN FULL', badgeBg: '#ECFDF5', textColor: '#047857' },
+  AI_COMPLETED: { label: 'AI TAX AUDIT', badgeBg: '#FAF5FF', textColor: '#7E22CE' },
+  SYSTEM: { label: 'SYSTEM ALERT', badgeBg: '#F3F4F6', textColor: '#4B5563' },
 };
 
 function formatRelativeTime(dateString: string): string {

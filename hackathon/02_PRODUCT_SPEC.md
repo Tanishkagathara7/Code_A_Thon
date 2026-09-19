@@ -1,68 +1,68 @@
-# 02 — Product Specification
+# 02 — Product Specification: VyaaparGST (GST Billing & Khata System)
 
-> **STATUS**: TEMPLATE / UNGENERATED  
-> *This document will be updated by Antigravity after completing [`01_PROBLEM_ANALYSIS.md`](file:///d:/Code_A_Thon/hackathon/01_PROBLEM_ANALYSIS.md).*
+> **STATUS**: ACTIVE / DOMAIN SPECIFICATION  
+> Aligned with Darshan University CE Department Project Task: GST Billing System.
 
 ---
 
 ## Product Name
 
-[PRODUCT NAME]
+**VyaaparGST** (व्यापार GST) — Smart GST Billing & Retail Invoicing Suite
 
 ## One-Line Description
 
-[CONCISE ONE-LINE VALUE PROPOSITION]
+A fast, reliable, and modern GST-compliant invoicing, party ledger, and billing application designed specifically for Indian retail shops, kirana stores, wholesalers, and service businesses.
 
 ## Target User
 
-[PRIMARY USER PROFILE]
+* **Primary Users**: Small and medium-sized Indian shopkeepers, retail store owners, kirana merchants, traders, service providers, and accounting staff.
+* **Context**: Fast-paced billing counters requiring rapid customer selection, barcode/item lookup, automated CGST/SGST/IGST tax calculation, immutable bill records, and instant A4 PDF / WhatsApp invoice sharing.
 
 ## Core Problem
 
-[PRIMARY PAIN POINT]
+Manual billing and spreadsheet accounting are slow, error-prone, and confusing when calculating multi-slab GST (0%, 5%, 12%, 18%, 28%) across intra-state (CGST + SGST) and inter-state (IGST) sales. Small business owners struggle to maintain customer credit ledgers, item prices, and compliant tax invoice records.
 
 ## Core Value Proposition
 
-[PRIMARY VALUE DELIVERED]
+1. **Sub-30-Second Invoicing**: Fast party search, item autocomplete, and automated tax calculations.
+2. **Accurate GST Engine**: Intra-state vs inter-state tax splits (CGST/SGST vs IGST) calculated automatically.
+3. **Reusable Party & Item Catalog**: One-click selection of customers and inventory items with preset HSN and GST rates.
+4. **Professional Printable Invoices**: GST-compliant A4 PDF invoice generator with business header, tax breakdown, and WhatsApp/Email sharing.
+5. **Dual-Platform Parity**: Full web dashboard for counter desktops and native mobile app for on-the-go billing.
+
+---
 
 ## Primary User Flow
 
 ```text
-[Step 1: Onboarding / Access] 
-  → [Step 2: Core Action / Creation] 
-  → [Step 3: AI Insights / Processing] 
-  → [Step 4: Status Update / Completion]
+[Step 1: Access / Login / Guest Mode] 
+  → [Step 2: Select or Quick-Add Party (Customer)] 
+  → [Step 3: Add Items, Quantities & Rates (Auto-compute Taxable & GST)] 
+  → [Step 4: Generate Bill & Download / Print / Share GST PDF Invoice]
 ```
 
-## MVP Features
-
-### P0 — Absolutely Required
-* **Feature P0-1**: [Feature Description]
-* **Feature P0-2**: [Feature Description]
-
-### P1 — Important
-* **Feature P1-1**: [Feature Description]
-
-### P2 — Optional
-* **Feature P2-1**: [Feature Description]
-
 ---
 
-## Winning Feature
+## MVP Features (Darshan University Task Alignment)
 
-> **The primary feature providing strong hackathon differentiation.**
+### P0 — Absolutely Required (Delivered in Core)
+* **Party Management**: Add, edit, search parties with Name, Mobile, Address, State, GSTIN, Email, and bill history.
+* **Item Management**: Add, edit, search items with Item Name, HSN/SAC code, Unit Price, GST % (0%, 5%, 12%, 18%, 28%).
+* **GST Bill Creation**:
+  * Party selection with state detection.
+  * Line items with quantity, rate, taxable amount ($Rate \times Qty$).
+  * Tax split: If Party State = Shop State $\rightarrow$ CGST ($GST\% / 2$) + SGST ($GST\% / 2$); else IGST ($GST\%$).
+  * Auto totals: Subtotal, Total Tax, Grand Total (rounded).
+  * Unique sequential invoice number (`INV-2026-XXXX`) and date.
+  * Immutability of saved bills.
+* **PDF Invoice Generation**:
+  * Standard tax invoice layout with shop header, party details, itemized table, tax breakdown, amount in words.
+  * Direct browser print and PDF download.
+* **Bill History & Dashboard**:
+  * Filterable bill history by party name or date range.
+  * Real dashboard metrics: Total Sales (₹), Total GST Collected (₹), Bill Count (Today / This Month).
 
-* **What It Does**: [Detailed description of the standout feature]
-* **Why It Matters**: [How it addresses the core problem uniquely]
-* **How It Solves The Problem**: [Mechanism and interaction flow]
-* **Why Judges Would Care**: [Impact, innovation, and presentation value]
-
----
-
-## Features Explicitly Not Building
-
-To prevent scope creep and ensure timely delivery, the following features are **intentionally excluded**:
-
-1. [Excluded Feature 1] — *Reason: Out of scope for hackathon MVP*
-2. [Excluded Feature 2] — *Reason: High complexity, low demo value*
-3. [Excluded Feature 3] — *Reason: Covered by existing static config or mock data*
+### P1 — Commercial SaaS Enhancements
+* Instant Guest Billing mode for quick over-the-counter sales without friction.
+* Dual-platform parity between Web desktop command center and touch-friendly mobile interface.
+* Indian Rupee (₹) and tabular numeral formatting across all financial surfaces.

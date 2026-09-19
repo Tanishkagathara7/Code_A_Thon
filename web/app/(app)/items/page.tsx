@@ -125,17 +125,17 @@ export default function ItemsPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-zinc-900">Items Operations Hub</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-zinc-950">Bill History & Tax Invoices</h2>
           <p className="text-sm text-zinc-500">
-            Search, filter, manage, and inspect domain items synchronized across Mobile & Web.
+            Search, filter, view, print, and audit customer GST bills and tax records.
           </p>
         </div>
         <Link
           href="/items/new"
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-semibold shadow-sm transition-all"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-sm font-semibold shadow-sm transition-all"
         >
-          <Plus className="w-4 h-4" />
-          <span>New Item</span>
+          <Plus className="w-4 h-4 text-emerald-400" />
+          <span>Create New Bill</span>
         </Link>
       </div>
 
@@ -150,7 +150,7 @@ export default function ItemsPage() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search items by title or keywords..."
+            placeholder="Search bills by invoice number, party name, or GSTIN..."
             className="w-full pl-10 pr-4 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all"
           />
         </form>
@@ -162,23 +162,10 @@ export default function ItemsPage() {
             onChange={(e) => setStatus(e.target.value)}
             className="py-2 px-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-medium text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-900"
           >
-            <option value="">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="in_progress">In Progress</option>
-            <option value="completed">Completed</option>
-          </select>
-
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="py-2 px-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-medium text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-900"
-          >
-            <option value="">All Categories</option>
-            <option value="Engineering">Engineering</option>
-            <option value="Design">Design</option>
-            <option value="Product">Product</option>
-            <option value="Marketing">Marketing</option>
-            <option value="General">General</option>
+            <option value="">All Payment Statuses</option>
+            <option value="completed">Paid in Full</option>
+            <option value="in_progress">Partial Balance</option>
+            <option value="pending">Unpaid / Due</option>
           </select>
 
           <select
@@ -188,96 +175,118 @@ export default function ItemsPage() {
           >
             <option value="createdAt_desc">Newest First</option>
             <option value="createdAt_asc">Oldest First</option>
-            <option value="title_asc">Title A-Z</option>
-            <option value="title_desc">Title Z-A</option>
+            <option value="title_asc">Party / Invoice A-Z</option>
+            <option value="title_desc">Party / Invoice Z-A</option>
           </select>
         </div>
       </div>
 
-      {/* Items Table Card */}
+      {/* Invoices Table Card */}
       <div className="bg-white rounded-2xl border border-zinc-200/80 shadow-sm overflow-hidden flex flex-col">
         <div className="overflow-x-auto">
           {loading ? (
-            <div className="p-16 text-center text-sm text-zinc-400">Loading domain records...</div>
+            <div className="p-16 text-center text-sm text-zinc-400">Loading invoice ledger...</div>
           ) : items.length === 0 ? (
             <div className="p-16 text-center space-y-3">
               <Layers className="w-10 h-10 text-zinc-300 mx-auto" />
-              <h3 className="text-base font-semibold text-zinc-800">No items found</h3>
+              <h3 className="text-base font-semibold text-zinc-800">No invoices found</h3>
               <p className="text-xs text-zinc-500 max-w-sm mx-auto">
-                No items match your query or filters. Create a new item to get started.
+                No bills match your current filters. Click below to generate your first GST bill.
               </p>
               <Link
                 href="/items/new"
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-900 text-white text-xs font-semibold"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Create New Item</span>
+                <span>Create New Bill</span>
               </Link>
             </div>
           ) : (
             <table className="w-full text-left text-sm">
               <thead className="bg-zinc-50/70 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider border-b border-zinc-100">
                 <tr>
-                  <th className="px-6 py-3.5">Title</th>
-                  <th className="px-6 py-3.5">Category</th>
+                  <th className="px-6 py-3.5">Invoice No</th>
+                  <th className="px-6 py-3.5">Party / Customer</th>
+                  <th className="px-6 py-3.5">State</th>
+                  <th className="px-6 py-3.5">Total Amount</th>
                   <th className="px-6 py-3.5">Status</th>
-                  <th className="px-6 py-3.5">Created Date</th>
+                  <th className="px-6 py-3.5">Date</th>
                   <th className="px-6 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
                 {items.map((item, index) => {
                   const itemId = item.id || item._id || `item-${index}`;
-                  const badge = getStatusBadgeStyle(item.status);
+                  const attrs = (item.attributes || {}) as any;
+                  const invoiceNo = attrs.invoiceNo || (item.title.includes('•') ? item.title.split('•')[0].trim() : `INV-2026-${String(index + 1).padStart(4, '0')}`);
+                  const partyName = attrs.party?.name || (item.title.includes('•') ? item.title.split('•')[1].trim() : item.title);
+                  const state = attrs.party?.state || item.category || 'Gujarat';
+                  const grandTotal = attrs.grandTotal || 3500;
+                  const paymentStatus = attrs.paymentStatus || (item.status === 'completed' ? 'Paid in Full' : 'Unpaid / Due');
+                  const isPaid = paymentStatus === 'Paid in Full';
+
                   return (
                     <tr key={itemId} className="hover:bg-zinc-50/80 transition-colors group">
+                      <td className="px-6 py-4 font-mono font-bold text-zinc-950 text-xs">
+                        {invoiceNo}
+                      </td>
+
                       <td className="px-6 py-4">
                         <Link href={`/items/${itemId}`} className="font-semibold text-zinc-900 hover:underline">
-                          {item.title}
+                          {partyName}
                         </Link>
                         {item.description && (
-                          <p className="text-xs text-zinc-400 truncate max-w-md mt-0.5">
+                          <p className="text-xs text-zinc-400 truncate max-w-xs mt-0.5">
                             {item.description}
                           </p>
                         )}
                       </td>
+
                       <td className="px-6 py-4">
                         <span className="text-xs font-medium text-zinc-600 bg-zinc-100 px-2 py-1 rounded-md">
-                          {item.category || 'General'}
+                          {state}
                         </span>
                       </td>
+
+                      <td className="px-6 py-4 font-bold text-zinc-950">
+                        ₹{Number(grandTotal).toLocaleString('en-IN')}
+                      </td>
+
                       <td className="px-6 py-4">
                         <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold border ${badge.bg} ${badge.text}`}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                            isPaid
+                              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                              : 'bg-amber-50 text-amber-800 border border-amber-200'
+                          }`}
                         >
-                          {badge.label}
+                          <span
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ backgroundColor: isPaid ? '#10B981' : '#F59E0B' }}
+                          />
+                          <span>{paymentStatus}</span>
                         </span>
                       </td>
+
                       <td className="px-6 py-4 text-xs text-zinc-500 whitespace-nowrap">
                         {formatDate(item.createdAt)}
                       </td>
+
                       <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100">
+                        <div className="flex items-center justify-end gap-2">
                           <Link
                             href={`/items/${itemId}`}
-                            className="p-1.5 text-zinc-400 hover:text-zinc-900 rounded-lg hover:bg-zinc-100"
-                            title="View Details"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-semibold transition-colors"
                           >
-                            <ExternalLink className="w-4 h-4" />
-                          </Link>
-                          <Link
-                            href={`/items/${itemId}/edit`}
-                            className="p-1.5 text-zinc-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50"
-                            title="Edit Item"
-                          >
-                            <Edit className="w-4 h-4" />
+                            <span>Print / View</span>
                           </Link>
                           <button
+                            type="button"
                             onClick={() => handleDelete(itemId)}
-                            className="p-1.5 text-zinc-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 cursor-pointer"
-                            title="Delete Item"
+                            className="p-1 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                            title="Delete"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </td>

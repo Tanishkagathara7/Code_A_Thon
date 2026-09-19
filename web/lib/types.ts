@@ -64,6 +64,8 @@ export interface CreateItemPayload {
   description?: string;
   status?: ItemStatus;
   category?: string;
+  priority?: string;
+  attributes?: Record<string, unknown>;
 }
 
 export interface UpdateItemPayload {
@@ -71,6 +73,8 @@ export interface UpdateItemPayload {
   description?: string;
   status?: ItemStatus;
   category?: string;
+  priority?: string;
+  attributes?: Record<string, unknown>;
 }
 
 export interface AnalyticsOverviewMetrics {
@@ -140,3 +144,5 @@ export interface AppNotification {
   read: boolean;
   createdAt: string;
 }
+
+export * from '@shared/types/gstBilling';

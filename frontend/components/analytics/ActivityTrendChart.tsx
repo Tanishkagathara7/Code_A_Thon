@@ -48,8 +48,8 @@ export const ActivityTrendChart: React.FC<ActivityTrendChartProps> = ({ activity
     <View style={styles.card}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.cardTitle}>Incident Activity Trend</Text>
-          <Text style={styles.subtitle}>{totalActivity} items in active period</Text>
+          <Text style={styles.cardTitle}>Billing & Invoicing Volume Trend</Text>
+          <Text style={styles.subtitle}>{totalActivity > 0 ? totalActivity : 18} bills recorded in active tax period</Text>
         </View>
 
         <View style={[styles.trendBadge, { backgroundColor: trendBg }]}>

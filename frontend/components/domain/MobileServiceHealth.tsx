@@ -11,31 +11,31 @@ interface ServiceItem {
 
 const SERVICES: ServiceItem[] = [
   {
-    name: 'API Gateway',
+    name: 'GST Portal Gateway',
     status: 'Healthy',
-    uptime: '99.98%',
-    latency: '24ms',
+    uptime: '99.99%',
+    latency: '18ms',
     iconColor: '#10B981',
   },
   {
-    name: 'Auth Service',
+    name: 'Tax Calculation Engine',
+    status: 'Healthy',
+    uptime: '100.0%',
+    latency: '4ms',
+    iconColor: '#10B981',
+  },
+  {
+    name: 'A4 / Thermal Print Queue',
     status: 'Healthy',
     uptime: '99.95%',
-    latency: '37ms',
+    latency: '12ms',
     iconColor: '#10B981',
   },
   {
-    name: 'Database',
-    status: 'Degraded',
-    uptime: '99.80%',
-    latency: '120ms',
-    iconColor: '#F59E0B',
-  },
-  {
-    name: 'Worker Queue',
+    name: 'WhatsApp & Khata Sync',
     status: 'Healthy',
-    uptime: '99.97%',
-    latency: '42ms',
+    uptime: '99.98%',
+    latency: '28ms',
     iconColor: '#10B981',
   },
 ];
@@ -47,11 +47,11 @@ export const MobileServiceHealth: React.FC = () => {
       <View style={styles.header}>
         <View style={styles.headerTitleRow}>
           <View style={styles.healthIcon}>
-            <Text style={{ fontSize: 13 }}>⚡</Text>
+            <Text style={{ fontSize: 13 }}>₹</Text>
           </View>
           <View>
-            <Text style={styles.title}>Service Health</Text>
-            <Text style={styles.subtitle}>Core infrastructure and subsystem status</Text>
+            <Text style={styles.title}>GST Engine & Portal Health</Text>
+            <Text style={styles.subtitle}>Statutory tax gateways and POS hardware link</Text>
           </View>
         </View>
       </View>

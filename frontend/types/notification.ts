@@ -1,9 +1,14 @@
 export type NotificationType =
+  | 'invoice_generated'
+  | 'payment_received'
+  | 'tax_rule'
+  | 'compliance'
   | 'ITEM_CREATED'
   | 'ITEM_UPDATED'
   | 'ITEM_COMPLETED'
   | 'AI_COMPLETED'
-  | 'SYSTEM';
+  | 'SYSTEM'
+  | string;
 
 export interface NotificationData {
   entityId?: string;

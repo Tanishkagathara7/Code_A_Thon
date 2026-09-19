@@ -105,7 +105,7 @@ export const MarketingNav: React.FC = () => {
             href="/signup"
             className="btn-primary px-4 py-2 text-xs font-semibold tracking-wide"
           >
-            <span>Launch Workspace</span>
+            <span>Start Billing</span>
             <ArrowUpRight className="w-3.5 h-3.5 ml-1 opacity-70" />
           </Link>
         </div>

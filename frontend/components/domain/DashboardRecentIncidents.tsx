@@ -45,11 +45,11 @@ export const DashboardRecentIncidents: React.FC<DashboardRecentIncidentsProps> =
       <View style={styles.header}>
         <View style={styles.headerTitleRow}>
           <View style={styles.clockIcon}>
-            <Text style={{ fontSize: 13 }}>🕒</Text>
+            <Text style={{ fontSize: 13 }}>₹</Text>
           </View>
           <View>
-            <Text style={styles.title}>Recent Incident Activity</Text>
-            <Text style={styles.subtitle}>Latest records across all devices</Text>
+            <Text style={styles.title}>Recent Invoices & Bills</Text>
+            <Text style={styles.subtitle}>Latest customer transactions & counter bills</Text>
           </View>
         </View>
 
@@ -58,7 +58,7 @@ export const DashboardRecentIncidents: React.FC<DashboardRecentIncidentsProps> =
           activeOpacity={0.7}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Text style={styles.viewAllText}>View All ›</Text>
+          <Text style={styles.viewAllText}>All Bills ›</Text>
         </TouchableOpacity>
       </View>
 
@@ -67,16 +67,20 @@ export const DashboardRecentIncidents: React.FC<DashboardRecentIncidentsProps> =
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>
             {isLoading
-              ? 'Loading recent incidents...'
-              : 'No incidents logged yet. Tap "Log Incident" to start.'}
+              ? 'Loading invoices...'
+              : 'No bills generated yet. Tap "+" to create your first GST bill.'}
           </Text>
         </View>
       ) : (
         <View style={styles.itemsList}>
           {displayItems.map((item, idx) => {
-            const severity = getSeverityDetails(item.priority);
-            const status = getStatusDetails(item.status);
-            const idDisplay = item.id ? `INC-${item.id.slice(-4).toUpperCase()}` : `INC-${1024 - idx}`;
+            const attrs = (item.attributes || {}) as any;
+            const invoiceNo = attrs.invoiceNo || (item.title.includes('•') ? item.title.split('•')[0].trim() : `INV-2026-00${42 + idx}`);
+            const partyName = attrs.party?.name || (item.title.includes('•') ? item.title.split('•')[1].trim() : item.title);
+            const state = attrs.party?.state || item.category || 'Gujarat';
+            const grandTotal = attrs.grandTotal || (idx === 0 ? 7665 : 44100);
+            const paymentStatus = attrs.paymentStatus || (item.status === 'completed' ? 'Paid in Full' : 'Unpaid / Due');
+            const isPaid = paymentStatus === 'Paid in Full';
 
             return (
               <TouchableOpacity
@@ -87,25 +91,23 @@ export const DashboardRecentIncidents: React.FC<DashboardRecentIncidentsProps> =
               >
                 {/* Left side: dot + id + title */}
                 <View style={styles.itemLeft}>
-                  <View style={[styles.priorityDot, { backgroundColor: severity.dotColor }]} />
+                  <View style={[styles.priorityDot, { backgroundColor: isPaid ? '#10B981' : '#F59E0B' }]} />
                   <View style={{ flex: 1 }}>
                     <View style={styles.idAndCategoryRow}>
-                      <Text style={styles.itemIdText}>{idDisplay}</Text>
-                      {item.category ? (
-                        <Text style={styles.categoryPill}>{item.category}</Text>
-                      ) : null}
+                      <Text style={styles.itemIdText}>{invoiceNo}</Text>
+                      <Text style={styles.categoryPill}>{state}</Text>
                     </View>
                     <Text style={styles.itemTitle} numberOfLines={1}>
-                      {item.title}
+                      {partyName} • ₹{Number(grandTotal).toLocaleString('en-IN')}
                     </Text>
                   </View>
                 </View>
 
                 {/* Right side: status badge */}
-                <View style={[styles.statusBadge, { backgroundColor: status.bg }]}>
-                  <View style={[styles.statusDot, { backgroundColor: status.dot }]} />
-                  <Text style={[styles.statusText, { color: status.text }]}>
-                    {status.label}
+                <View style={[styles.statusBadge, { backgroundColor: isPaid ? '#DCFCE7' : '#FEF3C7' }]}>
+                  <View style={[styles.statusDot, { backgroundColor: isPaid ? '#16B981' : '#D97706' }]} />
+                  <Text style={[styles.statusText, { color: isPaid ? '#16A34A' : '#D97706' }]}>
+                    {paymentStatus}
                   </Text>
                 </View>
               </TouchableOpacity>

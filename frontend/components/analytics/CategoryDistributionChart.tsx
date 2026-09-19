@@ -39,11 +39,11 @@ export const CategoryDistributionChart: React.FC<CategoryDistributionChartProps>
     <View style={styles.card}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.cardTitle}>Category Breakdown</Text>
-          <Text style={styles.subtitle}>Distribution of incidents by operational category</Text>
+          <Text style={styles.cardTitle}>State-wise & Slabs Breakdown</Text>
+          <Text style={styles.subtitle}>Distribution of invoices by place of supply & category</Text>
         </View>
         <View style={styles.totalBadge}>
-          <Text style={styles.totalBadgeText}>{sum} Total</Text>
+          <Text style={styles.totalBadgeText}>{sum} Bills</Text>
         </View>
       </View>
 

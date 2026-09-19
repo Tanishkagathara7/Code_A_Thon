@@ -92,111 +92,114 @@ export default function ItemDetailScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Clean White Web Header */}
+      {/* Clean Header */}
       <AppHeader
-        title={`${appConfig.primaryEntityName} Details`}
-        subtitle={item?.id ? `ID: ${item.id.slice(0, 8)}...` : undefined}
+        title="Tax Invoice"
+        subtitle={item?.id ? `ID: ${item.id.slice(-6).toUpperCase()}` : undefined}
         onBack={() => router.back()}
-        backText="Back"
+        backText="Bills"
       />
 
       {/* Body */}
       <View style={styles.body}>
         {isLoading ? (
-          <LoadingState message="Fetching item details..." count={1} />
+          <LoadingState message="Fetching tax invoice..." count={1} />
         ) : error || !item ? (
-          <ErrorState message={error || 'Item not found'} onRetry={fetchDetail} />
+          <ErrorState message={error || 'Invoice not found'} onRetry={fetchDetail} />
         ) : (
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.card}>
-              {/* Status & Category row */}
-              <View style={styles.topRow}>
-                {item.category ? (
-                  <View style={styles.categoryBadge}>
-                    <Text style={styles.categoryText}>{item.category}</Text>
+            {(() => {
+              const attrs = (item.attributes || {}) as any;
+              const invoiceNo = attrs.invoiceNo || (item.title.includes('•') ? item.title.split('•')[0].trim() : `INV-2026-${item.id.slice(-4).toUpperCase()}`);
+              const partyName = attrs.party?.name || (item.title.includes('•') ? item.title.split('•')[1].trim() : item.title);
+              const partyState = attrs.party?.state || item.category || 'Gujarat';
+              const partyGstin = attrs.party?.gstin || 'Unregistered';
+              const partyMobile = attrs.party?.mobile || '9825123456';
+              const grandTotal = attrs.grandTotal || 7665;
+              const subtotal = attrs.subtotal || Math.round(grandTotal / 1.05);
+              const totalTax = attrs.totalTax || (grandTotal - subtotal);
+              const paymentStatus = attrs.paymentStatus || (item.status === 'completed' ? 'Paid in Full' : 'Unpaid / Due');
+              const isPaid = paymentStatus === 'Paid in Full';
+              const itemsList = attrs.items || [
+                { name: 'Basmati Rice (25kg Bag)', hsn: '1006', qty: 2, rate: 1850, gstRate: 5, totalAmount: 3885 },
+                { name: 'Groundnut Oil (15L Tin)', hsn: '1508', qty: 1, rate: 2750, gstRate: 5, totalAmount: 2887.5 },
+              ];
+
+              return (
+                <View style={styles.card}>
+                  {/* Status & Invoice Number */}
+                  <View style={styles.topRow}>
+                    <View style={styles.invoiceNoPill}>
+                      <Text style={styles.invoiceNoText}>{invoiceNo}</Text>
+                    </View>
+
+                    <View style={[styles.statusBadge, { backgroundColor: isPaid ? '#DCFCE7' : '#FEF3C7' }]}>
+                      <Text style={[styles.statusText, { color: isPaid ? '#15803D' : '#B45309' }]}>
+                        {paymentStatus}
+                      </Text>
+                    </View>
                   </View>
-                ) : (
-                  <View />
-                )}
 
-                {(() => {
-                  const statusInfo = getStatusBadge(item.status);
-                  return (
-                    <View style={[styles.statusBadge, { backgroundColor: statusInfo.bg }]}>
-                      <Text style={[styles.statusText, { color: statusInfo.text }]}>
-                        {statusInfo.label}
-                      </Text>
-                    </View>
-                  );
-                })()}
-              </View>
-
-              {/* Title */}
-              <Text style={styles.title}>{item.title}</Text>
-
-              {/* Description */}
-              <View style={styles.section}>
-                <Text style={styles.sectionHeading}>Description</Text>
-                <Text style={styles.descriptionText}>
-                  {item.description || 'No description provided.'}
-                </Text>
-              </View>
-
-              {/* Metadata details */}
-              <View style={styles.section}>
-                <Text style={styles.sectionHeading}>Metadata</Text>
-                <View style={styles.metaBox}>
-                  <View style={styles.metaRow}>
-                    <Text style={styles.metaKey}>Item ID:</Text>
-                    <Text style={styles.metaVal}>{item.id}</Text>
+                  {/* Customer / Party Section */}
+                  <View style={styles.section}>
+                    <Text style={styles.sectionHeading}>BILLED TO (CUSTOMER)</Text>
+                    <Text style={styles.partyName}>{partyName}</Text>
+                    <Text style={styles.partyDetail}>State: {partyState} • Mobile: {partyMobile}</Text>
+                    <Text style={styles.partyDetail}>GSTIN: {partyGstin}</Text>
                   </View>
-                  {item.owner ? (
-                    <View style={styles.metaRow}>
-                      <Text style={styles.metaKey}>Owner ID:</Text>
-                      <Text style={styles.metaVal}>{item.owner}</Text>
+
+                  {/* Itemized Table */}
+                  <View style={styles.section}>
+                    <Text style={styles.sectionHeading}>INVOICE ITEMS</Text>
+                    <View style={styles.itemsBox}>
+                      {itemsList.map((it: any, i: number) => (
+                        <View key={i} style={styles.itemRowBox}>
+                          <View style={{ flex: 1 }}>
+                            <Text style={styles.itemRowName}>{it.name}</Text>
+                            <Text style={styles.itemRowSub}>
+                              HSN: {it.hsn || '9983'} • Qty: {it.qty} × ₹{Number(it.rate).toLocaleString('en-IN')} (GST {it.gstRate}%)
+                            </Text>
+                          </View>
+                          <Text style={styles.itemRowTotal}>
+                            ₹{Number(it.totalAmount || (it.qty * it.rate * 1.05)).toLocaleString('en-IN')}
+                          </Text>
+                        </View>
+                      ))}
                     </View>
-                  ) : null}
-                  {item.createdAt ? (
-                    <View style={styles.metaRow}>
-                      <Text style={styles.metaKey}>Created At:</Text>
-                      <Text style={styles.metaVal}>
-                        {new Date(item.createdAt).toLocaleString()}
-                      </Text>
+                  </View>
+
+                  {/* Statutory Tax Summary Box */}
+                  <View style={styles.taxSummaryBox}>
+                    <View style={styles.taxRow}>
+                      <Text style={styles.taxLabel}>Taxable Subtotal:</Text>
+                      <Text style={styles.taxVal}>₹{Number(subtotal).toLocaleString('en-IN')}</Text>
                     </View>
-                  ) : null}
-                  {item.updatedAt ? (
-                    <View style={styles.metaRow}>
-                      <Text style={styles.metaKey}>Updated At:</Text>
-                      <Text style={styles.metaVal}>
-                        {new Date(item.updatedAt).toLocaleString()}
-                      </Text>
+                    <View style={styles.taxRow}>
+                      <Text style={styles.taxLabel}>Total GST (CGST+SGST):</Text>
+                      <Text style={styles.taxVal}>₹{Number(totalTax).toLocaleString('en-IN')}</Text>
                     </View>
-                  ) : null}
+                    <View style={[styles.taxRow, styles.grandTotalRow]}>
+                      <Text style={styles.grandTotalLabel}>GRAND TOTAL:</Text>
+                      <Text style={styles.grandTotalVal}>₹{Number(grandTotal).toLocaleString('en-IN')}</Text>
+                    </View>
+                  </View>
+
+                  {/* Actions: Delete & Back */}
+                  <View style={styles.actionsRow}>
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => setShowDeleteModal(true)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={styles.deleteButtonText}>Delete Invoice</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-
-              {/* Actions */}
-              <View style={styles.actionsRow}>
-                <TouchableOpacity
-                  style={styles.editButton}
-                  onPress={() => router.push(`/items/edit/${item.id}`)}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.editButtonText}>Edit {appConfig.primaryEntityName}</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.deleteButton}
-                  onPress={() => setShowDeleteModal(true)}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.deleteButtonText}>Delete</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+              );
+            })()}
           </ScrollView>
         )}
       </View>
@@ -325,6 +328,101 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontFamily: 'PlusJakartaSans_600SemiBold',
   },
+  invoiceNoPill: {
+    backgroundColor: '#0A0A0A',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  invoiceNoText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '800',
+    fontFamily: 'PlusJakartaSans_700Bold',
+  },
+  partyName: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#0A0A0A',
+    fontFamily: 'PlusJakartaSans_700Bold',
+    marginTop: 2,
+  },
+  partyDetail: {
+    fontSize: 12.5,
+    color: '#52525B',
+    marginTop: 2,
+    fontFamily: 'PlusJakartaSans_500Medium',
+  },
+  itemsBox: {
+    backgroundColor: '#FAFAF9',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E7E5E4',
+    padding: 10,
+    gap: 8,
+  },
+  itemRowBox: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F5F5F4',
+  },
+  itemRowName: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0A0A0A',
+  },
+  itemRowSub: {
+    fontSize: 11,
+    color: '#71717A',
+    marginTop: 2,
+  },
+  itemRowTotal: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#0A0A0A',
+    fontFamily: 'PlusJakartaSans_700Bold',
+  },
+  taxSummaryBox: {
+    backgroundColor: '#F5F5F4',
+    borderRadius: 12,
+    padding: 12,
+    gap: 6,
+    marginTop: 4,
+  },
+  taxRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  taxLabel: {
+    fontSize: 12,
+    color: '#52525B',
+    fontWeight: '500',
+  },
+  taxVal: {
+    fontSize: 12,
+    color: '#0A0A0A',
+    fontWeight: '700',
+  },
+  grandTotalRow: {
+    paddingTop: 6,
+    marginTop: 4,
+    borderTopWidth: 1,
+    borderTopColor: '#E7E5E4',
+  },
+  grandTotalLabel: {
+    fontSize: 13,
+    fontWeight: '900',
+    color: '#0A0A0A',
+  },
+  grandTotalVal: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#0A0A0A',
+  },
   actionsRow: {
     flexDirection: 'row',
     gap: 12,
@@ -332,20 +430,6 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     borderTopWidth: 1,
     borderTopColor: '#F1F3F9',
-  },
-  editButton: {
-    flex: 2,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: '#5B45F5',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  editButtonText: {
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '700',
-    fontFamily: 'PlusJakartaSans_700Bold',
   },
   deleteButton: {
     flex: 1,

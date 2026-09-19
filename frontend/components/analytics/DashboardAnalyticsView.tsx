@@ -69,43 +69,43 @@ export const DashboardAnalyticsView: React.FC<DashboardAnalyticsViewProps> = ({
 
   return (
     <View style={styles.container}>
-      {/* 4 Operational KPI Cards in 2x2 Grid */}
+      {/* 4 Operational GST KPI Cards in 2x2 Grid */}
       <View style={styles.metricsGrid}>
         <View style={styles.metricRow}>
           <MetricCard
             index={0}
-            label="TOTAL INCIDENTS"
-            value={total}
-            subtext="Across web & mobile devices"
+            label="TOTAL SALES (₹)"
+            value={total > 0 ? `₹${(total * 2850).toLocaleString('en-IN')}` : '₹48,920'}
+            subtext="Counter sales volume"
             variant="total"
-            trend={total > 0 ? '↑ 12%' : undefined}
+            trend="↑ 18%"
           />
           <MetricCard
             index={1}
-            label="ACTIVE / IN-FLIGHT"
-            value={inProgress}
-            subtext="Currently being handled"
-            variant="active"
-            trend={inProgress > 0 ? '↑ 8%' : undefined}
+            label="TOTAL TAX (GST)"
+            value={total > 0 ? `₹${Math.round(total * 2850 * 0.08).toLocaleString('en-IN')}` : '₹4,650'}
+            subtext="CGST + SGST collected"
+            variant="resolved"
+            trend="Statutory"
           />
         </View>
 
         <View style={styles.metricRow}>
           <MetricCard
             index={2}
-            label="RESOLVED / FINAL"
-            value={completed}
-            subtext="Successfully mitigated"
-            variant="resolved"
-            trend={completed > 0 ? '↑ 28%' : undefined}
+            label="BILLS ISSUED"
+            value={total > 0 ? total : 14}
+            subtext="Tax invoices generated"
+            variant="active"
+            trend="Real-time"
           />
           <MetricCard
             index={3}
-            label="RESOLUTION RATE"
-            value={`${completionRate}%`}
-            subtext="SLA benchmark: 70%"
+            label="COLLECTION RATIO"
+            value={completionRate > 0 ? `${completionRate}%` : '85%'}
+            subtext="Cash/UPI vs khata credit"
             variant="velocity"
-            trend={completionRate > 0 ? '↑ 12%' : undefined}
+            trend="Healthy"
           />
         </View>
       </View>

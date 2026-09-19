@@ -201,136 +201,101 @@ export default function MarketingPage() {
             {/* Editorial Display Headline — Unified Color with Kinetic Multi-Color Animated Transitions */}
             <div className="hero-headline-wrapper space-y-1.5 sm:space-y-3 max-w-4xl lg:max-w-5xl cursor-default select-none mx-auto py-1">
               <h1 className="text-5xl sm:text-7xl lg:text-[5.25rem] xl:text-[5.75rem] font-extrabold tracking-tight leading-[1.10] sm:leading-[1.07] text-center text-[#1E1B4B]">
-                {/* Line 1: Precision Operations */}
+                {/* Line 1: Effortless GST */}
                 <div className="hero-headline-1 flex flex-wrap items-center justify-center gap-2 sm:gap-3 opacity-0">
-                  {/* Precision */}
                   <span
                     className="hero-anim-word relative inline-block px-1.5 sm:px-2 py-0.5 rounded-xl sm:rounded-2xl"
-                    data-word="precision"
+                    data-word="effortless"
                     data-text-color="#FFFFFF"
-                    data-base-color="#1E1B4B"
+                    data-base-color="#0A0A0A"
+                  >
+                    <span
+                      className="word-highlight-bg absolute inset-0 rounded-xl sm:rounded-2xl opacity-0 pointer-events-none"
+                      style={{ backgroundColor: '#10B981' }}
+                    />
+                    <span className="word-text relative z-10 text-[#0A0A0A] font-extrabold tracking-tight">
+                      Effortless
+                    </span>
+                  </span>
+
+                  <span
+                    className="hero-anim-word relative inline-block px-1.5 sm:px-2 py-0.5 rounded-xl sm:rounded-2xl"
+                    data-word="gst"
+                    data-text-color="#FFFFFF"
+                    data-base-color="#0A0A0A"
                   >
                     <span
                       className="word-highlight-bg absolute inset-0 rounded-xl sm:rounded-2xl opacity-0 pointer-events-none"
                       style={{ backgroundColor: '#2563EB' }}
                     />
-                    <span className="word-text relative z-10 text-[#1E1B4B] font-extrabold tracking-tight">
-                      Precision
-                    </span>
-                  </span>
-
-                  {/* Operations */}
-                  <span
-                    className="hero-anim-word relative inline-block px-1.5 sm:px-2 py-0.5 rounded-xl sm:rounded-2xl"
-                    data-word="operations"
-                    data-text-color="#FFFFFF"
-                    data-base-color="#1E1B4B"
-                  >
-                    <span
-                      className="word-highlight-bg absolute inset-0 rounded-xl sm:rounded-2xl opacity-0 pointer-events-none"
-                      style={{ backgroundColor: '#EC4899' }}
-                    />
-                    <span className="word-text relative z-10 text-[#1E1B4B] font-extrabold tracking-tight">
-                      Operations
+                    <span className="word-text relative z-10 text-[#0A0A0A] font-extrabold tracking-tight">
+                      GST
                     </span>
                   </span>
                 </div>
 
-                {/* Line 2: on Desktop */}
+                {/* Line 2: Invoicing for */}
                 <div className="hero-headline-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 mt-0.5 opacity-0">
                   <span
                     className="hero-anim-word relative inline-block px-1.5 sm:px-2 py-0.5 rounded-xl sm:rounded-2xl"
-                    data-word="on-1"
+                    data-word="invoicing"
                     data-text-color="#FFFFFF"
-                    data-base-color="#1E1B4B"
-                  >
-                    <span
-                      className="word-highlight-bg absolute inset-0 rounded-xl sm:rounded-2xl opacity-0 pointer-events-none"
-                      style={{ backgroundColor: '#10B981' }}
-                    />
-                    <span className="word-text relative z-10 text-[#1E1B4B] font-extrabold tracking-tight">
-                      on
-                    </span>
-                  </span>
-
-                  <span
-                    className="hero-anim-word relative inline-block px-1.5 sm:px-2 py-0.5 rounded-xl sm:rounded-2xl"
-                    data-word="desktop"
-                    data-text-color="#FFFFFF"
-                    data-base-color="#1E1B4B"
+                    data-base-color="#0A0A0A"
                   >
                     <span
                       className="word-highlight-bg absolute inset-0 rounded-xl sm:rounded-2xl opacity-0 pointer-events-none"
                       style={{ backgroundColor: '#F59E0B' }}
                     />
-                    <span className="word-text relative z-10 text-[#1E1B4B] font-extrabold tracking-tight">
-                      Desktop
+                    <span className="word-text relative z-10 text-[#0A0A0A] font-extrabold tracking-tight">
+                      Invoicing
                     </span>
                   </span>
-                </div>
 
-                {/* Line 3: Native Velocity on Mobile. */}
-                <div className="hero-headline-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3 mt-0.5 opacity-0">
                   <span
                     className="hero-anim-word relative inline-block px-1.5 sm:px-2 py-0.5 rounded-xl sm:rounded-2xl"
-                    data-word="native"
+                    data-word="for"
                     data-text-color="#FFFFFF"
-                    data-base-color="#1E1B4B"
+                    data-base-color="#0A0A0A"
                   >
                     <span
                       className="word-highlight-bg absolute inset-0 rounded-xl sm:rounded-2xl opacity-0 pointer-events-none"
                       style={{ backgroundColor: '#6366F1' }}
                     />
-                    <span className="word-text relative z-10 text-[#1E1B4B] font-extrabold tracking-tight">
-                      Native
+                    <span className="word-text relative z-10 text-[#0A0A0A] font-extrabold tracking-tight">
+                      for
                     </span>
                   </span>
+                </div>
 
-                  {/* Velocity */}
+                {/* Line 3: Indian Retailers. */}
+                <div className="hero-headline-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3 mt-0.5 opacity-0">
                   <span
                     className="hero-anim-word relative inline-block px-1.5 sm:px-2 py-0.5 rounded-xl sm:rounded-2xl"
-                    data-word="velocity"
+                    data-word="indian"
                     data-text-color="#FFFFFF"
-                    data-base-color="#1E1B4B"
+                    data-base-color="#0A0A0A"
                   >
                     <span
                       className="word-highlight-bg absolute inset-0 rounded-xl sm:rounded-2xl opacity-0 pointer-events-none"
-                      style={{ backgroundColor: '#8B5CF6' }}
+                      style={{ backgroundColor: '#EC4899' }}
                     />
-                    <span className="word-text relative z-10 text-[#1E1B4B] font-extrabold tracking-tight">
-                      Velocity
+                    <span className="word-text relative z-10 text-[#0A0A0A] font-extrabold tracking-tight">
+                      Indian
                     </span>
                   </span>
 
-                  {/* on */}
                   <span
                     className="hero-anim-word relative inline-block px-1.5 sm:px-2 py-0.5 rounded-xl sm:rounded-2xl"
-                    data-word="on-2"
+                    data-word="retailers"
                     data-text-color="#FFFFFF"
-                    data-base-color="#1E1B4B"
-                  >
-                    <span
-                      className="word-highlight-bg absolute inset-0 rounded-xl sm:rounded-2xl opacity-0 pointer-events-none"
-                      style={{ backgroundColor: '#06B6D4' }}
-                    />
-                    <span className="word-text relative z-10 text-[#1E1B4B] font-extrabold tracking-tight">
-                      on
-                    </span>
-                  </span>
-
-                  {/* Mobile. */}
-                  <span
-                    className="hero-anim-word relative inline-block px-1.5 sm:px-2 py-0.5 rounded-xl sm:rounded-2xl"
-                    data-word="mobile"
-                    data-text-color="#FFFFFF"
-                    data-base-color="#1E1B4B"
+                    data-base-color="#0A0A0A"
                   >
                     <span
                       className="word-highlight-bg absolute inset-0 rounded-xl sm:rounded-2xl opacity-0 pointer-events-none"
                       style={{ backgroundColor: '#10B981' }}
                     />
-                    <span className="word-text relative z-10 text-[#1E1B4B] font-extrabold tracking-tight">
-                      Mobile
+                    <span className="word-text relative z-10 text-[#0A0A0A] font-extrabold tracking-tight">
+                      Retailers.
                     </span>
                   </span>
                 </div>

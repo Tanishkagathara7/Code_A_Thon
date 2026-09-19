@@ -7,6 +7,7 @@ export * from './types/notification';
 export * from './types/productSpec';
 export * from './config/domain.config';
 export * from './config/activeProductSpec';
+export * from './types/gstBilling';
 export * from './constants';
 export * from './validation';
 

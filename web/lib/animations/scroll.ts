@@ -33,17 +33,20 @@ export const initScrollStory = (rootContainer: HTMLElement | null) => {
     // 01 & 01.5 HERO & PRODUCT STAGE SCROLL DEPTH
     // =========================================================================
     if (!isMobile) {
-      gsap.to('.hero-text-container', {
-        y: -50,
-        opacity: 0.88,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '.hero-section',
-          start: 'top top',
-          end: 'bottom 20%',
-          scrub: 1,
-        },
-      });
+      const heroText = document.querySelector('.hero-text-container');
+      if (heroText) {
+        gsap.to(heroText, {
+          y: -50,
+          opacity: 0.88,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: '.hero-section',
+            start: 'top top',
+            end: 'bottom 20%',
+            scrub: 1,
+          },
+        });
+      }
 
       const productHeader = document.querySelector('.product-header');
       if (productHeader) {
@@ -64,24 +67,27 @@ export const initScrollStory = (rootContainer: HTMLElement | null) => {
         );
       }
 
-      gsap.fromTo(
-        '.tablet-3d-body',
-        {
-          y: 20,
-          scale: 0.985,
-        },
-        {
-          y: -25,
-          scale: 1,
-          ease: 'power1.out',
-          scrollTrigger: {
-            trigger: '.product-stage-section',
-            start: 'top 85%',
-            end: 'bottom 40%',
-            scrub: 1.2,
+      const tabletBody = document.querySelector('.tablet-3d-body');
+      if (tabletBody) {
+        gsap.fromTo(
+          tabletBody,
+          {
+            y: 20,
+            scale: 0.985,
           },
-        }
-      );
+          {
+            y: -25,
+            scale: 1,
+            ease: 'power1.out',
+            scrollTrigger: {
+              trigger: '.product-stage-section',
+              start: 'top 85%',
+              end: 'bottom 40%',
+              scrub: 1.2,
+            },
+          }
+        );
+      }
     }
 
     // =========================================================================
@@ -204,9 +210,10 @@ export const initScrollStory = (rootContainer: HTMLElement | null) => {
         );
       }
 
-      if (document.querySelector('.sync-desktop-card')) {
+      const desktopCard = document.querySelector('.sync-desktop-card');
+      if (desktopCard) {
         tl.fromTo(
-          '.sync-desktop-card',
+          desktopCard,
           { x: isMobile ? 0 : -35, y: isMobile ? 25 : 0, opacity: 0 },
           {
             x: 0,
@@ -218,9 +225,10 @@ export const initScrollStory = (rootContainer: HTMLElement | null) => {
           '-=0.2'
         );
       }
-      if (document.querySelector('.sync-mobile-card')) {
+      const mobileCard = document.querySelector('.sync-mobile-card');
+      if (mobileCard) {
         tl.fromTo(
-          '.sync-mobile-card',
+          mobileCard,
           { x: isMobile ? 0 : 35, y: isMobile ? 25 : 0, opacity: 0 },
           {
             x: 0,
@@ -295,9 +303,10 @@ export const initScrollStory = (rootContainer: HTMLElement | null) => {
           { opacity: 1, y: 0, duration: 0.65, ease: MOTION.ease.smooth }
         );
       }
-      if (document.querySelector('.codeathon-visual-frame')) {
+      const codeVisual = document.querySelector('.codeathon-visual-frame');
+      if (codeVisual) {
         tl.fromTo(
-          '.codeathon-visual-frame',
+          codeVisual,
           { opacity: 0, y: 30, scale: 0.97 },
           {
             opacity: 1,
@@ -325,9 +334,10 @@ export const initScrollStory = (rootContainer: HTMLElement | null) => {
         },
       });
 
-      if (document.querySelector('.tanish-portrait-frame')) {
+      const tanishPortrait = document.querySelector('.tanish-portrait-frame');
+      if (tanishPortrait) {
         tl.fromTo(
-          '.tanish-portrait-frame',
+          tanishPortrait,
           { opacity: 0, y: 30, scale: 0.96 },
           { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: MOTION.ease.smooth }
         );

@@ -14,71 +14,81 @@ export const InteractiveDemonstrator: React.FC = () => {
     {
       id: 0,
       phase: '01',
-      title: `${entity} Intake & Schema Validation`,
-      client: 'NEXT.JS CLIENT',
+      title: 'Customer Selection & Item Line Entry',
+      client: 'NEXT.JS POS CLIENT',
       accent: 'blue',
       badgeBg: 'bg-blue-50 text-blue-700 border-blue-200',
       description:
-        `Domain ${entity.toLowerCase()} records created on the desktop workspace validate Mongoose schemas and execute atomic mutations against MongoDB Atlas.`,
+        'Select registered party with GSTIN state identification or quick-add walk-in customer. Add catalog items with HSN codes, unit rates, and quantities.',
       requestMethod: 'POST',
-      requestPath: '/api/items',
+      requestPath: '/api/items (GST Invoicing)',
       payload: `{
-  "title": "Priority ${entity} Dispatch",
-  "category": "${category}",
-  "priority": "high",
-  "status": "in_progress"
+  "invoiceNo": "INV-2026-0089",
+  "party": {
+    "name": "Rajesh Traders",
+    "gstin": "24AABCR1234F1Z9",
+    "state": "Gujarat (24)"
+  },
+  "items": [
+    { "name": "Basmati Rice (25kg)", "hsn": "1006", "qty": 2, "rate": 1850, "gstRate": 5 }
+  ]
 }`,
-      responseStatus: 'HTTP/1.1 201 Created',
-      responseDetail: 'Mongoose Transaction: Verified • MongoDB Atlas: Written',
+      responseStatus: 'HTTP/1.1 200 OK',
+      responseDetail: 'Taxable Subtotal: ₹3,700.00 • Intra-State State Match: True',
       systemMetrics: [
-        { label: 'DB Latency', value: '38ms' },
-        { label: 'Schema Audit', value: 'Strict Type' },
+        { label: 'Subtotal', value: '₹3,700' },
+        { label: 'HSN Match', value: 'Verified' },
       ],
     },
     {
       id: 1,
       phase: '02',
-      title: 'OpenRouter AI Summarization & Task Synthesis',
-      client: 'EXPRESS CORE API',
+      title: 'Real-time GST Split Engine (CGST + SGST vs IGST)',
+      client: 'EXPRESS BILLING CORE',
       accent: 'lavender',
       badgeBg: 'bg-violet-50 text-violet-700 border-violet-200',
       description:
-        'The shared backend dispatches verified records to the OpenRouter AI Gateway to generate operational risk evaluations and action summaries.',
+        'Computes statutory Indian tax rules. Same state splits tax 50:50 between Central and State GST. Out-of-state routing calculates IGST in full.',
       requestMethod: 'POST',
-      requestPath: '/api/ai/generate',
+      requestPath: '/api/tax/compute',
       payload: `{
-  "model": "openrouter/auto",
-  "prompt": "Evaluate current ${entity.toLowerCase()} pipeline for operational risk and dispatch priority."
+  "subtotal": 3700.00,
+  "taxRule": "intra_state_split",
+  "cgst": { "rate": 2.5, "amount": 92.50 },
+  "sgst": { "rate": 2.5, "amount": 92.50 },
+  "totalTax": 185.00,
+  "grandTotal": 3885.00
 }`,
       responseStatus: 'HTTP/1.1 200 OK',
-      responseDetail: 'Gateway: OpenRouter • Tokens Ingested: 284 • Status: Ready',
+      responseDetail: 'Statutory GSTIN Verification: Passed • Mathematical Precision: 100%',
       systemMetrics: [
-        { label: 'AI Gateway', value: 'OpenRouter' },
-        { label: 'Audit Output', value: 'Generated' },
+        { label: 'Total GST', value: '₹185.00' },
+        { label: 'Grand Total', value: '₹3,885.00' },
       ],
     },
     {
       id: 2,
       phase: '03',
-      title: 'Native Mobile Parity & SecureStore Persistence',
-      client: 'REACT NATIVE EXPO',
+      title: 'Printable A4 PDF & Mobile POS Sync',
+      client: 'REACT NATIVE EXPO + WEB PRINT',
       accent: 'green',
       badgeBg: 'bg-emerald-50 text-emerald-700 border-emerald-200',
       description:
-        'Mobile clients receive cache invalidation signals and persist cryptographic session credentials securely via expo-secure-store.',
+        'Generates instant printable A4 GST tax invoice with amount in words and shopkeeper header. Synchronizes bill history directly with mobile counter app.',
       requestMethod: 'GET',
-      requestPath: '/api/items?syncToken=verified',
-      payload: `// Synchronized native payload
+      requestPath: '/api/items/INV-2026-0089/print',
+      payload: `// Synchronized Tax Bill & PDF Record
 {
-  "client": "Expo SDK 57",
-  "secureStoreToken": "Bearer eyJhbGciOiJIUzI1...",
-  "status": "synchronized"
+  "invoiceNo": "INV-2026-0089",
+  "status": "Paid in Full",
+  "amountInWords": "Three Thousand Eight Hundred Eighty-Five Only",
+  "pdfStatus": "Ready for Print & WhatsApp Share"
 }`,
       responseStatus: 'HTTP/1.1 200 OK',
-      responseDetail: 'Client Invalidation: Verified • Gesture UI Re-Render: < 16ms',
+      responseDetail: 'Bill Saved Immutably • Mobile Notification: Delivered (< 20ms)',
       systemMetrics: [
-        { label: 'Sync Delay', value: '< 35ms' },
-        { label: 'Native Storage', value: 'Encrypted' },
+        { label: 'Print Render', value: 'A4 Ready' },
+        { label: 'Invoice State', value: 'Immutable' },
       ],
     },
   ];

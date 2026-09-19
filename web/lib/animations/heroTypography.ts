@@ -13,65 +13,49 @@ export interface WordHighlightItem {
 
 export const HERO_WORD_SEQUENCE: WordHighlightItem[] = [
   {
-    id: 'precision',
-    word: 'Precision',
-    bgColor: '#2563EB',       // Vibrant Royal Blue
+    id: 'effortless',
+    word: 'Effortless',
+    bgColor: '#10B981',       // Soft Emerald
     textColor: '#FFFFFF',     // Crisp White
-    borderColor: '#1D4ED8',
-    shadowColor: 'rgba(37, 99, 235, 0.35)',
-  },
-  {
-    id: 'operations',
-    word: 'Operations',
-    bgColor: '#EC4899',       // Vibrant Magenta / Pink
-    textColor: '#FFFFFF',
-    borderColor: '#DB2777',
-    shadowColor: 'rgba(236, 72, 153, 0.35)',
-  },
-  {
-    id: 'on-1',
-    word: 'on',
-    bgColor: '#10B981',       // Vibrant Emerald
-    textColor: '#FFFFFF',
     borderColor: '#059669',
     shadowColor: 'rgba(16, 185, 129, 0.35)',
   },
   {
-    id: 'desktop',
-    word: 'Desktop',
-    bgColor: '#F59E0B',       // Vibrant Amber / Gold
-    textColor: '#FFFFFF',     // Pure White
+    id: 'gst',
+    word: 'GST',
+    bgColor: '#2563EB',       // Royal Blue
+    textColor: '#FFFFFF',
+    borderColor: '#1D4ED8',
+    shadowColor: 'rgba(37, 99, 235, 0.35)',
+  },
+  {
+    id: 'invoicing',
+    word: 'Invoicing',
+    bgColor: '#F59E0B',       // Amber
+    textColor: '#FFFFFF',
     borderColor: '#D97706',
     shadowColor: 'rgba(245, 158, 11, 0.35)',
   },
   {
-    id: 'native',
-    word: 'Native',
-    bgColor: '#8B5CF6',       // Vibrant Purple / Violet
+    id: 'for',
+    word: 'for',
+    bgColor: '#6366F1',       // Indigo
     textColor: '#FFFFFF',
-    borderColor: '#7C3AED',
-    shadowColor: 'rgba(139, 92, 246, 0.35)',
+    borderColor: '#4F46E5',
+    shadowColor: 'rgba(99, 102, 241, 0.35)',
   },
   {
-    id: 'velocity',
-    word: 'Velocity',
-    bgColor: '#EC4899',       // Vibrant Rose / Pink
+    id: 'indian',
+    word: 'Indian',
+    bgColor: '#EC4899',       // Rose / Pink
     textColor: '#FFFFFF',
     borderColor: '#DB2777',
     shadowColor: 'rgba(236, 72, 153, 0.35)',
   },
   {
-    id: 'on-2',
-    word: 'on',
-    bgColor: '#06B6D4',       // Vibrant Cyan
-    textColor: '#FFFFFF',
-    borderColor: '#0891B2',
-    shadowColor: 'rgba(6, 182, 212, 0.35)',
-  },
-  {
-    id: 'mobile',
-    word: 'Mobile',
-    bgColor: '#10B981',       // Vibrant Emerald
+    id: 'retailers',
+    word: 'Retailers',
+    bgColor: '#10B981',       // Emerald
     textColor: '#FFFFFF',
     borderColor: '#059669',
     shadowColor: 'rgba(16, 185, 129, 0.35)',

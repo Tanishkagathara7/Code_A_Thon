@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Bell, Plus, Menu, Search } from 'lucide-react';
 import { domainConfig } from '@/lib/domain.config';
+import { NotificationPopover } from '@/components/layout/NotificationPopover';
 
 interface TopbarProps {
   unreadCount?: number;
@@ -80,25 +81,16 @@ export const Topbar: React.FC<TopbarProps> = ({
           <Search className="w-4 h-4" />
         </button>
 
-        {/* Notification Bell */}
-        <Link
-          href="/notifications"
-          className="relative p-2 rounded-xl text-[#68728A] hover:text-[#101226] hover:bg-[#F8F9FC] transition-colors"
-          title="Incident Alerts"
-        >
-          <Bell className="w-4 h-4" />
-          {unreadCount > 0 && (
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#EF4444] ring-2 ring-white" />
-          )}
-        </Link>
+        {/* Interactive Notification Popover */}
+        <NotificationPopover />
 
-        {/* New Incident Primary Action */}
+        {/* New Bill Primary Action */}
         <Link
           href="/items/new"
           className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#101226] hover:bg-[#1f2445] text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
         >
           <Plus className="w-3.5 h-3.5" />
-          <span>New Incident</span>
+          <span>Create Bill</span>
         </Link>
       </div>
     </header>

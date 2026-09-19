@@ -94,18 +94,18 @@ export const InteractiveNavbar: React.FC<InteractiveNavbarProps> = ({
           },
         ]}
       >
-        {/* Tab 1: Home / Command */}
+        {/* Tab 1: Home / Dashboard */}
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={() => onSelectTab('home')}
           style={styles.navItem}
           accessibilityRole="tab"
           accessibilityState={{ selected: activeTab === 'home' }}
-          accessibilityLabel="Command Console"
+          accessibilityLabel="Dashboard"
         >
           <NavHomeIcon
             size={24}
-            color={activeTab === 'home' ? '#5B45F5' : '#68728A'}
+            color={activeTab === 'home' ? '#0A0A0A' : '#68728A'}
             focused={activeTab === 'home'}
           />
           <Text
@@ -114,23 +114,23 @@ export const InteractiveNavbar: React.FC<InteractiveNavbarProps> = ({
               activeTab === 'home' ? styles.navLabelActive : styles.navLabelInactive,
             ]}
           >
-            Command
+            Dashboard
           </Text>
           {activeTab === 'home' && <View style={styles.activeIndicator} />}
         </TouchableOpacity>
 
-        {/* Tab 2: Incidents / Items */}
+        {/* Tab 2: Bills & Invoices */}
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={() => onSelectTab('items')}
           style={styles.navItem}
           accessibilityRole="tab"
           accessibilityState={{ selected: activeTab === 'items' }}
-          accessibilityLabel={appConfig.entityPluralName || 'Incidents'}
+          accessibilityLabel="Bills"
         >
           <NavShieldIcon
             size={24}
-            color={activeTab === 'items' ? '#5B45F5' : '#68728A'}
+            color={activeTab === 'items' ? '#0A0A0A' : '#68728A'}
             focused={activeTab === 'items'}
           />
           <Text
@@ -139,7 +139,7 @@ export const InteractiveNavbar: React.FC<InteractiveNavbarProps> = ({
               activeTab === 'items' ? styles.navLabelActive : styles.navLabelInactive,
             ]}
           >
-            {appConfig.entityPluralName || 'Incidents'}
+            Bills
           </Text>
           {activeTab === 'items' && <View style={styles.activeIndicator} />}
         </TouchableOpacity>

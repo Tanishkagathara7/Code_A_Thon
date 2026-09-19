@@ -19,6 +19,7 @@ import {
   X,
 } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';
+import { useNotifications } from '@/lib/context/NotificationContext';
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
@@ -29,23 +30,25 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
-  unreadNotifications = 2,
+  unreadNotifications,
   isOpen = false,
   onClose,
   onOpenCommandPalette,
 }) => {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { unreadCount: contextUnreadCount } = useNotifications();
   const [collapsed, setCollapsed] = useState(false);
+
+  const effectiveUnread = unreadNotifications !== undefined ? unreadNotifications : contextUnreadCount;
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Incident Hub', href: '/items', icon: Layers },
-    { name: 'AI Copilot', href: '/ai-assistant', icon: Sparkles },
-    { name: 'Files & Media', href: '/files', icon: FolderOpen },
-    { name: 'Analytics', href: '/dashboard/analytics', icon: Activity },
-    { name: 'Notifications', href: '/notifications', icon: Bell, badge: unreadNotifications || 2 },
-    { name: 'Settings', href: '/settings', icon: Settings },
+    { name: 'Create Bill', href: '/items/new', icon: Sparkles },
+    { name: 'Bills & Invoices', href: '/items', icon: Layers },
+    { name: 'Sales Analytics', href: '/dashboard/analytics', icon: Activity },
+    { name: 'Notifications', href: '/notifications', icon: Bell, badge: effectiveUnread > 0 ? effectiveUnread : undefined },
+    { name: 'Settings & Profile', href: '/settings', icon: Settings },
   ];
 
   const userRole = user?.role || 'operator';
@@ -106,7 +109,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     GST Billing
                   </span>
                   <span className="text-[9px] font-bold tracking-[0.06em] text-[#8C95A6] mt-1 uppercase">
-                    SYSTEM DASHBOARD
+                    BILLING & POS SUITE
                   </span>
                 </div>
               )}

@@ -24,25 +24,25 @@ interface DomainFormProps {
 
 const STATUS_OPTIONS: { key: ItemStatus; label: string; activeBorder: string; activeBg: string; activeText: string }[] = [
   {
-    key: 'pending',
-    label: 'Triage / Pending',
-    activeBorder: '#F59E0B',
-    activeBg: '#FEF3C7',
-    activeText: '#B45309',
+    key: 'completed',
+    label: 'Paid in Full',
+    activeBorder: '#10B981',
+    activeBg: '#DCFCE7',
+    activeText: '#15803D',
   },
   {
     key: 'in_progress',
-    label: 'In Transit / Active',
+    label: 'Partial Balance',
     activeBorder: '#5B45F5',
     activeBg: '#EDE9FE',
     activeText: '#5B45F5',
   },
   {
-    key: 'completed',
-    label: 'Resolved / Done',
-    activeBorder: '#10B981',
-    activeBg: '#DCFCE7',
-    activeText: '#15803D',
+    key: 'pending',
+    label: 'Unpaid / Due',
+    activeBorder: '#F59E0B',
+    activeBg: '#FEF3C7',
+    activeText: '#B45309',
   },
 ];
 

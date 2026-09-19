@@ -47,23 +47,23 @@ export const DefaultTheme: AppTheme = {
   appName: 'GST Billing',
   logoText: 'GST Billing',
   colors: {
-    background: '#F8F9FC',      // Web clean canvas background
-    surface: '#FFFFFF',         // Crisp white card background
-    surfaceHover: '#F1F3F9',    // Subtle interactive state
-    text: '#101226',            // High-contrast primary brand text
-    mutedText: '#68728A',       // Neutral 500 body text
-    subtleText: '#94A3B8',      // Neutral 400 helper text
-    border: '#E6E9F0',          // Subtle light border matching web
-    borderFocus: '#5B45F5',     // Focused border ring with brand purple
-    accent: '#5B45F5',          // Pulse brand purple accent
+    background: '#F7F5EF',      // Warm neutral paper canvas
+    surface: '#FFFDF8',         // Warm card background
+    surfaceHover: '#F4F7FB',    // Soft blue interactive tint
+    text: '#0A0A0A',            // Primary deep legible ink
+    mutedText: '#525866',       // Secondary slate neutral grey
+    subtleText: '#868C98',      // Subtle helper text
+    border: '#E2E4E9',          // Hairline warm subtle border
+    borderFocus: '#0A0A0A',     // High-contrast ink border ring
+    accent: '#0A0A0A',          // Deep structural ink accent
     accentText: '#FFFFFF',
-    error: '#EF4444',
+    error: '#DC2626',
     errorBg: '#FEE2E2',
-    success: '#16B981',
-    successBg: '#DCFCE7',
+    success: '#16A34A',
+    successBg: '#F1F8F2',       // Soft mint tint
     socialBg: '#FFFFFF',
-    socialBorder: '#E6E9F0',
-    socialText: '#101226',
+    socialBorder: '#E2E4E9',
+    socialText: '#0A0A0A',
   },
   spacing: {
     xs: 4,

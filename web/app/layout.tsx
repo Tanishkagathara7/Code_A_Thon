@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/lib/context/AuthContext';
 import { ToastProvider } from '@/lib/context/ToastContext';
+import { NotificationProvider } from '@/lib/context/NotificationContext';
 import { LoadingProvider } from '@/lib/context/LoadingContext';
 import { SITE_CONFIG, getSiteUrl } from '@/lib/seo';
 
@@ -79,9 +80,11 @@ export default function RootLayout({
       <body className="bg-[#FAFAF7] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white min-h-screen">
         <AuthProvider>
           <ToastProvider>
-            <LoadingProvider>
-              {children}
-            </LoadingProvider>
+            <NotificationProvider>
+              <LoadingProvider>
+                {children}
+              </LoadingProvider>
+            </NotificationProvider>
           </ToastProvider>
         </AuthProvider>
       </body>

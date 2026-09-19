@@ -27,7 +27,6 @@ import { CategoryDistributionChart } from '../components/analytics/CategoryDistr
 import { ActivityTrendChart } from '../components/analytics/ActivityTrendChart';
 import { MobileCopilotCard } from '../components/ai/MobileCopilotCard';
 import { DashboardRecentIncidents } from '../components/domain/DashboardRecentIncidents';
-import { MobileServiceHealth } from '../components/domain/MobileServiceHealth';
 import { NotificationBadge } from '../components/notifications/NotificationBadge';
 import { ProfileSettingsView } from '../components/profile/ProfileSettingsView';
 import { appConfig } from '../config/appConfig';
@@ -172,32 +171,40 @@ export default function HomeScreen() {
           }
         >
           {/* ========================================================
-              1. OPERATIONAL COMMAND CENTER HERO CARD
+              1. GST BILLING & SALES HUB HERO CARD (MATCHING WEB)
              ======================================================== */}
           <View style={styles.heroCard}>
-            {/* Top Row: Mesh Badge & Role Pill */}
+            {/* Top Row: GSTIN Badge & Fiscal Year Pill */}
             <View style={styles.heroBadgeRow}>
-              <View style={styles.meshPill}>
-                <View style={styles.meshPulseDot} />
-                <Text style={styles.meshText}>PULSE DISPATCH MESH</Text>
+              <View style={styles.gstinPill}>
+                <View style={styles.gstinPulseDot} />
+                <Text style={styles.gstinText}>GSTIN: 24AAACV1234F1Z5</Text>
               </View>
 
               <View style={styles.rolePill}>
-                <View style={styles.roleDot} />
                 <Text style={styles.roleText}>
-                  ROLE: <Text style={styles.roleHighlight}>{userRole}</Text>
+                  FY <Text style={styles.roleHighlight}>2025-26</Text>
                 </Text>
               </View>
             </View>
 
             {/* Title & Subtitle */}
-            <Text style={styles.heroTitle}>Operational Command Center</Text>
+            <Text style={styles.heroTitle}>GST Billing & Sales Hub</Text>
             <Text style={styles.heroSubtitle}>
-              Monitor incidents across web and mobile, analyze telemetry in real time, and coordinate faster with AI-powered intelligence.
+              Create compliant tax invoices, split CGST/SGST/IGST automatically, print A4 receipts, and reconcile party khata ledgers with zero latency.
             </Text>
 
-            {/* Action Buttons: Incident Ledger & Log Incident */}
+            {/* Action Buttons: Create New Bill & Bill History */}
             <View style={styles.heroActionRow}>
+              <TouchableOpacity
+                style={styles.primaryButton}
+                activeOpacity={0.8}
+                onPress={() => router.push('/items/create')}
+              >
+                <Text style={{ color: '#10B981', fontWeight: '900', fontSize: 16 }}>+</Text>
+                <Text style={styles.primaryButtonText}>Create New Bill</Text>
+              </TouchableOpacity>
+
               <TouchableOpacity
                 style={styles.secondaryButton}
                 activeOpacity={0.8}
@@ -206,50 +213,33 @@ export default function HomeScreen() {
                 <Svg width={15} height={15} viewBox="0 0 24 24" fill="none">
                   <Path
                     d="M12 2L2 7L12 12L22 7L12 2Z"
-                    stroke="#68728A"
+                    stroke="#0A0A0A"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                   <Path
                     d="M2 17L12 22L22 17"
-                    stroke="#68728A"
+                    stroke="#0A0A0A"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                 </Svg>
-                <Text style={styles.secondaryButtonText}>Incident Ledger</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.primaryButton}
-                activeOpacity={0.8}
-                onPress={() => router.push('/items/create')}
-              >
-                <Svg width={15} height={15} viewBox="0 0 24 24" fill="none">
-                  <Path
-                    d="M12 5V19M5 12H19"
-                    stroke="#FFFFFF"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </Svg>
-                <Text style={styles.primaryButtonText}>Log Incident</Text>
+                <Text style={styles.secondaryButtonText}>Bill History</Text>
               </TouchableOpacity>
             </View>
 
-            {/* Lifecycle Status Stepper Line matching Web */}
+            {/* Statutory Compliance Line */}
             <View style={styles.lifecycleRow}>
               <View style={styles.stepGroup}>
-                <Text style={styles.stepActive}>OBSERVE</Text>
+                <Text style={styles.stepActive}>FAST COUNTER POS</Text>
                 <Text style={styles.stepDivider}>•</Text>
-                <Text style={styles.stepInactive}>INVESTIGATE</Text>
+                <Text style={styles.stepActive}>CGST / SGST 50:50</Text>
                 <Text style={styles.stepDivider}>•</Text>
-                <Text style={styles.stepInactive}>RESOLVE</Text>
+                <Text style={styles.stepActive}>IGST 100%</Text>
                 <Text style={styles.stepDivider}>•</Text>
-                <Text style={styles.stepInactive}>IMPROVE</Text>
+                <Text style={styles.stepActive}>A4 PRINT READY</Text>
               </View>
             </View>
           </View>
@@ -299,11 +289,6 @@ export default function HomeScreen() {
               totalCount={overview.total}
             />
           )}
-
-          {/* ========================================================
-              7. SERVICE HEALTH INFRASTRUCTURE SECTION
-             ======================================================== */}
-          <MobileServiceHealth />
         </ScrollView>
       );
     }
@@ -348,13 +333,13 @@ export default function HomeScreen() {
               resizeMode="contain"
             />
             <View>
-              <Text style={styles.appNameText}>{appConfig.appName}</Text>
+              <Text style={styles.appNameText}>GST Billing</Text>
               <Text style={styles.appSubText}>
                 {activeTab === 'profile'
                   ? 'Operator Profile & Settings'
                   : activeTab === 'ai'
                   ? 'Copilot Gateway'
-                  : 'Command Console'}
+                  : 'Billing & POS Suite'}
               </Text>
             </View>
           </View>
@@ -542,32 +527,45 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     backgroundColor: '#16B981',
   },
-  meshText: {
+  gstinPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#ECFDF5',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#A7F3D0',
+  },
+  gstinPulseDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#059669',
+  },
+  gstinText: {
     fontSize: 9.5,
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: '#047857',
     fontFamily: 'PlusJakartaSans_700Bold',
-    letterSpacing: 0.6,
+    letterSpacing: 0.3,
   },
   rolePill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: '#EDE9FE',
+    backgroundColor: '#F4F7FB',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 16,
-  },
-  roleDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: '#5B45F5',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
   roleText: {
     fontSize: 9.5,
     fontWeight: '700',
-    color: '#5B45F5',
+    color: '#334155',
     fontFamily: 'PlusJakartaSans_700Bold',
   },
   roleHighlight: {
@@ -576,7 +574,7 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 22,
     fontWeight: '900',
-    color: '#101226',
+    color: '#0A0A0A',
     fontFamily: 'PlusJakartaSans_700Bold',
     letterSpacing: -0.4,
     marginBottom: 6,
@@ -608,7 +606,7 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#101226',
+    color: '#0A0A0A',
     fontFamily: 'PlusJakartaSans_700Bold',
   },
   primaryButton: {
@@ -619,12 +617,12 @@ const styles = StyleSheet.create({
     gap: 6,
     height: 40,
     borderRadius: 12,
-    backgroundColor: '#5B45F5',
+    backgroundColor: '#0A0A0A',
     ...Platform.select({
       ios: {
-        shadowColor: '#5B45F5',
+        shadowColor: '#000000',
         shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.28,
+        shadowOpacity: 0.2,
         shadowRadius: 6,
       },
       android: {

@@ -11,6 +11,7 @@ export interface DomainEntity {
   status: ItemStatus;
   category?: string;
   priority?: string;
+  attributes?: Record<string, any>;
   owner?: string;
   createdAt: string;
   updatedAt: string;
