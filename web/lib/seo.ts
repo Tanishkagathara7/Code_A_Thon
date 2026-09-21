@@ -5,12 +5,16 @@
 
 export const SITE_CONFIG = {
   name: 'VyaaparGST',
-  fullName: 'VyaaparGST — Bill Smarter, Grow Faster',
+  fullName: 'VyaaparGST — Code-A-Thon Project | Modern GST Invoicing & Retail Billing Software',
   shortDescription:
-    'Modern GST Billing & Invoicing System with real-time cross-platform synchronization across Web and Mobile.',
+    'VyaaparGST Code-A-Thon Project: Fast, compliant GST Billing & Invoicing System with real-time cross-platform synchronization across Web and Mobile.',
   fullDescription:
-    'VyaaparGST is a high-speed, compliant invoicing and tax management system. Generate GST-compliant invoices, track payments, monitor sales analytics, and manage client accounts with real-time sync across web and mobile clients.',
+    'VyaaparGST is a high-speed, compliant invoicing and tax management system developed for Code-A-Thon. Generate GST-compliant invoices, track payments, monitor sales analytics, and manage client accounts with real-time sync across web and mobile clients.',
   defaultKeywords: [
+    'Code-A-Thon',
+    'Code-A-Thon VyaaparGST',
+    'Code-A-Thon project',
+    'code-a-thon-one',
     'VyaaparGST',
     'GST Billing software',
     'retail billing software',
@@ -25,7 +29,7 @@ export const SITE_CONFIG = {
     'business accounting',
     'inventory and billing',
   ],
-  author: 'VyaaparGST Engineering Team',
+  author: 'VyaaparGST Code-A-Thon Team',
   twitterHandle: '@VyaaparGST',
   themeColor: '#FAFAFA',
 };

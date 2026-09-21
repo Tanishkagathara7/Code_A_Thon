@@ -68,6 +68,9 @@ export const MarketingNav: React.FC = () => {
             <span className="font-extrabold tracking-tight text-zinc-950 text-lg">
               {domainConfig.brand.name}
             </span>
+            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/80">
+              Code-A-Thon
+            </span>
           </div>
         </Link>
 

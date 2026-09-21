@@ -41,7 +41,7 @@ export const MarketingFooter: React.FC<{ className?: string }> = ({ className = 
         </div>
 
         <div className="text-zinc-500 font-mono text-[11px]">
-          © {new Date().getFullYear()} {domainConfig.brand.name} • All rights reserved.
+          © {new Date().getFullYear()} {domainConfig.brand.name} • Code-A-Thon Project • All rights reserved.
         </div>
       </div>
     </footer>
