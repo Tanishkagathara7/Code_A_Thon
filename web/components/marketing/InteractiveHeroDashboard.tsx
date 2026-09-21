@@ -722,6 +722,7 @@ export const InteractiveHeroDashboard: React.FC = () => {
           <div className="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-zinc-200 space-y-3">
             <div className="flex items-center justify-between border-b pb-2">
               <div>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">INVOICE PREVIEW</p>
                 <h4 className="text-xs font-bold text-zinc-900 font-mono">{selectedInvoice.invoiceNo}</h4>
                 <p className="text-[10px] text-zinc-500">Tax Invoice Receipt Preview</p>
               </div>

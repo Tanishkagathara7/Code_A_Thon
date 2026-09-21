@@ -1,24 +1,21 @@
 import { Metadata } from 'next';
-import { SITE_CONFIG } from '@/lib/seo';
+import { getSiteUrl } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: 'Create an Account — Launch Workspace',
+  title: 'Sign Up — Free GST Invoicing & Billing Software',
   description:
-    'Join APP. Deploy high-velocity, synchronized cross-platform intelligence across desktop and native mobile apps.',
+    'Create your VyaaparGST account to generate compliant Indian GST invoices in 30 seconds. Free retail billing with automated CGST/SGST/IGST tax calculation.',
   alternates: {
-    canonical: '/signup',
+    canonical: `${getSiteUrl()}/signup`,
   },
   openGraph: {
-    title: `Create Account | ${SITE_CONFIG.name}`,
-    description: 'Create an account to deploy synchronized operational workflows.',
-    url: '/signup',
+    title: 'Create Account — VyaaparGST Billing Suite',
+    description:
+      'Start billing smarter with VyaaparGST. Effortless GST invoicing, customer party khata, and printable A4 invoices.',
+    url: `${getSiteUrl()}/signup`,
   },
 };
 
-export default function SignupLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function SignupLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

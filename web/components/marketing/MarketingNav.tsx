@@ -57,7 +57,7 @@ export const MarketingNav: React.FC = () => {
           <div className="w-11 h-11 rounded-xl overflow-hidden shadow-md shadow-zinc-950/10 border border-zinc-200/90 group-hover:scale-105 transition-transform flex items-center justify-center bg-white p-0.5 shrink-0">
             <Image
               src="/icon.png"
-              alt="GST Billing"
+              alt="VyaaparGST — Modern GST Billing & Invoicing Platform"
               width={44}
               height={44}
               className="object-contain w-full h-full scale-110"

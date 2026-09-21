@@ -13,7 +13,7 @@ export const MarketingFooter: React.FC<{ className?: string }> = ({ className = 
           <div className="w-9 h-9 rounded-xl overflow-hidden border border-zinc-200/90 shadow-xs flex items-center justify-center bg-white p-0.5 shrink-0">
             <Image
               src="/icon.png"
-              alt="GST Billing Logo"
+              alt="VyaaparGST — Modern GST Billing & Tax Invoicing Software Logo"
               width={36}
               height={36}
               className="object-contain w-full h-full scale-110"
@@ -32,8 +32,8 @@ export const MarketingFooter: React.FC<{ className?: string }> = ({ className = 
           <Link href="/#product" className="hover:text-zinc-950 transition-colors">
             Product
           </Link>
-          <Link href="/#architecture" className="hover:text-zinc-950 transition-colors">
-            Architecture
+          <Link href="/#tax-engine" className="hover:text-zinc-950 transition-colors">
+            GST Engine
           </Link>
           <Link href="/#faq" className="hover:text-zinc-950 transition-colors">
             FAQ

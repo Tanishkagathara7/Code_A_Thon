@@ -144,7 +144,7 @@ export function UnifiedAuthView({ initialMode = 'signin' }: AuthPageProps) {
             <div className="relative aspect-square w-full max-w-[340px] rounded-3xl overflow-hidden shadow-2xl border border-black/[0.06] bg-white flex items-center justify-center cursor-pointer p-4 group">
               <Image
                 src="/logo.png"
-                alt="GST Billing"
+                alt="VyaaparGST — Modern GST Billing & Tax Invoicing Software"
                 fill
                 priority
                 sizes="340px"
@@ -152,6 +152,26 @@ export function UnifiedAuthView({ initialMode = 'signin' }: AuthPageProps) {
               />
             </div>
           </TiltCard>
+
+          {/* Value proposition feature list for search crawlers & visitors */}
+          <div className="mt-5 space-y-2.5 max-w-md text-xs text-zinc-600 bg-white/70 backdrop-blur-sm p-4 rounded-2xl border border-black/[0.06]">
+            <div className="flex items-center gap-2 text-zinc-800 font-semibold">
+              <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span>Instant 30-Second GST Tax Invoicing &amp; Cash Memo</span>
+            </div>
+            <div className="flex items-center gap-2 text-zinc-800 font-semibold">
+              <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span>Automated 50:50 CGST/SGST &amp; 100% IGST Tax Engine</span>
+            </div>
+            <div className="flex items-center gap-2 text-zinc-800 font-semibold">
+              <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span>Customer Party Khata Ledger &amp; Balance Reconciliation</span>
+            </div>
+            <div className="flex items-center gap-2 text-zinc-800 font-semibold">
+              <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span>Standard A4 Printable PDF Tax Invoices &amp; Thermal Receipts</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -206,9 +226,9 @@ export function UnifiedAuthView({ initialMode = 'signin' }: AuthPageProps) {
 
           {/* Header */}
           <div className="space-y-1 mb-6">
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-950 transition-all duration-300">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-950 transition-all duration-300">
               {mode === 'signin' ? `Sign in to ${domainConfig.brand.name}` : `Join ${domainConfig.brand.name}`}
-            </h2>
+            </h1>
             <p className="text-xs sm:text-sm text-zinc-500">
               {mode === 'signin'
                 ? `Enter credentials to access the ${domainConfig.brand.name} operations center.`

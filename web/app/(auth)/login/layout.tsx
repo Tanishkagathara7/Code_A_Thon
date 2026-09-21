@@ -1,24 +1,21 @@
 import { Metadata } from 'next';
-import { SITE_CONFIG } from '@/lib/seo';
+import { getSiteUrl } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: 'Sign In to Workspace',
+  title: 'Sign In — Access Your Billing Workspace',
   description:
-    'Log in to APP. Access synchronized real-time cross-platform operations across Next.js and React Native.',
+    'Log in to your VyaaparGST account to manage customers, inventory items, generate GST tax invoices, and track retail sales.',
   alternates: {
-    canonical: '/login',
+    canonical: `${getSiteUrl()}/login`,
   },
   openGraph: {
-    title: `Sign In | ${SITE_CONFIG.name}`,
-    description: 'Log in to access your synchronized operational intelligence workspace.',
-    url: '/login',
+    title: 'Sign In — VyaaparGST',
+    description:
+      'Access your VyaaparGST billing workspace, customer khata ledger, and instant A4 invoice printer.',
+    url: `${getSiteUrl()}/login`,
   },
 };
 
-export default function LoginLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LoginLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

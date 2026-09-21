@@ -87,6 +87,84 @@ export default function MarketingPage() {
         name: SITE_CONFIG.author,
       },
     },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'How does VyaaparGST calculate intra-state vs. inter-state GST?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The tax engine compares your business operating state (e.g. Gujarat, State Code 24) with the customer’s place of supply state. If the buyer is also located in Gujarat, the item GST slab rate is divided 50:50 into Central Tax (CGST) and State Tax (SGST). If the buyer is located outside Gujarat (e.g. Maharashtra, State Code 27), the full GST percentage is applied as Integrated Tax (IGST) in accordance with Indian tax rules.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can I generate tax invoices for walk-in retail customers without a GSTIN?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. The GSTIN field is completely optional. For retail counter B2C sales, simply provide the customer’s name and mobile number. The system generates a valid Tax Invoice with full itemized rates, HSN codes, and tax totals.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Are saved invoices editable after generation?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'To comply with statutory accounting requirements and prevent audit tampering, finalized invoices are saved immutably with sequential numbering (e.g. INV-2026-4749). If a correction is needed, shopkeepers can delete the draft record or issue a new bill.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does invoice printing and PDF export work?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Every bill is rendered in standard A4 portrait format with clean CSS print styles. Clicking "Print / Export PDF" launches the browser print dialog where you can save as a PDF or print directly to any office laser, inkjet, or thermal printer without extra software.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can I access VyaaparGST from any web browser or tablet?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. VyaaparGST is built on Next.js and operates entirely in modern web browsers (Chrome, Edge, Safari, Firefox) on desktop monitors, laptops, and tablets. No manual software installation or database drivers are required.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Which GST rate slabs are supported?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'VyaaparGST natively supports standard Indian GST slabs: 0% (exempt goods), 5% (essentials/foodgrains), 12% (processed goods), 18% (electronics/general retail), and 28% (luxury items), with automatic calculation of taxable values and tax splits per line item.',
+          },
+        },
+      ],
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: siteUrl,
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Sign In',
+          item: `${siteUrl}/login`,
+        },
+        {
+          '@type': 'ListItem',
+          position: 3,
+          name: 'Sign Up',
+          item: `${siteUrl}/signup`,
+        },
+      ],
+    },
   ];
 
   const { isLoading } = useLoading();
@@ -306,11 +384,16 @@ export default function MarketingPage() {
            ======================================================== */}
         <section id="product" className="product-stage-section relative pt-6 sm:pt-10 pb-8 sm:pb-12 px-4 sm:px-6 border-b border-black/[0.06] scroll-mt-20">
           <div className="max-w-6xl mx-auto relative z-10 space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
-                {'// 01. INTERACTIVE GST DASHBOARD & SALES LEDGER'}
-              </span>
-              <span className="text-xs text-zinc-500 font-mono hidden sm:inline">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <div>
+                <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-500 block">
+                  {'// 01. INTERACTIVE GST DASHBOARD & SALES LEDGER'}
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 mt-1">
+                  Live Retail Billing &amp; Sales Command Center
+                </h2>
+              </div>
+              <span className="text-xs text-zinc-500 font-mono hidden sm:inline self-end">
                 Live Simulation • Click buttons to test
               </span>
             </div>
