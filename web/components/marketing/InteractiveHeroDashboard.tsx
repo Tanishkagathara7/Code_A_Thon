@@ -567,6 +567,7 @@ export const InteractiveHeroDashboard: React.FC = () => {
             <form onSubmit={handleCustomCopilotSubmit} className="pt-2 flex items-center gap-2">
               <input
                 type="text"
+                aria-label="Ask GST Copilot a question"
                 value={copilotPrompt}
                 onChange={(e) => setCopilotPrompt(e.target.value)}
                 placeholder="Ask about GST slabs or HSN..."
@@ -574,6 +575,7 @@ export const InteractiveHeroDashboard: React.FC = () => {
               />
               <button
                 type="submit"
+                aria-label="Submit question to GST Copilot"
                 disabled={copilotLoading || !copilotPrompt.trim()}
                 className="w-8 h-8 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center disabled:opacity-40 cursor-pointer shrink-0"
               >

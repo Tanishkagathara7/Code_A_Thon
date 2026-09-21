@@ -218,6 +218,7 @@ export default function MarketingPage() {
         <JsonLd data={jsonLdSchemas} />
         <MarketingNav />
 
+        <main id="main-content">
         {/* ========================================================
             01. HERO SECTION: EDITORIAL HEADLINE & VALUE PROPOSITION
            ======================================================== */}
@@ -608,6 +609,7 @@ export default function MarketingPage() {
             </div>
           </div>
         </section>
+        </main>
 
         {/* ========================================================
             10. TECHNICAL FOOTER

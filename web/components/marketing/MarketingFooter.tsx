@@ -40,7 +40,7 @@ export const MarketingFooter: React.FC<{ className?: string }> = ({ className = 
           </Link>
         </div>
 
-        <div className="text-zinc-400 font-mono text-[11px]">
+        <div className="text-zinc-500 font-mono text-[11px]">
           © {new Date().getFullYear()} {domainConfig.brand.name} • All rights reserved.
         </div>
       </div>
