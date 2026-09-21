@@ -19,10 +19,10 @@ export default function NotFound() {
       <div className="max-w-4xl mx-auto w-full flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5 group">
           <div className="w-8 h-8 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-bold text-xs tracking-wider shadow-sm group-hover:bg-zinc-800 transition-colors">
-            A
+            VG
           </div>
           <span className="text-sm font-bold tracking-tight text-zinc-950">
-            APP
+            VyaaparGST
           </span>
         </Link>
         <span className="font-mono text-xs text-zinc-400">STATUS // 404</span>
@@ -63,7 +63,7 @@ export default function NotFound() {
 
       {/* Footer */}
       <div className="max-w-4xl mx-auto w-full text-center text-xs font-mono text-zinc-400 border-t border-black/[0.05] pt-6">
-        APP CROSS-PLATFORM OPERATIONAL ARCHITECTURE
+        VYAAPARGST CROSS-PLATFORM OPERATIONAL ARCHITECTURE
       </div>
     </div>
   );

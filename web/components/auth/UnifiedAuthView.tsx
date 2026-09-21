@@ -154,23 +154,26 @@ export function UnifiedAuthView({ initialMode = 'signin' }: AuthPageProps) {
           </TiltCard>
 
           {/* Value proposition feature list for search crawlers & visitors */}
-          <div className="mt-5 space-y-2.5 max-w-md text-xs text-zinc-600 bg-white/70 backdrop-blur-sm p-4 rounded-2xl border border-black/[0.06]">
+          <div className="mt-5 space-y-3 max-w-md text-xs text-zinc-600 bg-white/70 backdrop-blur-sm p-4 rounded-2xl border border-black/[0.06]">
             <div className="flex items-center gap-2 text-zinc-800 font-semibold">
               <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span>Instant 30-Second GST Tax Invoicing &amp; Cash Memo</span>
+              <span>Instant 30-Second GST Tax Invoicing &amp; Cash Memo Generation</span>
             </div>
             <div className="flex items-center gap-2 text-zinc-800 font-semibold">
               <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span>Automated 50:50 CGST/SGST &amp; 100% IGST Tax Engine</span>
+              <span>Automated 50:50 CGST/SGST &amp; 100% IGST Tax Computation Engine</span>
             </div>
             <div className="flex items-center gap-2 text-zinc-800 font-semibold">
               <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span>Customer Party Khata Ledger &amp; Balance Reconciliation</span>
+              <span>Customer Party Khata Ledger, Balance Tracking &amp; Payment History</span>
             </div>
             <div className="flex items-center gap-2 text-zinc-800 font-semibold">
               <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span>Standard A4 Printable PDF Tax Invoices &amp; Thermal Receipts</span>
+              <span>Standard A4 Printable PDF Tax Invoices &amp; 80mm Thermal Receipts</span>
             </div>
+            <p className="pt-2 text-[11px] text-zinc-500 leading-relaxed border-t border-black/[0.05]">
+              VyaaparGST provides enterprise-grade Indian GST billing compliance for retail shopkeepers, wholesale distributors, and trade counters. Sign in or create a free account to manage inventory items, verify HSN codes, compute accurate tax splits, and issue compliant GST invoices with zero sync latency across web and mobile workspaces.
+            </p>
           </div>
         </div>
       </div>

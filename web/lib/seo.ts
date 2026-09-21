@@ -5,7 +5,7 @@
 
 export const SITE_CONFIG = {
   name: 'VyaaparGST',
-  fullName: 'VyaaparGST — Code-A-Thon Project | Modern GST Invoicing & Retail Billing Software',
+  fullName: 'VyaaparGST — Code-A-Thon GST Invoicing & Retail Billing',
   shortDescription:
     'VyaaparGST Code-A-Thon Project: Fast, compliant GST Billing & Invoicing System with real-time cross-platform synchronization across Web and Mobile.',
   fullDescription:
